@@ -144,6 +144,8 @@ class Settings {
 	static QString sourcePath();
 	static QString importPath();
 	static QString selfTestPath();
+	/// 题面目录：每个比赛日下的 `statement/`（固定放 statement.md 与 statement.pdf）。
+	static QString statementPath();
 	/// 交互库 / 校验器只允许放在 <题>/graders/ 下，返回相对 dataPath() 的该目录（带结尾分隔符）。
 	static QString gradersPath(const QString &taskName);
 	/// <题>/graders/<文件>（相对 dataPath()），与工程中保存交互库路径的格式一致。

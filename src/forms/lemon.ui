@@ -438,6 +438,26 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="statementTab">
+       <attribute name="title">
+        <string>Statement</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="StatementEditWidget" name="statementEdit" native="true">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="statusTip">
+           <string>Edit the statement of this contest day...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -983,6 +1003,12 @@
    <class>StatisticsBrowser</class>
    <extends>QWidget</extends>
    <header>statisticsbrowser.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>StatementEditWidget</class>
+   <extends>QWidget</extends>
+   <header>statementeditwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -656,3 +656,6 @@ void Settings::ensureTaskDirs(const QString &taskName) {
 }
 
 auto Settings::selfTestPath() -> QString { return QString("selftest") + QDir::separator(); }
+
+// 每个比赛日一个 statement/ 目录：题面 markdown 与导出的 PDF 都固定放在这里。
+auto Settings::statementPath() -> QString { return QString("statement") + QDir::separator(); }

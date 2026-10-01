@@ -132,6 +132,8 @@ void LemonLime::changeEvent(QEvent *event) {
 }
 
 void LemonLime::closeEvent(QCloseEvent * /*event*/) {
+	ui->statementEdit->saveIfNeeded();
+
 	if (curContest)
 		saveContest(curFile);
 
@@ -628,12 +630,39 @@ void LemonLime::contestantDeleted() {
 }
 
 void LemonLime::saveContest(const QString &fileName) {
-	QFile file(fileName);
+	if (fileName.isEmpty())
+		return;
+
+	// curFile 以前只存文件名，完全依赖当前工作目录；工作目录一旦被切走
+	// （例如误把工程文件当成比赛日载入），保存就会写进别的文件里。这里统一用绝对路径。
+	const QString target = QFileInfo(fileName).absoluteFilePath();
+
+	// 工程文件（contest.conf）只允许由 saveProjectFile() 写：比赛日的数据一旦写进去，
+	// 整场比赛的配置（标题 + 比赛日列表）就没了。写入前做最后一道拦截。
+	bool projectTarget = ! projectFile.isEmpty() && target == QFileInfo(projectFile).absoluteFilePath();
+
+	if (! projectTarget && QFileInfo::exists(target)) {
+		QFile probe(target);
+
+		if (probe.open(QFile::ReadOnly)) {
+			const QJsonObject object = QJsonDocument::fromJson(probe.readAll()).object();
+			projectTarget = DayProject::isProjectObject(object);
+		}
+	}
+
+	if (projectTarget) {
+		LOG("Refused to overwrite a project file:", target);
+		ui->statusBar->showMessage(tr("Save Failed"), 1000);
+		WARN(target, "Save Failed");
+		return;
+	}
+
+	QFile file(target);
 
 	if (! file.open(QFile::WriteOnly)) {
-		QMessageBox::warning(this, tr("Error"), tr("Cannot open file %1").arg(fileName), QMessageBox::Close);
+		QMessageBox::warning(this, tr("Error"), tr("Cannot open file %1").arg(target), QMessageBox::Close);
 		ui->statusBar->showMessage(tr("Save Failed"), 1000);
-		WARN(fileName, "Save Failed");
+		WARN(target, "Save Failed");
 		return;
 	}
 
@@ -675,6 +704,16 @@ void LemonLime::loadContest(const QString &filePath) {
 		return;
 	}
 
+	// 名字是 contest.conf 却没有 days 列表 —— 这是被写坏的比赛工程文件。
+	// 绝不能把它当成「一个比赛日」载入：那样它自己会被当成比赛日文件重新写回去。
+	if (QFileInfo(filePath).fileName().compare(QStringLiteral("contest.conf"), Qt::CaseInsensitive) == 0) {
+		LOG("Refused to load a broken project file:", filePath);
+		QMessageBox::warning(this, tr("Error"),
+		                     tr("File %1 is broken").arg(QFileInfo(filePath).fileName()), QMessageBox::Close);
+		return;
+	}
+
+	// 单个 .cdf / .conf 当作「只有一个比赛日」的工程载入，保持向后兼容。
 	curProject = DayProject();
 	projectFile.clear();
 	curDayIndex = 0;
@@ -812,13 +851,22 @@ void LemonLime::loadDay(const QString &filePath) {
 	if (curContest)
 		closeAction();
 
-	curContest = new Contest(this);
+	// 载入过程中任何一步失败，都不能把「空比赛」留在 curContest 里：curFile 还是上一次
+	// 的路径，30 秒一次的自动保存会把空白内容写进那个文件（比赛配置就是这样丢的）。
+	auto *loaded = new Contest(this);
+	const QString name = QFileInfo(filePath).fileName();
+
+	auto abort = [this, loaded]() {
+		delete loaded;
+		curContest = nullptr;
+		curFile.clear();
+	};
 
 	QFile file(filePath);
 
 	if (! file.open(QFile::ReadOnly)) {
-		QMessageBox::warning(this, tr("Error"), tr("Cannot open file %1").arg(QFileInfo(filePath).fileName()),
-		                     QMessageBox::Close);
+		QMessageBox::warning(this, tr("Error"), tr("Cannot open file %1").arg(name), QMessageBox::Close);
+		abort();
 		return;
 	}
 	char firstChar;
@@ -829,19 +877,18 @@ void LemonLime::loadDay(const QString &filePath) {
 		QJsonObject inObj(QJsonDocument::fromJson(file.readAll(), &parseError).object());
 		if (parseError.error != 0) {
 			QMessageBox::warning(this, tr("Error"),
-			                     tr("File %1 is broken").arg(QFileInfo(filePath).fileName()) + "\n" +
-			                         parseError.errorString() + "at position" +
-			                         QString("%1").arg(parseError.offset),
+			                     tr("File %1 is broken").arg(name) + "\n" + parseError.errorString() +
+			                         "at position" + QString("%1").arg(parseError.offset),
 			                     QMessageBox::Close);
+			abort();
 			return;
 		}
 		QApplication::setOverrideCursor(Qt::WaitCursor);
-		curContest->setSettings(settings);
-		if (curContest->readFromJson(inObj) == -1) {
-			QMessageBox::warning(this, tr("Error"),
-			                     tr("File %1 is broken").arg(QFileInfo(filePath).fileName()),
-			                     QMessageBox::Close);
+		loaded->setSettings(settings);
+		if (loaded->readFromJson(inObj) == -1) {
 			QApplication::restoreOverrideCursor();
+			QMessageBox::warning(this, tr("Error"), tr("File %1 is broken").arg(name), QMessageBox::Close);
+			abort();
 			return;
 		}
 	} else {
@@ -850,9 +897,8 @@ void LemonLime::loadDay(const QString &filePath) {
 		_in >> checkNumber;
 
 		if (checkNumber != unsigned(MagicNumber)) {
-			QMessageBox::warning(this, tr("Error"),
-			                     tr("File %1 is broken").arg(QFileInfo(filePath).fileName()),
-			                     QMessageBox::Close);
+			QMessageBox::warning(this, tr("Error"), tr("File %1 is broken").arg(name), QMessageBox::Close);
+			abort();
 			return;
 		}
 
@@ -863,10 +909,9 @@ void LemonLime::loadDay(const QString &filePath) {
 		_in.readRawData(raw, len);
 
 		if (qChecksum(QByteArrayView(raw, static_cast<uint>(len))) != checksum) {
-			QMessageBox::warning(this, tr("Error"),
-			                     tr("File %1 is broken").arg(QFileInfo(filePath).fileName()),
-			                     QMessageBox::Close);
 			delete[] raw;
+			QMessageBox::warning(this, tr("Error"), tr("File %1 is broken").arg(name), QMessageBox::Close);
+			abort();
 			return;
 		}
 
@@ -875,15 +920,21 @@ void LemonLime::loadDay(const QString &filePath) {
 		data = qUncompress(data);
 		QDataStream in(data);
 		QApplication::setOverrideCursor(Qt::WaitCursor);
-		curContest->setSettings(settings);
-		curContest->readFromStream(in);
+		loaded->setSettings(settings);
+		loaded->readFromStream(in);
 	}
-	curFile = QFileInfo(filePath).fileName();
-	QDir::setCurrent(QFileInfo(filePath).path());
+
+	curContest = loaded;
+	// curFile 存绝对路径：保存不再依赖当前工作目录，避免写进别的比赛日 / 工程里。
+	const QString absolutePath = QFileInfo(filePath).absoluteFilePath();
+	curFile = absolutePath;
+	QDir::setCurrent(QFileInfo(absolutePath).path());
 	migrateLayout();
 	QDir().mkdir(Settings::dataPath());
 	QDir().mkdir(Settings::sourcePath());
 	QDir().mkdir(Settings::importPath());
+	// 每个比赛日一个 statement/ 目录：题面 markdown 与导出的 PDF 都放这里。
+	QDir().mkpath(Settings::statementPath());
 
 	// 补齐每个试题的标准子目录（data / down / graders / gen / tests）
 	for (auto *task : curContest->getTaskList()) {
@@ -926,6 +977,8 @@ void LemonLime::loadDay(const QString &filePath) {
 		setWindowTitle(tr("LemonLime - %1 / %2").arg(curProject.title, curContest->getContestTitle()));
 
 	ui->tabWidget->setCurrentIndex(0);
+	// 题面：加载当前比赛日的 statement/statement.md
+	ui->statementEdit->reload();
 	QApplication::restoreOverrideCursor();
 	LOG("Contest -", curContest->getContestTitle(), "loaded successfully");
 }
@@ -968,6 +1021,8 @@ void LemonLime::newAction() {
 }
 
 void LemonLime::closeAction() {
+	// 还处于当前比赛日的工作目录，先把题面写回去。
+	ui->statementEdit->saveIfNeeded();
 	saveContest(curFile);
 	ui->summary->setContest(nullptr);
 	ui->taskEdit->setEditTask(nullptr);
@@ -1240,6 +1295,13 @@ void LemonLime::saveProjectFile() {
 	if (projectFile.isEmpty())
 		return;
 
+	// 覆盖前留一份上一次的内容：误写 / 写坏时还能救回来。
+	if (QFile::exists(projectFile)) {
+		const QString backup = projectFile + QStringLiteral(".bak");
+		QFile::remove(backup);
+		QFile::copy(projectFile, backup);
+	}
+
 	QFile file(projectFile);
 
 	if (! file.open(QFile::WriteOnly)) {
@@ -1332,7 +1394,7 @@ bool LemonLime::createDay(const QString &title, const QString &fileName) {
 		blank->setSettings(settings);
 		blank->setContestTitle(title);
 		curContest = blank;
-		curFile = fileName + ".conf";
+		curFile = QDir::current().absoluteFilePath(fileName + QStringLiteral(".conf"));
 		saveContest(curFile);
 		curContest = nullptr;
 		delete blank;

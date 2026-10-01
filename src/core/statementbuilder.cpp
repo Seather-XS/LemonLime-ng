@@ -64,8 +64,6 @@ namespace {
 		return list;
 	}
 
-	const QStringList &noiTemplateNames() { return StatementBuilder::templateNames(); }
-
 	bool isNoiTemplate(const QString &name) {
 		return name == QStringLiteral("noi") || name == QStringLiteral("noi new");
 	}
@@ -89,6 +87,10 @@ namespace {
   \noalign{\global\arrayrulewidth=2pt}\cline{1-\statementtablecols}\end{tabular}%
 }
 \newsavebox{\statementtablebox}
+% 表格上下留白：在模板里用 \renewcommand 就能调；导览区（概览表 / 提交源程序文件名 /
+% 编译选项）用后一个长度，通常要写得更紧凑一些。
+\providecommand{\statementtableskip}{\bigskipamount}
+\providecommand{\statementoverviewtableskip}{0.6em}
 )STMT";
 	}
 
@@ -591,17 +593,33 @@ namespace {
 		return result;
 	}
 
-	QString wrapTable(const QString &onePage, const QString &multiPage) {
-		return QStringLiteral("\\sbox{\\statementtablebox}{%\n") + onePage + QStringLiteral("%\n}%\n") +
-		       QStringLiteral("\\ifdim\\dimexpr\\ht\\statementtablebox+\\dp\\statementtablebox\\relax>\\textheight\n") +
-		       multiPage + QStringLiteral("\n\\else\n") +
-		       QStringLiteral("\\par\\noindent\\begin{minipage}{\\linewidth}\\centering"
+	/// 表格前后留一点空白（\addvspace 会和前后已有的间距合并，不会叠出一个大空洞），
+	/// 并用「量高度 + 比较当前页面剩余空间」决定分页：
+	///   - 表格装得进整页时：若当前页剩余空间不够，就整张表换到下一页（不拆开）；
+	///   - 表格比整页还高时：只能交给 longtable 拆页，但先判断剩余空间，
+	///     剩下太少就从新一页开始，免得只放下一个表头。
+	QString wrapTable(const QString &onePage, const QString &multiPage, const QString &skip) {
+		const QString height = QStringLiteral("\\dimexpr\\ht\\statementtablebox+\\dp\\statementtablebox\\relax");
+		const QString remaining = QStringLiteral("\\dimexpr\\pagegoal-\\pagetotal\\relax");
+		return QStringLiteral("\\par\\addvspace{") + skip + QStringLiteral("}%\n") +
+		       QStringLiteral("\\sbox{\\statementtablebox}{%\n") + onePage + QStringLiteral("%\n}%\n") +
+		       QStringLiteral("\\ifdim") + height + QStringLiteral(">\\textheight\n") +
+		       QStringLiteral("\\ifdim") + remaining + QStringLiteral("<.25\\textheight") +
+		       QStringLiteral("\\ifdim\\pagetotal>0pt\\newpage\\fi\\fi\n") +
+		       // longtable 自带 LTpre / LTpost 上下留白，会和上面的 \addvspace 叠加，
+		       // 统一清零，保证与一页表格的上下间距一致。
+		       QStringLiteral("\\setlength{\\LTpre}{0pt}\\setlength{\\LTpost}{0pt}%\n") + multiPage +
+		       QStringLiteral("\n\\else\n") +
+		       QStringLiteral("\\ifdim") + height + QStringLiteral(">") + remaining +
+		       QStringLiteral("\\newpage\\fi\n") +
+		       QStringLiteral("\\noindent\\begin{minipage}{\\linewidth}\\centering"
 		                      "\\setlength{\\parindent}{0pt}%\n\\usebox{\\statementtablebox}%\n"
-		                      "\\end{minipage}\\par\n\\fi");
+		                      "\\end{minipage}%\n\\fi\n") +
+		       QStringLiteral("\\par\\addvspace{") + skip + QStringLiteral("}%\n");
 	}
 
 	/// longtable 表格重排：Tuack 风格（合并单元格）与固定首列两套模式。
-	QString convertLongtableBlock(const QString &block, const QString &tableMode) {
+	QString convertLongtableBlock(const QString &block, const QString &tableMode, const QString &tableSkip) {
 		const QString beginToken = QStringLiteral("\\begin{longtable}");
 		const QString endToken = QStringLiteral("\\end{longtable}");
 		const int start = block.indexOf(beginToken);
@@ -699,7 +717,7 @@ namespace {
 			const QString multiPage = QStringLiteral("\\begin{tuacktable}[%1]{%2}\n%3\n\\end{tuacktable}")
 			                              .arg(columnCount)
 			                              .arg(header, bodyText.join(QChar('\n')));
-			return wrapTable(onePage, multiPage);
+			return wrapTable(onePage, multiPage, tableSkip);
 		}
 
 		QString tableSpec;
@@ -744,10 +762,12 @@ namespace {
 		                   "\\begin{longtable}{%1}\n\\hline\n%2 \\\\ %3\n\\endfirsthead\n\\hline\n%2 \\\\ %3\n"
 		                   "\\endhead\n%4\n\\end{longtable}\n\\endgroup")
 		        .arg(tableSpec, header, separators.first(), bodyText.join(QChar('\n')));
-		return wrapTable(onePage, multiPage) + QStringLiteral("\n\\vspace{0.8em}");
+		// 表格上下的空白现在由 wrapTable() 统一处理，这里不再额外加，免得叠加。
+		return wrapTable(onePage, multiPage, tableSkip);
 	}
 
-	QString sanitizeLatex(const QString &source, const QString &tableMode, bool insertPageBreaks) {
+	QString sanitizeLatex(const QString &source, const QString &tableMode, bool insertPageBreaks,
+	                      const QString &tableSkip) {
 		QString text = unwrapPassthroughInline(source);
 		text.remove(QRegularExpression(QStringLiteral(R"(\\label\{[^}]+\})")));
 		text.remove(QStringLiteral("\\begin{Shaded}"));
@@ -807,7 +827,7 @@ namespace {
 			}
 
 			const QString block = text.mid(pos, end - pos + endToken.length());
-			pieces.append(convertLongtableBlock(block, tableMode));
+			pieces.append(convertLongtableBlock(block, tableMode, tableSkip));
 			start = end + endToken.length();
 		}
 
@@ -883,6 +903,13 @@ namespace {
 		QStringList listingsArgs;
 	};
 
+	/// build() 无论从哪个分支返回都把 building 复位。
+	struct FlagGuard {
+		bool &flag;
+		explicit FlagGuard(bool &value) : flag(value) { flag = true; }
+		~FlagGuard() { flag = false; }
+	};
+
 	int runTool(const QString &program, const QStringList &arguments, const QString &workingDirectory,
 	            const QByteArray &input, QByteArray *output, QByteArray *errors) {
 		QProcess process;
@@ -937,9 +964,11 @@ namespace {
 
 	bool pandocToLatex(const ToolChain &tools, const QString &markdown, const QString &workingDirectory,
 	                   QString &latex, QString *error) {
-		QStringList args = {QStringLiteral("-f"),  QStringLiteral("markdown"),
-		                    QStringLiteral("-t"),  QStringLiteral("latex"),
-		                    QStringLiteral("--wrap=none")};
+		// 题面里列表经常紧贴着上一行正文写（`……：` 下一行就是 `- 项目`），
+		// pandoc 默认要求列表前必须空一行，否则会把整个列表并进段落当普通文本。
+		// 打开 lists_without_preceding_blankline 才能正确解析成 itemize / enumerate。
+		QStringList args = {QStringLiteral("-f"), QStringLiteral("markdown+lists_without_preceding_blankline"),
+		                    QStringLiteral("-t"), QStringLiteral("latex"), QStringLiteral("--wrap=none")};
 		args += tools.listingsArgs;
 
 		QByteArray out;
@@ -954,12 +983,29 @@ namespace {
 		}
 
 		latex = QString::fromUtf8(out);
+		// pandoc 在 Windows 下用 CRLF 写 stdout，而这些 \r 一旦跟着进了 .lstlisting，
+		// 会被当成额外的换行：代码块每行后面多一个空行、行号翻倍。
+		// statement-editor 那边是 read_text() 按文本模式读回来的，天然做了这个归一化。
+		latex.replace(QStringLiteral("\r\n"), QStringLiteral("\n"));
+		latex.replace(QChar('\r'), QChar('\n'));
 		return true;
 	}
 
 	// ==================================================================================
 	// 构建流程
 	// ==================================================================================
+
+	/// 与 statement-editor 一致：先把 CRLF / CR 统一成 LF，并去掉开头的 BOM。
+	QString normalizeSourceText(const QString &rawText) {
+		QString text = rawText;
+		text.replace(QStringLiteral("\r\n"), QStringLiteral("\n"));
+		text.replace(QChar('\r'), QChar('\n'));
+
+		if (! text.isEmpty() && text.at(0) == QChar(0xfeff))
+			text.remove(0, 1);
+
+		return text;
+	}
 
 	QMap<QString, QString> parseMarkdownMetadata(const QString &rawText, QString &body) {
 		QMap<QString, QString> metadata;
@@ -1076,7 +1122,7 @@ namespace {
 	}
 
 	QString renderMarkdownSection(const ToolChain &tools, const QString &sectionText, const QString &tableMode,
-	                              QString *error) {
+	                              const QString &tableSkip, QString *error) {
 		QString text = sectionText.trimmed();
 
 		if (text.isEmpty())
@@ -1091,7 +1137,7 @@ namespace {
 		if (! pandocToLatex(tools, text + QStringLiteral("\n"), QString(), latex, error))
 			return {};
 
-		return sanitizeLatex(latex, tableMode, true).trimmed();
+		return sanitizeLatex(latex, tableMode, true, tableSkip).trimmed();
 	}
 
 	QString addSubmissionTitle(const QString &sectionKey, const QString &rendered, const QString &templateName) {
@@ -1101,8 +1147,11 @@ namespace {
 		const QString title = sectionKey == QStringLiteral("submission_filename")
 		                          ? QStringLiteral("提交源程序文件名")
 		                          : QStringLiteral("编译选项");
-		return QStringLiteral("\\noindent{}\\hspace{2em}") + title + QStringLiteral("\\par\\vspace{0.5em}\n") +
-		       rendered + QStringLiteral("\n\\par\\vspace{0.1em}");
+		// 标题前后都用与导览区表格相同的留白长度，这样「表 → 标题 → 表」的间距一致；
+		// \addvspace 会和表格自身的留白取较大值合并，不会叠加成一大块空白。
+		const QString skip = QStringLiteral("\\statementoverviewtableskip");
+		return QStringLiteral("\\noindent{}\\hspace{2em}") + title + QStringLiteral("\\par\\addvspace{") + skip +
+		       QStringLiteral("}%\n") + rendered + QStringLiteral("\n\\par\\addvspace{") + skip + QStringLiteral("}%");
 	}
 
 	bool buildTexFromMarkdown(const ToolChain &tools, const QString &markdown, QString &generatedLatex,
@@ -1120,7 +1169,8 @@ namespace {
 		if (! pandocToLatex(tools, body, QString(), generatedLatex, error))
 			return false;
 
-		generatedLatex = sanitizeLatex(generatedLatex, QStringLiteral("tuacktable"), ! hasProblemMarkers);
+		generatedLatex = sanitizeLatex(generatedLatex, QStringLiteral("tuacktable"), ! hasProblemMarkers,
+		                               QStringLiteral("\\statementtableskip"));
 		return true;
 	}
 
@@ -1182,13 +1232,16 @@ namespace {
 		QMap<QString, QString> renderedSections;
 
 		for (auto it = userSectionMarkers().constBegin(); it != userSectionMarkers().constEnd(); ++it) {
-			const QString tableMode = (it.key() == QStringLiteral("overview_table") ||
-			                           it.key() == QStringLiteral("submission_filename") ||
-			                           it.key() == QStringLiteral("compile_options"))
-			                              ? QStringLiteral("fixed-first-column")
-			                              : QStringLiteral("tuacktable");
-			renderedSections.insert(it.key(), renderMarkdownSection(tools, namedSections.value(it.key()),
-			                                                       tableMode, error));
+			// 导览区那三张表（概览表 / 提交源程序文件名 / 编译选项）用固定首列模式，
+			// 上下留白也单独用一个更紧凑的长度；其余（如数据范围）用 tuacktable 模式。
+			const bool overview = it.key() == QStringLiteral("overview_table") ||
+			                      it.key() == QStringLiteral("submission_filename") ||
+			                      it.key() == QStringLiteral("compile_options");
+			const QString tableMode = overview ? QStringLiteral("fixed-first-column") : QStringLiteral("tuacktable");
+			const QString tableSkip = overview ? QStringLiteral("\\statementoverviewtableskip")
+			                                   : QStringLiteral("\\statementtableskip");
+			renderedSections.insert(it.key(), renderMarkdownSection(tools, namedSections.value(it.key()), tableMode,
+			                                                       tableSkip, error));
 
 			if (error && ! error->isEmpty())
 				return false;
@@ -1330,7 +1383,7 @@ namespace {
 			return false;
 		}
 
-		const QString markdown = QString::fromUtf8(file.readAll());
+		const QString markdown = normalizeSourceText(QString::fromUtf8(file.readAll()));
 		file.close();
 
 		const QString templatePath = QStringLiteral("%1/%2/main.tex").arg(StatementBuilder::templateRoot(), templateName);
@@ -1449,9 +1502,12 @@ QStringList StatementBuilder::templateNames() {
 
 QString StatementBuilder::templateRoot() {
 	static const QString cached = [] {
+		// 发布时模板放在 lemon.exe 旁边，开发时在工程目录里（build 的上一级）。
 		const QStringList candidates = {
 		    QCoreApplication::applicationDirPath() + QStringLiteral("/statement-templates"),
+		    QCoreApplication::applicationDirPath() + QStringLiteral("/assets/statement-templates"),
 		    QCoreApplication::applicationDirPath() + QStringLiteral("/../statement-templates"),
+		    QCoreApplication::applicationDirPath() + QStringLiteral("/../assets/statement-templates"),
 		};
 
 		for (const QString &candidate : candidates) {
@@ -1497,6 +1553,13 @@ void StatementBuilder::fail(const QString &message) { errorText = message; }
 
 bool StatementBuilder::build() {
 	errorText.clear();
+
+	if (building) {
+		fail(tr("A statement build is already running."));
+		return false;
+	}
+
+	FlagGuard guard(building);
 	const QString root = templateRoot();
 
 	if (root.isEmpty()) {

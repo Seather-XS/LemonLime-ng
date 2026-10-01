@@ -40,7 +40,10 @@ class StatementDocument {
   public:
 	static const QStringList &knownSections();
 	static const QStringList &editableMetaKeys();
-	static const QString &problemMarker();
+	static QString problemMarker();
+
+	/// 判断一行是否是试题标题（`# 中文名（英文名）`），是则拆出中英文名。
+	static bool headingOf(const QString &line, QString &title, QString &english);
 
 	static StatementDocument parse(const QString &text);
 

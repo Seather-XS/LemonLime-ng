@@ -25,7 +25,10 @@ namespace {
 		return list;
 	}
 
-	const QString &problemMarkerText() { return QStringLiteral("<!-- PROBLEM -->"); }
+	// 注意：必须**按值**返回。QStringLiteral 产生的是一个临时 QString，
+	// 返回 const QString& 会得到悬垂引用；一旦这 16 字节被后面的调用覆盖，
+	// 拼接时就变成读野指针（粘贴长题面后崩溃就是因为这个）。
+	QString problemMarkerText() { return QStringLiteral("<!-- PROBLEM -->"); }
 
 	const QRegularExpression &sectionPattern() {
 		static const QRegularExpression re(
@@ -100,13 +103,16 @@ namespace {
 			while (! line.isEmpty() && line.at(line.length() - 1).isSpace())
 				line.chop(1);
 
-		while (! lines.isEmpty() && lines.first().trimmed().isEmpty())
-			lines.removeFirst();
+		int begin = 0;
+		int end = lines.size();
 
-		while (! lines.isEmpty() && lines.last().trimmed().isEmpty())
-			lines.removeLast();
+		while (begin < end && lines.at(begin).trimmed().isEmpty())
+			begin++;
 
-		return lines.join(QChar('\n'));
+		while (end > begin && lines.at(end - 1).trimmed().isEmpty())
+			end--;
+
+		return lines.mid(begin, end - begin).join(QChar('\n'));
 	}
 
 	QString renderSectionBlock(const QString &name, const QString &body) {
@@ -218,7 +224,11 @@ const QStringList &StatementDocument::knownSections() { return knownSectionsList
 
 const QStringList &StatementDocument::editableMetaKeys() { return editableMetaKeysList(); }
 
-const QString &StatementDocument::problemMarker() { return problemMarkerText(); }
+QString StatementDocument::problemMarker() { return problemMarkerText(); }
+
+bool StatementDocument::headingOf(const QString &line, QString &title, QString &english) {
+	return matchProblemHeading(line, title, english);
+}
 
 QStringList StatementDocument::splitLines(const QString &text) { return text.split(QChar('\n')); }
 
@@ -242,29 +252,40 @@ bool StatementDocument::matchProblemHeading(const QString &line, QString &title,
 	title.clear();
 	english.clear();
 
-	if (! headingStartPattern().match(line).hasMatch())
+	// 手写解析（不用正则）：标题可能很长且含大量括号，正则回溯会把栈吃光。
+	if (! line.startsWith(QChar('#')))
 		return false;
 
-	if (emptyHeadingPattern().match(line).hasMatch())
+	if (line.length() > 1 && ! line.at(1).isSpace())
+		return false;
+
+	QString text = line.mid(1).trimmed();
+
+	if (text.isEmpty())
 		return true;
 
-	const QRegularExpressionMatch matched = headingWithEnglishPattern().match(line);
+	// 末尾形如 `（英文名）` 时拆出英文名
+	const QChar last = text.at(text.length() - 1);
 
-	if (matched.hasMatch()) {
-		title = matched.captured(QStringLiteral("title")).trimmed();
-		english = matched.captured(QStringLiteral("eng")).trimmed();
-		return true;
+	if (last == QChar(0xff09) || last == QChar(')')) {
+		const QChar open = last == QChar(0xff09) ? QChar(0xff08) : QChar('(');
+		const int position = text.lastIndexOf(open);
+
+		if (position > 0) {
+			const QString candidate = text.mid(position + 1, text.length() - position - 2);
+
+			if (! candidate.contains(QChar(0xff08)) && ! candidate.contains(QChar(0xff09)) &&
+			    ! candidate.contains(QChar('(')) && ! candidate.contains(QChar(')')) &&
+			    candidate.length() <= 100) {
+				title = text.left(position).trimmed();
+				english = candidate.trimmed();
+				return true;
+			}
+		}
 	}
 
-	const QRegularExpressionMatch fallback = headingOnlyPattern().match(line);
-
-	if (fallback.hasMatch()) {
-		title = fallback.captured(QStringLiteral("title")).trimmed();
-		english.clear();
-		return true;
-	}
-
-	return false;
+	title = text;
+	return true;
 }
 
 void StatementDocument::splitProblemArea(const QString &text, QStringList &head, QList<StatementProblem> &problems) {
@@ -310,9 +331,11 @@ QString StatementDocument::serializeProblemArea(const QStringList &head, const Q
 
 	for (const StatementProblem &problem : problems) {
 		QString block = problem.heading();
+		const QString body = normalizeBlock(problem.body.join(QChar('\n')));
 
-		if (! problem.body.isEmpty())
-			block += QChar('\n') + problem.body.join(QChar('\n'));
+		// 标题与正文之间固定一个空行（与 statement-editor 的 join_problem_title 一致）
+		if (! body.isEmpty())
+			block += QStringLiteral("\n\n") + body;
 
 		const QString cleaned = normalizeBlock(block);
 
@@ -522,7 +545,16 @@ QString StatementDocument::toMarkdown() const {
 	QStringList blocks;
 
 	if (hasFront) {
-		const QString header = buildFrontMatter(metaEntries, metaValues);
+		QList<MetaEntry> entries;
+
+		for (const QPair<QString, QString> &pair : metaEntries) {
+			MetaEntry entry;
+			entry.key = pair.first;
+			entry.raw = pair.second;
+			entries.append(entry);
+		}
+
+		const QString header = buildFrontMatter(entries, metaValues);
 		QString front = QStringLiteral("---\n");
 
 		if (! header.isEmpty())

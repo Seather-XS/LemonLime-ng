@@ -873,7 +873,7 @@
         <location filename="../src/forms/daydialog.ui" line="48"/>
         <location filename="../src/daydialog.cpp" line="48"/>
         <source>Day</source>
-        <translation type="unfinished"></translation>
+        <translation>比賽日</translation>
     </message>
     <message>
         <location filename="../src/forms/daydialog.ui" line="53"/>
@@ -1590,6 +1590,79 @@ Depends: </source>
     </message>
 </context>
 <context>
+    <name>FindReplaceBar</name>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="28"/>
+        <source>Find:</source>
+        <translation>尋找：</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="42"/>
+        <source>Match case</source>
+        <translation>區分大小寫</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="35"/>
+        <source>Previous</source>
+        <translation>上一個</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="38"/>
+        <source>Next</source>
+        <translation>下一個</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="44"/>
+        <source>Whole words</source>
+        <translation>全字符合</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="49"/>
+        <source>Close</source>
+        <translation>關閉</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="56"/>
+        <source>Replace:</source>
+        <translation>取代為：</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="60"/>
+        <source>Replace</source>
+        <translation>取代</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="61"/>
+        <source>Replace All</source>
+        <translation>全部取代</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="155"/>
+        <source>Type something to find.</source>
+        <translation>請先輸入要尋找的內容。</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="175"/>
+        <source>Wrapped around.</source>
+        <translation>已回繞繼續尋找。</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="177"/>
+        <source>Not found.</source>
+        <translation>未找到。</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="195"/>
+        <source>Replaced 1 occurrence.</source>
+        <translation>已取代 1 處。</translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="232"/>
+        <source>Replaced %1 occurrence(s).</source>
+        <translation>已取代 %1 處。</translation>
+    </message>
+</context>
+<context>
     <name>GeneralSettings</name>
     <message>
         <location filename="../src/forms/generalsettings.ui" line="26"/>
@@ -2044,8 +2117,8 @@ Depends: </source>
     <name>LemonLime</name>
     <message>
         <location filename="../src/forms/lemon.ui" line="20"/>
-        <location filename="../src/lemon.cpp" line="994"/>
-        <location filename="../src/lemon.cpp" line="1150"/>
+        <location filename="../src/lemon.cpp" line="1002"/>
+        <location filename="../src/lemon.cpp" line="1158"/>
         <source>LemonLime</source>
         <translation>LemonLime</translation>
     </message>
@@ -2106,7 +2179,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="277"/>
-        <location filename="../src/forms/lemon.ui" line="910"/>
+        <location filename="../src/forms/lemon.ui" line="930"/>
         <source>Cleanup the files of all contestants...</source>
         <translation>整理所有選手檔案…</translation>
     </message>
@@ -2117,7 +2190,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="316"/>
-        <location filename="../src/forms/lemon.ui" line="925"/>
+        <location filename="../src/forms/lemon.ui" line="945"/>
         <source>Refresh the contestant list...</source>
         <translation>重新整理選手列表…</translation>
     </message>
@@ -2128,7 +2201,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="348"/>
-        <location filename="../src/forms/lemon.ui" line="708"/>
+        <location filename="../src/forms/lemon.ui" line="728"/>
         <source>Judge unjudged...</source>
         <translation>測試未測試…</translation>
     </message>
@@ -2139,7 +2212,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="377"/>
-        <location filename="../src/forms/lemon.ui" line="623"/>
+        <location filename="../src/forms/lemon.ui" line="643"/>
         <source>Judge selected area...</source>
         <translation>測試指定區域…</translation>
     </message>
@@ -2150,7 +2223,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="406"/>
-        <location filename="../src/forms/lemon.ui" line="638"/>
+        <location filename="../src/forms/lemon.ui" line="658"/>
         <source>Judge all contestants...</source>
         <translation>測試所有選手…</translation>
     </message>
@@ -2170,551 +2243,561 @@ Depends: </source>
         <translation>統計資料瀏覽…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="461"/>
+        <location filename="../src/forms/lemon.ui" line="443"/>
+        <source>Statement</source>
+        <translation>題面</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/lemon.ui" line="455"/>
+        <source>Edit the statement of this contest day...</source>
+        <translation>編輯本比賽日的題面…</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/lemon.ui" line="481"/>
         <source>Open / Close / Rename contest and etc</source>
         <translation>開啟 / 關閉 / 改變比賽名稱等</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="464"/>
+        <location filename="../src/forms/lemon.ui" line="484"/>
         <source>&amp;File</source>
         <translation>檔案(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="468"/>
+        <location filename="../src/forms/lemon.ui" line="488"/>
         <source>Switch &amp;Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="488"/>
+        <location filename="../src/forms/lemon.ui" line="508"/>
         <source>&amp;Control</source>
         <translation>控制(&amp;C)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="511"/>
+        <location filename="../src/forms/lemon.ui" line="531"/>
         <source>&amp;Tools</source>
         <translation>工具(&amp;T)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="524"/>
+        <location filename="../src/forms/lemon.ui" line="544"/>
         <source>&amp;Help</source>
         <translation>幫助(&amp;H)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="528"/>
+        <location filename="../src/forms/lemon.ui" line="548"/>
         <source>LemonLime Guides...</source>
         <translation>LemonLime 教程…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="531"/>
+        <location filename="../src/forms/lemon.ui" line="551"/>
         <source>&amp;Guides</source>
         <translation>指南(&amp;G)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="557"/>
+        <location filename="../src/forms/lemon.ui" line="577"/>
         <source>&amp;New Contest</source>
         <translation>新建比賽(&amp;N)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="560"/>
+        <location filename="../src/forms/lemon.ui" line="580"/>
         <source>Make a new contest...</source>
         <translation>建立新的比賽…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="569"/>
+        <location filename="../src/forms/lemon.ui" line="589"/>
         <source>&amp;Open Existing Contest</source>
         <translation>開啟已有的比賽(&amp;O)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="572"/>
+        <location filename="../src/forms/lemon.ui" line="592"/>
         <source>Open an existing contest...</source>
         <translation>開啟已有的比賽…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="581"/>
+        <location filename="../src/forms/lemon.ui" line="601"/>
         <source>E&amp;xit</source>
         <translation>退出(&amp;X)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="584"/>
+        <location filename="../src/forms/lemon.ui" line="604"/>
         <source>Exit LemonLime...</source>
         <translation>退出 LemonLime…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="593"/>
+        <location filename="../src/forms/lemon.ui" line="613"/>
         <source>&amp;Settings</source>
         <translation>設定(&amp;S)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="596"/>
+        <location filename="../src/forms/lemon.ui" line="616"/>
         <source>LemonLime Settings...</source>
         <translation>LemonLime 設定…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="605"/>
+        <location filename="../src/forms/lemon.ui" line="625"/>
         <source>&amp;About</source>
         <translation>關於(&amp;A)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="608"/>
+        <location filename="../src/forms/lemon.ui" line="628"/>
         <source>About LemonLime...</source>
         <translation>關於 LemonLime…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="620"/>
+        <location filename="../src/forms/lemon.ui" line="640"/>
         <source>&amp;Judge Selected</source>
         <translation>測試選中選手(&amp;J)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="635"/>
+        <location filename="../src/forms/lemon.ui" line="655"/>
         <source>Judge &amp;All</source>
         <translation>測試全部(&amp;A)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="647"/>
+        <location filename="../src/forms/lemon.ui" line="667"/>
         <source>&amp;Close Current Contest</source>
         <translation>關閉當前的比賽(&amp;C)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="650"/>
+        <location filename="../src/forms/lemon.ui" line="670"/>
         <source>Close this contest...</source>
         <translation>關閉這個比賽…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="667"/>
+        <location filename="../src/forms/lemon.ui" line="687"/>
         <source>Add &amp;Tasks from import/</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="670"/>
+        <location filename="../src/forms/lemon.ui" line="690"/>
         <source>Read the import folder (Lemon data layout) and add tasks automatically...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="678"/>
+        <location filename="../src/forms/lemon.ui" line="698"/>
         <source>&amp;Make Self-testing Folder</source>
         <translation>建立批處理測試資料夾(&amp;M)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="690"/>
+        <location filename="../src/forms/lemon.ui" line="710"/>
         <source>&amp;Export Result</source>
         <translation>匯出成績(&amp;E)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="693"/>
+        <location filename="../src/forms/lemon.ui" line="713"/>
         <source>Export the result...</source>
         <translation>匯出成績…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="705"/>
+        <location filename="../src/forms/lemon.ui" line="725"/>
         <source>Judge &amp;Unjudged</source>
         <translation>測試未測試(&amp;U)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="717"/>
+        <location filename="../src/forms/lemon.ui" line="737"/>
         <source>Open Current Contest &amp;Folder</source>
         <translation>開啟當前比賽的資料夾(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="720"/>
+        <location filename="../src/forms/lemon.ui" line="740"/>
         <source>Open the folder of this contest with file manager...</source>
         <translation>在檔案管理器中開啟這個比賽的資料夾…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="729"/>
+        <location filename="../src/forms/lemon.ui" line="749"/>
         <source>&amp;Save Current Contest</source>
         <translation>儲存比賽檔案(&amp;S)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="732"/>
+        <location filename="../src/forms/lemon.ui" line="752"/>
         <source>Save this contest...</source>
         <translation>儲存這個比賽…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="737"/>
+        <location filename="../src/forms/lemon.ui" line="757"/>
         <source>Interaction</source>
         <translation>互動題</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="740"/>
+        <location filename="../src/forms/lemon.ui" line="760"/>
         <source>How to make Interaction Tasks...</source>
         <translation>如何新增互動題…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="745"/>
+        <location filename="../src/forms/lemon.ui" line="765"/>
         <source>Subtasks</source>
         <translation>打包的測試點</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="748"/>
+        <location filename="../src/forms/lemon.ui" line="768"/>
         <source>How to make Subtasks...</source>
         <translation>如何建立打包的測試點（Subtasks）…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="753"/>
-        <location filename="../src/lemon.cpp" line="344"/>
-        <location filename="../src/lemon.cpp" line="362"/>
-        <location filename="../src/lemon.cpp" line="366"/>
-        <location filename="../src/lemon.cpp" line="374"/>
-        <location filename="../src/lemon.cpp" line="380"/>
-        <location filename="../src/lemon.cpp" line="538"/>
+        <location filename="../src/forms/lemon.ui" line="773"/>
+        <location filename="../src/lemon.cpp" line="346"/>
+        <location filename="../src/lemon.cpp" line="364"/>
+        <location filename="../src/lemon.cpp" line="368"/>
+        <location filename="../src/lemon.cpp" line="376"/>
+        <location filename="../src/lemon.cpp" line="382"/>
         <location filename="../src/lemon.cpp" line="540"/>
+        <location filename="../src/lemon.cpp" line="542"/>
         <source>Clean up Files</source>
         <translation>整理檔案</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="756"/>
+        <location filename="../src/forms/lemon.ui" line="776"/>
         <source>What is Cleanup Files...</source>
         <translation>什麼是整理檔案…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="761"/>
+        <location filename="../src/forms/lemon.ui" line="781"/>
         <source>Compile Features</source>
         <translation>編譯選項</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="764"/>
+        <location filename="../src/forms/lemon.ui" line="784"/>
         <source>The difference in compiling between Lemon and LemonLime...</source>
         <translation>LemonLime 編譯檔案的不同…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="769"/>
+        <location filename="../src/forms/lemon.ui" line="789"/>
         <source>Skip</source>
         <translation>跳過這一題</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="772"/>
+        <location filename="../src/forms/lemon.ui" line="792"/>
         <source>What is Skip...</source>
         <translation>什麼是“跳過這一題”…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="777"/>
+        <location filename="../src/forms/lemon.ui" line="797"/>
         <source>Special Judge</source>
         <translation>客製化校驗器(SPJ)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="780"/>
+        <location filename="../src/forms/lemon.ui" line="800"/>
         <source>How to write Special Judge...</source>
         <translation>如何寫一個校驗器…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="785"/>
+        <location filename="../src/forms/lemon.ui" line="805"/>
         <source>Single &amp;Judge</source>
         <translation>測試某一題(&amp;J)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="790"/>
+        <location filename="../src/forms/lemon.ui" line="810"/>
         <source>Export Result</source>
         <translation>匯出成績</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="793"/>
+        <location filename="../src/forms/lemon.ui" line="813"/>
         <source>New features of Exporting Result...</source>
         <translation>LemonLime 新加的關於匯出檔案的特性…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="802"/>
+        <location filename="../src/forms/lemon.ui" line="822"/>
         <source>More</source>
         <translation>更多</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="805"/>
+        <location filename="../src/forms/lemon.ui" line="825"/>
         <source>Online Guides...</source>
         <translation>線上幫助…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="817"/>
+        <location filename="../src/forms/lemon.ui" line="837"/>
         <source>Judge &amp;No Source</source>
         <translation>測試無原始檔(&amp;N)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="820"/>
+        <location filename="../src/forms/lemon.ui" line="840"/>
         <source>Judge &quot;No Source&quot;...</source>
         <translation>測試“未測試”…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="832"/>
+        <location filename="../src/forms/lemon.ui" line="852"/>
         <source>Judge &amp;Compile Failed</source>
         <translation>測試編譯問題(&amp;C)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="835"/>
+        <location filename="../src/forms/lemon.ui" line="855"/>
         <source>Judge &quot;Compile Error&quot;, &quot;Compile Time Limit Exceeded&quot;, etc...</source>
         <translation>測試“編譯錯誤”、“編譯超時”等…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="844"/>
+        <location filename="../src/forms/lemon.ui" line="864"/>
         <source>C&amp;hange Contest Name</source>
         <translation>更改比賽標題(&amp;H)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="847"/>
+        <location filename="../src/forms/lemon.ui" line="867"/>
         <source>Change the name of this contest...</source>
         <translation>修改這場比賽的名稱…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="856"/>
+        <location filename="../src/forms/lemon.ui" line="876"/>
         <source>Rename &amp;Contest (Project)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="859"/>
+        <location filename="../src/forms/lemon.ui" line="879"/>
         <source>Rename the whole contest (the project title)...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="868"/>
+        <location filename="../src/forms/lemon.ui" line="888"/>
         <source>Remove Contest Da&amp;y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="871"/>
+        <location filename="../src/forms/lemon.ui" line="891"/>
         <source>Remove the current contest day from the contest...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="880"/>
+        <location filename="../src/forms/lemon.ui" line="900"/>
         <source>New Contest &amp;Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="883"/>
+        <location filename="../src/forms/lemon.ui" line="903"/>
         <source>Create a new contest day inside the current contest...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="892"/>
+        <location filename="../src/forms/lemon.ui" line="912"/>
         <source>Contest &amp;Day Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="895"/>
+        <location filename="../src/forms/lemon.ui" line="915"/>
         <source>Configure regions, violation checking and contestant folder naming...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="907"/>
+        <location filename="../src/forms/lemon.ui" line="927"/>
         <source>Clean Up &amp;Files</source>
         <translation>整理檔案(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="922"/>
+        <location filename="../src/forms/lemon.ui" line="942"/>
         <source>&amp;Refresh</source>
         <translation>重新整理(&amp;R)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="930"/>
+        <location filename="../src/forms/lemon.ui" line="950"/>
         <source>Communication</source>
         <translation>通訊題</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="933"/>
+        <location filename="../src/forms/lemon.ui" line="953"/>
         <source>How to make Communication Tasks...</source>
         <translation>如何新增通訊題…</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="945"/>
+        <location filename="../src/forms/lemon.ui" line="965"/>
         <source>Export &amp;Statistics</source>
         <translation>匯出統計資訊(&amp;S)</translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="954"/>
+        <location filename="../src/forms/lemon.ui" line="974"/>
         <source>Manual</source>
         <translation>使用者手冊</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="341"/>
+        <location filename="../src/lemon.cpp" line="343"/>
         <source>Are you sure to Clean up Files?</source>
         <translation>確定要整理檔案嗎？</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="342"/>
+        <location filename="../src/lemon.cpp" line="344"/>
         <source>Reading guide are recommended.</source>
         <translation>建議參看教程後再確認操作。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="360"/>
+        <location filename="../src/lemon.cpp" line="362"/>
         <source>Making backup files to dir &lt;br&gt; `%1&apos;?</source>
         <translation>建立備份檔案到 &lt;br&gt; `%1&apos;？</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="366"/>
+        <location filename="../src/lemon.cpp" line="368"/>
         <source>Aborted.</source>
         <translation>沒有進行整理。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="375"/>
+        <location filename="../src/lemon.cpp" line="377"/>
         <source>Aborted: `%1&apos; already exist.</source>
         <translation>沒有進行整理：`%1&apos; 已經存在。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="381"/>
+        <location filename="../src/lemon.cpp" line="383"/>
         <source>Aborted: Cannot make dir `%1&apos;.</source>
         <translation>沒有進行整理：沒法建立 `%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="386"/>
+        <location filename="../src/lemon.cpp" line="388"/>
         <source>Making Backup...</source>
         <translation>備份中…</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="407"/>
+        <location filename="../src/lemon.cpp" line="409"/>
         <source>Cleaning</source>
         <translation>整理中</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="414"/>
+        <location filename="../src/lemon.cpp" line="416"/>
         <source>Working on it...</source>
         <translation>正在整理…</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="419"/>
+        <location filename="../src/lemon.cpp" line="421"/>
         <source>Fetching Data...</source>
         <translation>抓取題目資料…</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="427"/>
+        <location filename="../src/lemon.cpp" line="429"/>
         <source>Initing...</source>
         <translation>預處理中…</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="459"/>
+        <location filename="../src/lemon.cpp" line="461"/>
         <source>Now Cleaning...</source>
         <translation>整理檔案中…</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="537"/>
+        <location filename="../src/lemon.cpp" line="539"/>
         <source>Finished.</source>
         <translation>整理完成。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="540"/>
+        <location filename="../src/lemon.cpp" line="542"/>
         <source>Aborted</source>
         <translation>沒有進行整理</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="634"/>
-        <location filename="../src/lemon.cpp" line="688"/>
-        <location filename="../src/lemon.cpp" line="697"/>
-        <location filename="../src/lemon.cpp" line="820"/>
-        <location filename="../src/lemon.cpp" line="831"/>
-        <location filename="../src/lemon.cpp" line="841"/>
-        <location filename="../src/lemon.cpp" line="853"/>
-        <location filename="../src/lemon.cpp" line="866"/>
-        <location filename="../src/lemon.cpp" line="937"/>
-        <location filename="../src/lemon.cpp" line="1246"/>
-        <location filename="../src/lemon.cpp" line="1312"/>
+        <location filename="../src/lemon.cpp" line="636"/>
+        <location filename="../src/lemon.cpp" line="690"/>
+        <location filename="../src/lemon.cpp" line="699"/>
+        <location filename="../src/lemon.cpp" line="822"/>
+        <location filename="../src/lemon.cpp" line="833"/>
+        <location filename="../src/lemon.cpp" line="843"/>
+        <location filename="../src/lemon.cpp" line="855"/>
+        <location filename="../src/lemon.cpp" line="868"/>
+        <location filename="../src/lemon.cpp" line="943"/>
+        <location filename="../src/lemon.cpp" line="1254"/>
+        <location filename="../src/lemon.cpp" line="1320"/>
         <source>Error</source>
         <translation>出錯了</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="634"/>
-        <location filename="../src/lemon.cpp" line="689"/>
-        <location filename="../src/lemon.cpp" line="820"/>
-        <location filename="../src/lemon.cpp" line="1246"/>
+        <location filename="../src/lemon.cpp" line="636"/>
+        <location filename="../src/lemon.cpp" line="691"/>
+        <location filename="../src/lemon.cpp" line="822"/>
+        <location filename="../src/lemon.cpp" line="1254"/>
         <source>Cannot open file %1</source>
         <translation>無法打開檔案 %1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="635"/>
+        <location filename="../src/lemon.cpp" line="637"/>
         <source>Save Failed</source>
         <translation>儲存失敗</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="653"/>
+        <location filename="../src/lemon.cpp" line="655"/>
         <source>Saved</source>
         <translation>已儲存</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="698"/>
-        <location filename="../src/lemon.cpp" line="832"/>
-        <location filename="../src/lemon.cpp" line="842"/>
-        <location filename="../src/lemon.cpp" line="854"/>
-        <location filename="../src/lemon.cpp" line="867"/>
+        <location filename="../src/lemon.cpp" line="700"/>
+        <location filename="../src/lemon.cpp" line="834"/>
+        <location filename="../src/lemon.cpp" line="844"/>
+        <location filename="../src/lemon.cpp" line="856"/>
+        <location filename="../src/lemon.cpp" line="869"/>
         <source>File %1 is broken</source>
         <translation>%1 已損壞</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="924"/>
-        <location filename="../src/lemon.cpp" line="1230"/>
+        <location filename="../src/lemon.cpp" line="928"/>
+        <location filename="../src/lemon.cpp" line="1238"/>
         <source>LemonLime - %1</source>
         <translation>LemonLime - %1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="926"/>
-        <location filename="../src/lemon.cpp" line="1232"/>
-        <location filename="../src/lemon.cpp" line="1463"/>
+        <location filename="../src/lemon.cpp" line="930"/>
+        <location filename="../src/lemon.cpp" line="1240"/>
+        <location filename="../src/lemon.cpp" line="1471"/>
         <source>LemonLime - %1 / %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="937"/>
-        <location filename="../src/lemon.cpp" line="1312"/>
+        <location filename="../src/lemon.cpp" line="943"/>
+        <location filename="../src/lemon.cpp" line="1320"/>
         <source>Cannot make contest path</source>
         <translation>無法建立比賽資料夾</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1150"/>
+        <location filename="../src/lemon.cpp" line="1158"/>
         <source>No task found</source>
         <translation>找不到任何試題</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1207"/>
-        <location filename="../src/lemon.cpp" line="1212"/>
-        <location filename="../src/lemon.cpp" line="1216"/>
-        <location filename="../src/lemon.cpp" line="1452"/>
+        <location filename="../src/lemon.cpp" line="1215"/>
+        <location filename="../src/lemon.cpp" line="1220"/>
+        <location filename="../src/lemon.cpp" line="1224"/>
+        <location filename="../src/lemon.cpp" line="1460"/>
         <source>Rename Contest</source>
         <translation>重新命名比賽</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1207"/>
+        <location filename="../src/lemon.cpp" line="1215"/>
         <source>No Contest Yet</source>
         <translation>還沒有比賽</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1212"/>
-        <location filename="../src/lemon.cpp" line="1453"/>
+        <location filename="../src/lemon.cpp" line="1220"/>
+        <location filename="../src/lemon.cpp" line="1461"/>
         <source>Write the name you want.</source>
         <translation>輸入你想要的名稱。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1213"/>
+        <location filename="../src/lemon.cpp" line="1221"/>
         <source>New Name</source>
         <translation>新名稱</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1216"/>
+        <location filename="../src/lemon.cpp" line="1224"/>
         <source>The name did not changes.</source>
         <translation>名稱沒有改變。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1295"/>
-        <location filename="../src/lemon.cpp" line="1305"/>
-        <location filename="../src/lemon.cpp" line="1417"/>
+        <location filename="../src/lemon.cpp" line="1303"/>
+        <location filename="../src/lemon.cpp" line="1313"/>
+        <location filename="../src/lemon.cpp" line="1425"/>
         <source>New Contest Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1296"/>
+        <location filename="../src/lemon.cpp" line="1304"/>
         <source>The folder name cannot contain path separators.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1306"/>
+        <location filename="../src/lemon.cpp" line="1314"/>
         <source>A contest day with this folder already exists.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1417"/>
+        <location filename="../src/lemon.cpp" line="1425"/>
         <source>Please create or open a contest first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1432"/>
+        <location filename="../src/lemon.cpp" line="1440"/>
         <source>Remove Contest Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1433"/>
+        <location filename="../src/lemon.cpp" line="1441"/>
         <source>Remove contest day &quot;%1&quot;?
 
 Yes: also delete its files.
@@ -2722,52 +2805,52 @@ No: remove it from the contest only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1477"/>
+        <location filename="../src/lemon.cpp" line="1485"/>
         <source>Version: %1</source>
         <translation>版本：%1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1479"/>
+        <location filename="../src/lemon.cpp" line="1487"/>
         <source>This is a tiny judging environment for OI contest based on Project LemonPlus.</source>
         <translation>這是一個基於 LemonPlus 的簡易 OI 競賽測試環境。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1480"/>
+        <location filename="../src/lemon.cpp" line="1488"/>
         <source>Based on Project Lemon version 1.2 Beta by Zhipeng Jia, 2011</source>
         <translation>基於 Lemon v1.2 by Zhipeng Jia, 2011</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1481"/>
+        <location filename="../src/lemon.cpp" line="1489"/>
         <source>Based on Project LemonPlus by Dust1404, 2019</source>
         <translation>基於 LemonPlus by Dust1404, 2019</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1482"/>
+        <location filename="../src/lemon.cpp" line="1490"/>
         <source>Update by iotang and Coelacanthus</source>
         <translation>由 iotang 和 Coelacanthus 更新</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1483"/>
+        <location filename="../src/lemon.cpp" line="1491"/>
         <source>Build Info: %1</source>
         <translation>編譯訊息：%1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1484"/>
+        <location filename="../src/lemon.cpp" line="1492"/>
         <source>Build Extra Info: %1</source>
         <translation>附加編譯訊息：%1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1485"/>
+        <location filename="../src/lemon.cpp" line="1493"/>
         <source>Build Date: %1</source>
         <translation>構建日期：%1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1486"/>
+        <location filename="../src/lemon.cpp" line="1494"/>
         <source>This program is under the &lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;GPLv3&lt;/a&gt; license</source>
         <translation>本程式基於&lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;GPLv3&lt;/a&gt;許可協議</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1489"/>
+        <location filename="../src/lemon.cpp" line="1497"/>
         <source>About LemonLime</source>
         <translation>關於 LemonLime</translation>
     </message>
@@ -2833,7 +2916,7 @@ No: remove it from the contest only.</source>
     <message>
         <location filename="../src/newtaskdialog.cpp" line="58"/>
         <source>Problem Title</source>
-        <translation type="unfinished">試題標題</translation>
+        <translation>試題標題</translation>
     </message>
     <message>
         <location filename="../src/newtaskdialog.cpp" line="60"/>
@@ -2933,6 +3016,66 @@ No: remove it from the contest only.</source>
         <location filename="../src/forms/optionsdialog.ui" line="40"/>
         <source>Compiler</source>
         <translation>編譯器</translation>
+    </message>
+</context>
+<context>
+    <name>PdfPreviewWidget</name>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="49"/>
+        <source>PDF Preview</source>
+        <translation>PDF 預覽</translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="51"/>
+        <source>Zoom:</source>
+        <translation>縮放：</translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="57"/>
+        <source>Zoom (Ctrl + mouse wheel)</source>
+        <translation>縮放（Ctrl + 滾輪）</translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="59"/>
+        <source>Refresh</source>
+        <translation>重新整理</translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="93"/>
+        <location filename="../src/pdfpreview.cpp" line="136"/>
+        <location filename="../src/pdfpreview.cpp" line="170"/>
+        <source>Compile the statement to see the preview here.</source>
+        <translation>編譯題面後，這裡會顯示 statement.pdf 的分頁預覽。</translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="175"/>
+        <source>statement.pdf does not exist yet.</source>
+        <translation>statement.pdf 還不存在。</translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="188"/>
+        <source>pdftocairo / pdftoppm not found in PATH, so the PDF cannot be previewed.</source>
+        <translation>在 PATH 中找不到 pdftocairo / pdftoppm，無法預覽 PDF。</translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="198"/>
+        <source>Rendering ...</source>
+        <translation>正在算圖預覽…</translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="210"/>
+        <source>Rendering the PDF preview failed.</source>
+        <translation>算圖 PDF 預覽失敗。</translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="221"/>
+        <source>Nothing could be rendered from statement.pdf.</source>
+        <translation>沒能從 statement.pdf 算圖出任何頁面。</translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="240"/>
+        <source>%1 page(s) · zoom %2</source>
+        <translation>共 %1 頁 · 縮放 %2</translation>
     </message>
 </context>
 <context>
@@ -3180,6 +3323,236 @@ No: remove it from the contest only.</source>
         <location filename="../src/base/settings.cpp" line="364"/>
         <source>Interactor Error</source>
         <translation>互動庫錯誤</translation>
+    </message>
+</context>
+<context>
+    <name>StatementBuilder</name>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1510"/>
+        <source>A statement build is already running.</source>
+        <translation>已經有一次題面建置正在進行。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1518"/>
+        <source>Cannot find the statement templates (statement-templates).</source>
+        <translation>找不到題面模板目錄（statement-templates）。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1525"/>
+        <source>pandoc not found in PATH.</source>
+        <translation>在 PATH 中找不到 pandoc。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1532"/>
+        <source>xelatex not found in PATH.</source>
+        <translation>在 PATH 中找不到 xelatex。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1541"/>
+        <source>Building with template &quot;%1&quot; ...</source>
+        <translation>正在使用模板「%1」建置…</translation>
+    </message>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1547"/>
+        <source>Building the statement PDF failed.</source>
+        <translation>產生題面 PDF 失敗。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1551"/>
+        <source>Statement PDF written to %1</source>
+        <translation>題面 PDF 已產生：%1</translation>
+    </message>
+</context>
+<context>
+    <name>StatementEditWidget</name>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="180"/>
+        <source>Template:</source>
+        <translation>模板：</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="186"/>
+        <source>Import</source>
+        <translation>匯入</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="187"/>
+        <source>Load statement/statement.md into the editor.</source>
+        <translation>把 statement/statement.md 讀入編輯器。</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="188"/>
+        <source>Save</source>
+        <translation>儲存</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="189"/>
+        <source>Export PDF</source>
+        <translation>匯出 PDF</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="190"/>
+        <source>Compile statement/statement.pdf with pandoc + xelatex.</source>
+        <translation>用 pandoc + xelatex 編譯出 statement/statement.pdf。</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="191"/>
+        <source>Open PDF</source>
+        <translation>開啟 PDF</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="220"/>
+        <source>Title / subtitle / day / date of the statement.</source>
+        <translation>題面的標題、副標題、比賽日與日期。</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="222"/>
+        <source>Title</source>
+        <translation>標題</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="222"/>
+        <source>Subtitle</source>
+        <translation>副標題</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="222"/>
+        <source>Day</source>
+        <translation>比賽日</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="222"/>
+        <source>Date</source>
+        <translation>日期</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="239"/>
+        <source>Problem Title</source>
+        <translation>試題標題</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="241"/>
+        <source>Title only, no leading #</source>
+        <translation>只填標題，不要寫 #</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="243"/>
+        <source>No leading &quot;#&quot; needed: it is added automatically.</source>
+        <translation>標題不必寫「#」，會自動加上。</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="266"/>
+        <source>Add a problem</source>
+        <translation>新增試題</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="269"/>
+        <source>Remove the selected problem</source>
+        <translation>刪除選中的試題</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="284"/>
+        <source>Build log</source>
+        <translation>建置日誌</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="358"/>
+        <source>Compile the statement to see the preview here.</source>
+        <translation>編譯題面後，這裡會顯示 statement.pdf 的分頁預覽。</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="374"/>
+        <source>Basic Information</source>
+        <translation>基礎資訊</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="376"/>
+        <source>Sections</source>
+        <translation>區段</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="377"/>
+        <source>Problems</source>
+        <translation>試題</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="572"/>
+        <source>Problem %1</source>
+        <translation>第 %1 題</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="612"/>
+        <source>Filled the default sections for the noi / noi new template.</source>
+        <translation>已依 noi / noi new 模板填入預設區段內容。</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="633"/>
+        <location filename="../src/statementeditwidget.cpp" line="654"/>
+        <location filename="../src/statementeditwidget.cpp" line="711"/>
+        <source>Statement</source>
+        <translation>題面</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="633"/>
+        <source>A statement build is still running.</source>
+        <translation>正在編譯題面，請稍候。</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="638"/>
+        <source>Imported %1</source>
+        <translation>已匯入 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="645"/>
+        <source>Saved %1</source>
+        <translation>已儲存 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="654"/>
+        <source>Cannot write %1</source>
+        <translation>無法寫入 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="680"/>
+        <location filename="../src/statementeditwidget.cpp" line="681"/>
+        <source>Building statement.pdf ...</source>
+        <translation>正在產生 statement.pdf …</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="695"/>
+        <source>Exported %1</source>
+        <translation>已匯出 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="699"/>
+        <source>Done.</source>
+        <translation>完成。</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="701"/>
+        <source>Failed: %1</source>
+        <translation>失敗：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="702"/>
+        <location filename="../src/statementeditwidget.cpp" line="703"/>
+        <source>Building statement.pdf failed.</source>
+        <translation>產生 statement.pdf 失敗。</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="711"/>
+        <source>%1 does not exist yet.</source>
+        <translation>%1 還不存在。</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="721"/>
+        <source>New Problem</source>
+        <translation>新題目</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="787"/>
+        <source>(unsaved changes)</source>
+        <translation>（有未儲存的變更）</translation>
     </message>
 </context>
 <context>

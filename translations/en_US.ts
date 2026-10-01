@@ -863,7 +863,7 @@
         <location filename="../src/forms/daydialog.ui" line="48"/>
         <location filename="../src/daydialog.cpp" line="48"/>
         <source>Day</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/forms/daydialog.ui" line="53"/>
@@ -1569,6 +1569,79 @@ Depends: </source>
     </message>
 </context>
 <context>
+    <name>FindReplaceBar</name>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="28"/>
+        <source>Find:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="42"/>
+        <source>Match case</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="35"/>
+        <source>Previous</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="38"/>
+        <source>Next</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="44"/>
+        <source>Whole words</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="49"/>
+        <source>Close</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="56"/>
+        <source>Replace:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="60"/>
+        <source>Replace</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="61"/>
+        <source>Replace All</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="155"/>
+        <source>Type something to find.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="175"/>
+        <source>Wrapped around.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="177"/>
+        <source>Not found.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="195"/>
+        <source>Replaced 1 occurrence.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/findreplacebar.cpp" line="232"/>
+        <source>Replaced %1 occurrence(s).</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>GeneralSettings</name>
     <message>
         <location filename="../src/forms/generalsettings.ui" line="26"/>
@@ -2019,8 +2092,8 @@ Depends: </source>
     <name>LemonLime</name>
     <message>
         <location filename="../src/forms/lemon.ui" line="20"/>
-        <location filename="../src/lemon.cpp" line="994"/>
-        <location filename="../src/lemon.cpp" line="1150"/>
+        <location filename="../src/lemon.cpp" line="1002"/>
+        <location filename="../src/lemon.cpp" line="1158"/>
         <source>LemonLime</source>
         <translation></translation>
     </message>
@@ -2081,7 +2154,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="277"/>
-        <location filename="../src/forms/lemon.ui" line="910"/>
+        <location filename="../src/forms/lemon.ui" line="930"/>
         <source>Cleanup the files of all contestants...</source>
         <translation></translation>
     </message>
@@ -2092,7 +2165,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="316"/>
-        <location filename="../src/forms/lemon.ui" line="925"/>
+        <location filename="../src/forms/lemon.ui" line="945"/>
         <source>Refresh the contestant list...</source>
         <translation></translation>
     </message>
@@ -2103,7 +2176,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="348"/>
-        <location filename="../src/forms/lemon.ui" line="708"/>
+        <location filename="../src/forms/lemon.ui" line="728"/>
         <source>Judge unjudged...</source>
         <translation></translation>
     </message>
@@ -2114,7 +2187,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="377"/>
-        <location filename="../src/forms/lemon.ui" line="623"/>
+        <location filename="../src/forms/lemon.ui" line="643"/>
         <source>Judge selected area...</source>
         <translation></translation>
     </message>
@@ -2125,7 +2198,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="406"/>
-        <location filename="../src/forms/lemon.ui" line="638"/>
+        <location filename="../src/forms/lemon.ui" line="658"/>
         <source>Judge all contestants...</source>
         <translation></translation>
     </message>
@@ -2145,551 +2218,561 @@ Depends: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="461"/>
+        <location filename="../src/forms/lemon.ui" line="443"/>
+        <source>Statement</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/forms/lemon.ui" line="455"/>
+        <source>Edit the statement of this contest day...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/forms/lemon.ui" line="481"/>
         <source>Open / Close / Rename contest and etc</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="464"/>
+        <location filename="../src/forms/lemon.ui" line="484"/>
         <source>&amp;File</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="468"/>
+        <location filename="../src/forms/lemon.ui" line="488"/>
         <source>Switch &amp;Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="488"/>
+        <location filename="../src/forms/lemon.ui" line="508"/>
         <source>&amp;Control</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="511"/>
+        <location filename="../src/forms/lemon.ui" line="531"/>
         <source>&amp;Tools</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="524"/>
+        <location filename="../src/forms/lemon.ui" line="544"/>
         <source>&amp;Help</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="528"/>
+        <location filename="../src/forms/lemon.ui" line="548"/>
         <source>LemonLime Guides...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="531"/>
+        <location filename="../src/forms/lemon.ui" line="551"/>
         <source>&amp;Guides</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="557"/>
+        <location filename="../src/forms/lemon.ui" line="577"/>
         <source>&amp;New Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="560"/>
+        <location filename="../src/forms/lemon.ui" line="580"/>
         <source>Make a new contest...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="569"/>
+        <location filename="../src/forms/lemon.ui" line="589"/>
         <source>&amp;Open Existing Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="572"/>
+        <location filename="../src/forms/lemon.ui" line="592"/>
         <source>Open an existing contest...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="581"/>
+        <location filename="../src/forms/lemon.ui" line="601"/>
         <source>E&amp;xit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="584"/>
+        <location filename="../src/forms/lemon.ui" line="604"/>
         <source>Exit LemonLime...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="593"/>
+        <location filename="../src/forms/lemon.ui" line="613"/>
         <source>&amp;Settings</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="596"/>
+        <location filename="../src/forms/lemon.ui" line="616"/>
         <source>LemonLime Settings...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="605"/>
+        <location filename="../src/forms/lemon.ui" line="625"/>
         <source>&amp;About</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="608"/>
+        <location filename="../src/forms/lemon.ui" line="628"/>
         <source>About LemonLime...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="620"/>
+        <location filename="../src/forms/lemon.ui" line="640"/>
         <source>&amp;Judge Selected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="635"/>
+        <location filename="../src/forms/lemon.ui" line="655"/>
         <source>Judge &amp;All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="647"/>
+        <location filename="../src/forms/lemon.ui" line="667"/>
         <source>&amp;Close Current Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="650"/>
+        <location filename="../src/forms/lemon.ui" line="670"/>
         <source>Close this contest...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="667"/>
+        <location filename="../src/forms/lemon.ui" line="687"/>
         <source>Add &amp;Tasks from import/</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="670"/>
+        <location filename="../src/forms/lemon.ui" line="690"/>
         <source>Read the import folder (Lemon data layout) and add tasks automatically...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="678"/>
+        <location filename="../src/forms/lemon.ui" line="698"/>
         <source>&amp;Make Self-testing Folder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="690"/>
+        <location filename="../src/forms/lemon.ui" line="710"/>
         <source>&amp;Export Result</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="693"/>
+        <location filename="../src/forms/lemon.ui" line="713"/>
         <source>Export the result...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="705"/>
+        <location filename="../src/forms/lemon.ui" line="725"/>
         <source>Judge &amp;Unjudged</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="717"/>
+        <location filename="../src/forms/lemon.ui" line="737"/>
         <source>Open Current Contest &amp;Folder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="720"/>
+        <location filename="../src/forms/lemon.ui" line="740"/>
         <source>Open the folder of this contest with file manager...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="729"/>
+        <location filename="../src/forms/lemon.ui" line="749"/>
         <source>&amp;Save Current Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="732"/>
+        <location filename="../src/forms/lemon.ui" line="752"/>
         <source>Save this contest...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="737"/>
+        <location filename="../src/forms/lemon.ui" line="757"/>
         <source>Interaction</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="740"/>
+        <location filename="../src/forms/lemon.ui" line="760"/>
         <source>How to make Interaction Tasks...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="745"/>
+        <location filename="../src/forms/lemon.ui" line="765"/>
         <source>Subtasks</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="748"/>
+        <location filename="../src/forms/lemon.ui" line="768"/>
         <source>How to make Subtasks...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="753"/>
-        <location filename="../src/lemon.cpp" line="344"/>
-        <location filename="../src/lemon.cpp" line="362"/>
-        <location filename="../src/lemon.cpp" line="366"/>
-        <location filename="../src/lemon.cpp" line="374"/>
-        <location filename="../src/lemon.cpp" line="380"/>
-        <location filename="../src/lemon.cpp" line="538"/>
+        <location filename="../src/forms/lemon.ui" line="773"/>
+        <location filename="../src/lemon.cpp" line="346"/>
+        <location filename="../src/lemon.cpp" line="364"/>
+        <location filename="../src/lemon.cpp" line="368"/>
+        <location filename="../src/lemon.cpp" line="376"/>
+        <location filename="../src/lemon.cpp" line="382"/>
         <location filename="../src/lemon.cpp" line="540"/>
+        <location filename="../src/lemon.cpp" line="542"/>
         <source>Clean up Files</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="756"/>
+        <location filename="../src/forms/lemon.ui" line="776"/>
         <source>What is Cleanup Files...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="761"/>
+        <location filename="../src/forms/lemon.ui" line="781"/>
         <source>Compile Features</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="764"/>
+        <location filename="../src/forms/lemon.ui" line="784"/>
         <source>The difference in compiling between Lemon and LemonLime...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="769"/>
+        <location filename="../src/forms/lemon.ui" line="789"/>
         <source>Skip</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="772"/>
+        <location filename="../src/forms/lemon.ui" line="792"/>
         <source>What is Skip...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="777"/>
+        <location filename="../src/forms/lemon.ui" line="797"/>
         <source>Special Judge</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="780"/>
+        <location filename="../src/forms/lemon.ui" line="800"/>
         <source>How to write Special Judge...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="785"/>
+        <location filename="../src/forms/lemon.ui" line="805"/>
         <source>Single &amp;Judge</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="790"/>
+        <location filename="../src/forms/lemon.ui" line="810"/>
         <source>Export Result</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="793"/>
+        <location filename="../src/forms/lemon.ui" line="813"/>
         <source>New features of Exporting Result...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="802"/>
+        <location filename="../src/forms/lemon.ui" line="822"/>
         <source>More</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="805"/>
+        <location filename="../src/forms/lemon.ui" line="825"/>
         <source>Online Guides...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="817"/>
+        <location filename="../src/forms/lemon.ui" line="837"/>
         <source>Judge &amp;No Source</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="820"/>
+        <location filename="../src/forms/lemon.ui" line="840"/>
         <source>Judge &quot;No Source&quot;...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="832"/>
+        <location filename="../src/forms/lemon.ui" line="852"/>
         <source>Judge &amp;Compile Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="835"/>
+        <location filename="../src/forms/lemon.ui" line="855"/>
         <source>Judge &quot;Compile Error&quot;, &quot;Compile Time Limit Exceeded&quot;, etc...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="844"/>
+        <location filename="../src/forms/lemon.ui" line="864"/>
         <source>C&amp;hange Contest Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="847"/>
+        <location filename="../src/forms/lemon.ui" line="867"/>
         <source>Change the name of this contest...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="856"/>
+        <location filename="../src/forms/lemon.ui" line="876"/>
         <source>Rename &amp;Contest (Project)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="859"/>
+        <location filename="../src/forms/lemon.ui" line="879"/>
         <source>Rename the whole contest (the project title)...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="868"/>
+        <location filename="../src/forms/lemon.ui" line="888"/>
         <source>Remove Contest Da&amp;y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="871"/>
+        <location filename="../src/forms/lemon.ui" line="891"/>
         <source>Remove the current contest day from the contest...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="880"/>
+        <location filename="../src/forms/lemon.ui" line="900"/>
         <source>New Contest &amp;Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="883"/>
+        <location filename="../src/forms/lemon.ui" line="903"/>
         <source>Create a new contest day inside the current contest...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="892"/>
+        <location filename="../src/forms/lemon.ui" line="912"/>
         <source>Contest &amp;Day Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="895"/>
+        <location filename="../src/forms/lemon.ui" line="915"/>
         <source>Configure regions, violation checking and contestant folder naming...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="907"/>
+        <location filename="../src/forms/lemon.ui" line="927"/>
         <source>Clean Up &amp;Files</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="922"/>
+        <location filename="../src/forms/lemon.ui" line="942"/>
         <source>&amp;Refresh</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="930"/>
+        <location filename="../src/forms/lemon.ui" line="950"/>
         <source>Communication</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="933"/>
+        <location filename="../src/forms/lemon.ui" line="953"/>
         <source>How to make Communication Tasks...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="945"/>
+        <location filename="../src/forms/lemon.ui" line="965"/>
         <source>Export &amp;Statistics</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="954"/>
+        <location filename="../src/forms/lemon.ui" line="974"/>
         <source>Manual</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="341"/>
+        <location filename="../src/lemon.cpp" line="343"/>
         <source>Are you sure to Clean up Files?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="342"/>
+        <location filename="../src/lemon.cpp" line="344"/>
         <source>Reading guide are recommended.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="360"/>
+        <location filename="../src/lemon.cpp" line="362"/>
         <source>Making backup files to dir &lt;br&gt; `%1&apos;?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="366"/>
+        <location filename="../src/lemon.cpp" line="368"/>
         <source>Aborted.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="375"/>
+        <location filename="../src/lemon.cpp" line="377"/>
         <source>Aborted: `%1&apos; already exist.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="381"/>
+        <location filename="../src/lemon.cpp" line="383"/>
         <source>Aborted: Cannot make dir `%1&apos;.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="386"/>
+        <location filename="../src/lemon.cpp" line="388"/>
         <source>Making Backup...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="407"/>
+        <location filename="../src/lemon.cpp" line="409"/>
         <source>Cleaning</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="414"/>
+        <location filename="../src/lemon.cpp" line="416"/>
         <source>Working on it...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="419"/>
+        <location filename="../src/lemon.cpp" line="421"/>
         <source>Fetching Data...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="427"/>
+        <location filename="../src/lemon.cpp" line="429"/>
         <source>Initing...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="459"/>
+        <location filename="../src/lemon.cpp" line="461"/>
         <source>Now Cleaning...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="537"/>
+        <location filename="../src/lemon.cpp" line="539"/>
         <source>Finished.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="540"/>
+        <location filename="../src/lemon.cpp" line="542"/>
         <source>Aborted</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="634"/>
-        <location filename="../src/lemon.cpp" line="688"/>
-        <location filename="../src/lemon.cpp" line="697"/>
-        <location filename="../src/lemon.cpp" line="820"/>
-        <location filename="../src/lemon.cpp" line="831"/>
-        <location filename="../src/lemon.cpp" line="841"/>
-        <location filename="../src/lemon.cpp" line="853"/>
-        <location filename="../src/lemon.cpp" line="866"/>
-        <location filename="../src/lemon.cpp" line="937"/>
-        <location filename="../src/lemon.cpp" line="1246"/>
-        <location filename="../src/lemon.cpp" line="1312"/>
+        <location filename="../src/lemon.cpp" line="636"/>
+        <location filename="../src/lemon.cpp" line="690"/>
+        <location filename="../src/lemon.cpp" line="699"/>
+        <location filename="../src/lemon.cpp" line="822"/>
+        <location filename="../src/lemon.cpp" line="833"/>
+        <location filename="../src/lemon.cpp" line="843"/>
+        <location filename="../src/lemon.cpp" line="855"/>
+        <location filename="../src/lemon.cpp" line="868"/>
+        <location filename="../src/lemon.cpp" line="943"/>
+        <location filename="../src/lemon.cpp" line="1254"/>
+        <location filename="../src/lemon.cpp" line="1320"/>
         <source>Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="634"/>
-        <location filename="../src/lemon.cpp" line="689"/>
-        <location filename="../src/lemon.cpp" line="820"/>
-        <location filename="../src/lemon.cpp" line="1246"/>
+        <location filename="../src/lemon.cpp" line="636"/>
+        <location filename="../src/lemon.cpp" line="691"/>
+        <location filename="../src/lemon.cpp" line="822"/>
+        <location filename="../src/lemon.cpp" line="1254"/>
         <source>Cannot open file %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="635"/>
+        <location filename="../src/lemon.cpp" line="637"/>
         <source>Save Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="653"/>
+        <location filename="../src/lemon.cpp" line="655"/>
         <source>Saved</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="698"/>
-        <location filename="../src/lemon.cpp" line="832"/>
-        <location filename="../src/lemon.cpp" line="842"/>
-        <location filename="../src/lemon.cpp" line="854"/>
-        <location filename="../src/lemon.cpp" line="867"/>
+        <location filename="../src/lemon.cpp" line="700"/>
+        <location filename="../src/lemon.cpp" line="834"/>
+        <location filename="../src/lemon.cpp" line="844"/>
+        <location filename="../src/lemon.cpp" line="856"/>
+        <location filename="../src/lemon.cpp" line="869"/>
         <source>File %1 is broken</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="924"/>
-        <location filename="../src/lemon.cpp" line="1230"/>
+        <location filename="../src/lemon.cpp" line="928"/>
+        <location filename="../src/lemon.cpp" line="1238"/>
         <source>LemonLime - %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="926"/>
-        <location filename="../src/lemon.cpp" line="1232"/>
-        <location filename="../src/lemon.cpp" line="1463"/>
+        <location filename="../src/lemon.cpp" line="930"/>
+        <location filename="../src/lemon.cpp" line="1240"/>
+        <location filename="../src/lemon.cpp" line="1471"/>
         <source>LemonLime - %1 / %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="937"/>
-        <location filename="../src/lemon.cpp" line="1312"/>
+        <location filename="../src/lemon.cpp" line="943"/>
+        <location filename="../src/lemon.cpp" line="1320"/>
         <source>Cannot make contest path</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1150"/>
+        <location filename="../src/lemon.cpp" line="1158"/>
         <source>No task found</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1207"/>
-        <location filename="../src/lemon.cpp" line="1212"/>
-        <location filename="../src/lemon.cpp" line="1216"/>
-        <location filename="../src/lemon.cpp" line="1452"/>
+        <location filename="../src/lemon.cpp" line="1215"/>
+        <location filename="../src/lemon.cpp" line="1220"/>
+        <location filename="../src/lemon.cpp" line="1224"/>
+        <location filename="../src/lemon.cpp" line="1460"/>
         <source>Rename Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1207"/>
+        <location filename="../src/lemon.cpp" line="1215"/>
         <source>No Contest Yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1212"/>
-        <location filename="../src/lemon.cpp" line="1453"/>
+        <location filename="../src/lemon.cpp" line="1220"/>
+        <location filename="../src/lemon.cpp" line="1461"/>
         <source>Write the name you want.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1213"/>
+        <location filename="../src/lemon.cpp" line="1221"/>
         <source>New Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1216"/>
+        <location filename="../src/lemon.cpp" line="1224"/>
         <source>The name did not changes.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1295"/>
-        <location filename="../src/lemon.cpp" line="1305"/>
-        <location filename="../src/lemon.cpp" line="1417"/>
+        <location filename="../src/lemon.cpp" line="1303"/>
+        <location filename="../src/lemon.cpp" line="1313"/>
+        <location filename="../src/lemon.cpp" line="1425"/>
         <source>New Contest Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1296"/>
+        <location filename="../src/lemon.cpp" line="1304"/>
         <source>The folder name cannot contain path separators.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1306"/>
+        <location filename="../src/lemon.cpp" line="1314"/>
         <source>A contest day with this folder already exists.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1417"/>
+        <location filename="../src/lemon.cpp" line="1425"/>
         <source>Please create or open a contest first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1432"/>
+        <location filename="../src/lemon.cpp" line="1440"/>
         <source>Remove Contest Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1433"/>
+        <location filename="../src/lemon.cpp" line="1441"/>
         <source>Remove contest day &quot;%1&quot;?
 
 Yes: also delete its files.
@@ -2697,52 +2780,52 @@ No: remove it from the contest only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1477"/>
+        <location filename="../src/lemon.cpp" line="1485"/>
         <source>Version: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1479"/>
+        <location filename="../src/lemon.cpp" line="1487"/>
         <source>This is a tiny judging environment for OI contest based on Project LemonPlus.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1480"/>
+        <location filename="../src/lemon.cpp" line="1488"/>
         <source>Based on Project Lemon version 1.2 Beta by Zhipeng Jia, 2011</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1481"/>
+        <location filename="../src/lemon.cpp" line="1489"/>
         <source>Based on Project LemonPlus by Dust1404, 2019</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1482"/>
+        <location filename="../src/lemon.cpp" line="1490"/>
         <source>Update by iotang and Coelacanthus</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1483"/>
+        <location filename="../src/lemon.cpp" line="1491"/>
         <source>Build Info: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1484"/>
+        <location filename="../src/lemon.cpp" line="1492"/>
         <source>Build Extra Info: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1485"/>
+        <location filename="../src/lemon.cpp" line="1493"/>
         <source>Build Date: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1486"/>
+        <location filename="../src/lemon.cpp" line="1494"/>
         <source>This program is under the &lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;GPLv3&lt;/a&gt; license</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1489"/>
+        <location filename="../src/lemon.cpp" line="1497"/>
         <source>About LemonLime</source>
         <translation></translation>
     </message>
@@ -2808,7 +2891,7 @@ No: remove it from the contest only.</source>
     <message>
         <location filename="../src/newtaskdialog.cpp" line="58"/>
         <source>Problem Title</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/newtaskdialog.cpp" line="60"/>
@@ -2907,6 +2990,66 @@ No: remove it from the contest only.</source>
     <message>
         <location filename="../src/forms/optionsdialog.ui" line="40"/>
         <source>Compiler</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>PdfPreviewWidget</name>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="49"/>
+        <source>PDF Preview</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="51"/>
+        <source>Zoom:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="57"/>
+        <source>Zoom (Ctrl + mouse wheel)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="59"/>
+        <source>Refresh</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="93"/>
+        <location filename="../src/pdfpreview.cpp" line="136"/>
+        <location filename="../src/pdfpreview.cpp" line="170"/>
+        <source>Compile the statement to see the preview here.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="175"/>
+        <source>statement.pdf does not exist yet.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="188"/>
+        <source>pdftocairo / pdftoppm not found in PATH, so the PDF cannot be previewed.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="198"/>
+        <source>Rendering ...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="210"/>
+        <source>Rendering the PDF preview failed.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="221"/>
+        <source>Nothing could be rendered from statement.pdf.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="240"/>
+        <source>%1 page(s) · zoom %2</source>
         <translation></translation>
     </message>
 </context>
@@ -3152,6 +3295,236 @@ No: remove it from the contest only.</source>
     <message>
         <location filename="../src/base/settings.cpp" line="364"/>
         <source>Interactor Error</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>StatementBuilder</name>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1510"/>
+        <source>A statement build is already running.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1518"/>
+        <source>Cannot find the statement templates (statement-templates).</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1525"/>
+        <source>pandoc not found in PATH.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1532"/>
+        <source>xelatex not found in PATH.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1541"/>
+        <source>Building with template &quot;%1&quot; ...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1547"/>
+        <source>Building the statement PDF failed.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/statementbuilder.cpp" line="1551"/>
+        <source>Statement PDF written to %1</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>StatementEditWidget</name>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="180"/>
+        <source>Template:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="186"/>
+        <source>Import</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="187"/>
+        <source>Load statement/statement.md into the editor.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="188"/>
+        <source>Save</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="189"/>
+        <source>Export PDF</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="190"/>
+        <source>Compile statement/statement.pdf with pandoc + xelatex.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="191"/>
+        <source>Open PDF</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="220"/>
+        <source>Title / subtitle / day / date of the statement.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="222"/>
+        <source>Title</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="222"/>
+        <source>Subtitle</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="222"/>
+        <source>Day</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="222"/>
+        <source>Date</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="239"/>
+        <source>Problem Title</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="241"/>
+        <source>Title only, no leading #</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="243"/>
+        <source>No leading &quot;#&quot; needed: it is added automatically.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="266"/>
+        <source>Add a problem</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="269"/>
+        <source>Remove the selected problem</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="284"/>
+        <source>Build log</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="358"/>
+        <source>Compile the statement to see the preview here.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="374"/>
+        <source>Basic Information</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="376"/>
+        <source>Sections</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="377"/>
+        <source>Problems</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="572"/>
+        <source>Problem %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="612"/>
+        <source>Filled the default sections for the noi / noi new template.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="633"/>
+        <location filename="../src/statementeditwidget.cpp" line="654"/>
+        <location filename="../src/statementeditwidget.cpp" line="711"/>
+        <source>Statement</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="633"/>
+        <source>A statement build is still running.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="638"/>
+        <source>Imported %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="645"/>
+        <source>Saved %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="654"/>
+        <source>Cannot write %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="680"/>
+        <location filename="../src/statementeditwidget.cpp" line="681"/>
+        <source>Building statement.pdf ...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="695"/>
+        <source>Exported %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="699"/>
+        <source>Done.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="701"/>
+        <source>Failed: %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="702"/>
+        <location filename="../src/statementeditwidget.cpp" line="703"/>
+        <source>Building statement.pdf failed.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="711"/>
+        <source>%1 does not exist yet.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="721"/>
+        <source>New Problem</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="787"/>
+        <source>(unsaved changes)</source>
         <translation></translation>
     </message>
 </context>

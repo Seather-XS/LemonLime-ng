@@ -37,6 +37,8 @@ class StatementBuilder : public QObject {
 
 	/// 同步构建；失败时 `lastError()` 给出原因，构建日志通过 logMessage() 发出。
 	bool build();
+	/// 是否正在构建（供界面禁用按钮用）。
+	bool isBuilding() const { return building; }
 
 	QString lastError() const { return errorText; }
 
@@ -51,4 +53,5 @@ class StatementBuilder : public QObject {
 	QString sourceFile;
 	QString outputBase;
 	QString errorText;
+	bool building{false};
 };
