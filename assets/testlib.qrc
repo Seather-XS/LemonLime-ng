@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/testlib">
+        <file>testlib.h</file>
+    </qresource>
+</RCC>

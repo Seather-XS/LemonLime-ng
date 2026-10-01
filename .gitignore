@@ -1,0 +1,80 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Qt
+moc_*.cpp
+moc_*.h
+ui_*.cpp
+ui_*.h
+qrc_resource.cpp
+lemon.pro.user
+
+# CMake
+.ninja_deps
+.ninja_log
+CMakeCache.txt
+CMakeFiles/
+CMakeLists.txt.user
+build.ninja
+cmake_install.cmake
+lemon
+*_autogen/
+watcher_unix
+CPackConfig.cmake
+CPackSourceConfig.cmake
+_CPack_Packages/
+install_manifest.txt
+lemon-*-Linux.sh
+lemon-*-Linux.tar.Z
+lemon-*-Linux.tar.gz
+
+# Build output directories
+/build/
+/dist/
+
+# Generated translations and helper logs
+*.qm
+lupdate.txt
+build_log.txt
+
+# KDevelop
+.kdev4/
+*.kdev4
+.cache/
+
+# Extra
+build/
+build-debug/
+.idea/
+cmake-build-debug/
+.vscode/
