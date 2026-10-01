@@ -1,0 +1,213 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage{geometry}
+\geometry{a4paper, top=1in, bottom=1in, left=1in, right=1in, headsep=1.5em}
+\setlength{\intextsep}{0.5em}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\usepackage{CJKfntef}
+\usepackage{makecell}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage[svgnames]{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{tabu}
+\usepackage{multirow}
+\usepackage{tabulary}
+\usepackage{multicol}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{indentfirst}
+\usepackage{stackengine}
+\usepackage{amssymb}
+\usepackage{fix-cm}
+\usepackage{needspace}
+\usepackage{tocloft}
+
+\definecolor{mylinkcolor}{HTML}{FF007F}
+\hypersetup
+{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=mylinkcolor,
+    citecolor=mylinkcolor
+}
+\newcommand{\link}[2]{\href{#2}{#1}}
+\setCJKmainfont[BoldFont={SimHei}]{SimSun}
+\setCJKfamilyfont{kai}{KaiTi}
+\setCJKfamilyfont{hei}{SimHei}
+\newcommand{\kaishu}[1]{{\CJKfamily{kai} #1}}
+
+\setmonofont{Consolas}
+\setCJKmonofont{SimSun}
+
+\setlength{\parindent}{2em}
+\setlength{\headheight}{15pt}
+\setlist{
+    leftmargin=2em,
+    labelindent=0em,
+    labelsep=0.5em,
+    labelwidth=1.5em,
+    itemindent=0pt,
+    listparindent=0pt,
+    topsep=0pt,
+    partopsep=0pt,
+    parsep=0pt,
+    itemsep=0pt,
+}
+
+\setlist[1]{
+    leftmargin=3em,
+    labelindent=2em,
+    labelsep=0.5em,
+    labelwidth=0.5em,
+}
+\setstretch{1.3}
+\mathchardef\plainmathcomma=\mathcode`\, 
+\mathcode`\,="8000 
+{\catcode`\,=\active
+  \gdef,{ \plainmathcomma \allowbreak }
+}
+\sloppy
+
+\lstset{
+    basicstyle=\ttfamily,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{blue!70!white},
+    framerule=0.4pt,
+    numbers=left,
+    numberstyle=\color{gray}\upshape\ttfamily\footnotesize,
+    stepnumber=1,
+    firstnumber=1,
+    numberfirstline=true,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    xleftmargin=1em,
+    numbersep=1em,
+    xrightmargin=0em,
+    columns=flexible,
+    basewidth=0.35em,
+    keywordstyle=\bfseries\upshape\color{red!10!purple},
+    commentstyle=\upshape\color{green!60!white},
+    stringstyle=\bfseries\upshape\color{black},
+    identifierstyle=\upshape\color{black},
+    sensitive=true,
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]",
+    morestring=[b]',
+    morestring=[b]`,
+}
+
+\newenvironment{ul}{\begin{itemize}}{\end{itemize}}
+\newenvironment{ol}{\begin{enumerate}}{\end{enumerate}}
+\newcommand{\dottextbf}[1]{\CJKunderdot{\textbf{#1}}}
+\newcommand{\bolddot}[1]{\dottextbf{#1}}   
+\newcommand{\file}[1]{\textbf{\textit{#1}}}
+\newcommand{\cnbf}[1]{{\CJKfamily{hei} #1}}
+\let\emptyset\varnothing
+\titleformat{\section}
+    {\CJKfamily{hei}\fontsize{17.7pt}{17.7pt}\selectfont\filcenter}
+    {}{0em}
+    {}
+\titlespacing{\section}{2.5em}{0ex plus 0ex minus 0ex}{3ex plus .2ex}
+\newcommand{\bracketSubsection}[1]{【#1】}
+\titleformat{\subsection}
+    {\fontsize{12.8pt}{12.8pt}\selectfont\CJKfamily{hei}}
+    {}{0em}
+    {\bracketSubsection}
+\titleformat{\subsubsection}
+    {\fontsize{12.8pt}{12.8pt}\selectfont\CJKfamily{hei}}
+    {}{0em}
+    {}
+\titlespacing{\subsection}{1em}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\renewcommand{\thesection}{}
+\renewcommand{\thesubsection}{}
+\renewcommand{\thesubsubsection}{}
+
+\newenvironment{eqtabularx}[1]
+{
+    \tabularx{\textwidth}{*#1{X}}
+    \arrayrulewidth=0.5pt
+}
+{
+    \endtabularx
+}
+\newenvironment{tuacktable}[2][3]{%
+    \def\tuacktablecolumns{#1}%
+    \renewcommand{\arraystretch}{1.1}\setlength{\LTleft}{\fill}\setlength{\LTright}{\fill}%
+    \begin{longtable}{@{}c*{\numexpr#1-1\relax}{|c}@{}}%
+    \noalign{\global\arrayrulewidth=2pt}\cline{1-#1}\noalign{\global\arrayrulewidth=0.4pt}%
+    #2\\\noalign{\global\arrayrulewidth=1pt}\cline{1-#1}\noalign{\global\arrayrulewidth=0.4pt}\endfirsthead%
+    \noalign{\global\arrayrulewidth=2pt}\cline{1-#1}\noalign{\global\arrayrulewidth=0.4pt}%
+    #2\\\noalign{\global\arrayrulewidth=1pt}\cline{1-#1}\noalign{\global\arrayrulewidth=0.4pt}\endhead%
+}{%
+    \noalign{\global\arrayrulewidth=2pt}\cline{1-\tuacktablecolumns}\end{longtable}%
+}
+
+\newcommand{\textbolddot}[1]{\stackunder[0.4ex]{\textbf{#1}}{\textbullet}}
+\setcounter{tocdepth}{1}
+\setlength{\cftsecindent}{0pt}
+\setlength{\cftsecnumwidth}{0pt}
+\renewcommand{\contentsname}{}
+\setlength{\cftbeforetoctitleskip}{0pt}
+\setlength{\cftaftertoctitleskip}{0pt}
+\renewcommand{\cftsecfont}{\CJKfamily{hei}\selectfont}
+\renewcommand{\cftsecpagefont}{\CJKfamily{hei}\selectfont}
+\renewcommand{\headrulewidth}{0.2pt}
+
+\newcommand{\myTitleSize}{\fontsize{22pt}{26.4pt}\selectfont}
+\newcommand{\myDateSize}{\fontsize{15pt}{0.6pt}\selectfont}
+\newcommand{\bigtitle}{CCPC}
+\newcommand{\shorttitle}{CCPC}
+\newcommand{\myday}{}
+\newcommand{\mydate}{}
+
+\renewcommand{\sectionmark}[1]{\markboth{#1}{#1}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead{}
+\fancyhead[L]{{\footnotesize \bigtitle  }}
+\fancyhead[R]{\footnotesize \myday\hspace{0.5em}\nouppercase{\leftmark}\unskip}
+\fancyfoot[C]{{\footnotesize 第 \thepage 页\hspace{2em}共 \hyperref[LastPage]{\pageref{LastPage}} 页}}
+
+\begin{document}
+\thispagestyle{empty}
+\begin{center}
+
+\includegraphics[width=1.0\textwidth]{ccpc.png}
+
+\if\relax\detokenize\expandafter{\bigtitle}\relax
+  \if\relax\detokenize\expandafter{\shorttitle}\relax\else\vspace{0.6em}{\myTitleSize \cnbf{\shorttitle}}\fi
+\else
+  \if\relax\detokenize\expandafter{\shorttitle}\relax
+    \vspace{0.6em}{\myTitleSize \textbf{\bigtitle}}
+  \else
+    \vspace{0.6em}{\myTitleSize \textbf{\bigtitle}}\hspace{1.3em}{\myTitleSize \cnbf{\shorttitle}}
+  \fi
+\fi
+
+\if\relax\detokenize\expandafter{\myday}\relax\else\vspace{1.0em}{\myTitleSize \kaishu{\myday}}\fi
+
+\if\relax\detokenize\expandafter{\mydate}\relax\else\vspace{0.5em}{\myDateSize{\cnbf{时间：\mydate}}}\fi
+\end{center}
+
+\vspace{2.0em}
+
+\textbf{目录}
+
+\tableofcontents
+
+\thispagestyle{empty}
+
+\newpage
+
+% Intentionally empty document body; content will be injected from markdown
+% and named sections. This template does not include example problems by default.
+\end{document}
