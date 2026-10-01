@@ -121,12 +121,35 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 		QString extraFiles = "";
 
 		if (task->getTaskType() == Task::Interaction) {
-			QFile::copy(Settings::dataPath() + task->getInteractor(),
-			            QDir::toNativeSeparators(temporaryDir.path()) + QDir::separator() + contestantName +
-			                QDir::separator() + task->getInteractorName());
-			QFile::copy(Settings::dataPath() + task->getGrader(),
-			            QDir::toNativeSeparators(temporaryDir.path()) + QDir::separator() + contestantName +
-			                QDir::separator() + "__grader.cpp");
+			// 交互库只从 <题>/graders/ 下读取：工程里存的是哪里的路径都按文件名去该目录找。
+			QString taskName = task->getSourceFileName();
+
+			if (taskName.isEmpty())
+				taskName = task->getProblemTitle();
+
+			const QString interactorSource =
+			    Settings::dataPath() + Settings::graderFilePath(taskName, task->getInteractor());
+			const QString copyTarget =
+			    QDir::toNativeSeparators(temporaryDir.path()) + QDir::separator() + contestantName +
+			    QDir::separator();
+			QString interactorName = task->getInteractorName();
+
+			if (interactorName.isEmpty())
+				interactorName = QFileInfo(interactorSource).fileName();
+
+			if (! QFile::copy(interactorSource, copyTarget + interactorName))
+				makeDialogAlert(tr("The interactor %1 cannot be found in %2")
+				                    .arg(QFileInfo(interactorSource).fileName(),
+				                         QDir::fromNativeSeparators(Settings::gradersPath(taskName))));
+
+			// 主接口程序同样只在 <题>/graders/ 下读取。
+			const QString graderSource =
+			    Settings::dataPath() + Settings::graderFilePath(taskName, task->getGrader());
+
+			if (! QFile::copy(graderSource, copyTarget + "__grader.cpp"))
+				makeDialogAlert(tr("The grader %1 cannot be found in %2")
+				                    .arg(QFileInfo(graderSource).fileName(),
+				                         QDir::fromNativeSeparators(Settings::gradersPath(taskName))));
 		}
 
 		if (task->getTaskType() == Task::Communication || task->getTaskType() == Task::CommunicationExec) {

@@ -47,9 +47,29 @@ void FileLineEdit::setFileExtensions(const QStringList &extensions) {
 	refreshFileList();
 }
 
+void FileLineEdit::setRootDirectory(const QString &relativeDir) {
+	rootDirectory.clear();
+
+	if (! relativeDir.isEmpty()) {
+		rootDirectory = relativeDir;
+
+		if (! rootDirectory.endsWith(QDir::separator()))
+			rootDirectory.append(QDir::separator());
+	}
+
+	refreshFileList();
+}
+
 void FileLineEdit::refreshFileList() {
 	QStringList files;
-	getFiles(Settings::dataPath(), "", files);
+
+	// 限定根目录时只列出该目录（含其子目录）下的文件，补全项带上目录前缀，
+	// 这样填进控件的就是 <题>/graders/<文件> 这类可直接使用的相对路径。
+	if (rootDirectory.isEmpty())
+		getFiles(Settings::dataPath(), "", files);
+	else
+		getFiles(Settings::dataPath() + rootDirectory, rootDirectory, files);
+
 	delete completer;
 	completer = new QCompleter(files, this);
 	setCompleter(completer);

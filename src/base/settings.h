@@ -144,6 +144,10 @@ class Settings {
 	static QString sourcePath();
 	static QString importPath();
 	static QString selfTestPath();
+	/// 交互库 / 校验器只允许放在 <题>/graders/ 下，返回相对 dataPath() 的该目录（带结尾分隔符）。
+	static QString gradersPath(const QString &taskName);
+	/// <题>/graders/<文件>（相对 dataPath()），与工程中保存交互库路径的格式一致。
+	static QString graderFilePath(const QString &taskName, const QString &fileName);
 	/// 建立某个试题的标准子目录：problem/<题>/{data,down,graders,gen,tests}。
 	static void ensureTaskDirs(const QString &taskName);
 

@@ -56,6 +56,9 @@ TaskEditWidget::TaskEditWidget(QWidget *parent) : QWidget(parent), ui(new Ui::Ta
 	        &TaskEditWidget::comparisonModeChanged);
 	connect(ui->testlibSpecialJudge, &QLineEdit::textChanged, this, &TaskEditWidget::specialJudgeChanged);
 	connect(ui->interactorPath, &QLineEdit::textChanged, this, &TaskEditWidget::interactorChanged);
+	connect(ui->interactorPath, &QLineEdit::editingFinished, this,
+	        &TaskEditWidget::graderPathEditingFinished);
+	connect(ui->graderPath, &QLineEdit::editingFinished, this, &TaskEditWidget::graderPathEditingFinished);
 	connect(ui->interactorName, &QLineEdit::textChanged, this, &TaskEditWidget::interactorNameChanged);
 	connect(ui->graderPath, &QLineEdit::textChanged, this, &TaskEditWidget::graderChanged);
 	connect(ui->compilersList, &QListWidget::currentRowChanged, this,
@@ -113,6 +116,8 @@ void TaskEditWidget::setEditTask(Task *task) {
 	ui->interactorPath->setText(editTask->getInteractor());
 	ui->interactorName->setText(editTask->getInteractorName());
 	ui->graderPath->setText(editTask->getGrader());
+	// 交互库与主接口程序只能从 <题>/graders/ 中选取
+	refreshGraderRoots();
 	ui->standardInputCheck->setChecked(editTask->getStandardInputCheck());
 	ui->standardOutputCheck->setChecked(editTask->getStandardOutputCheck());
 	// ui->interactorPathLabel->setVisible(editTask->getTaskType() == Task::Interaction);
@@ -247,6 +252,7 @@ void TaskEditWidget::setToInteraction(bool check) {
 	ui->interactorPath->setText(editTask->getInteractor());
 	ui->interactorName->setText(editTask->getInteractorName());
 	ui->graderPath->setText(editTask->getGrader());
+	refreshGraderRoots();
 	// editTask->setStandardOutputCheck(true);
 	// ui->standardOutputCheck->setCheckState(Qt::Checked);
 	refreshWidgetState();
@@ -349,6 +355,81 @@ void TaskEditWidget::interactorChanged(const QString &text) {
 		return;
 
 	editTask->setInteractor(text);
+}
+
+// 交互库与主接口程序（grader.cpp）都只从 <题>/graders/ 读取：返回规范化后的相对路径，
+// 本来就在该目录里的原样返回。
+static QString toGradersPath(const QString &relative, const QString &taskName) {
+	const QString prefix = QDir::fromNativeSeparators(Settings::gradersPath(taskName));
+
+	if (QDir::fromNativeSeparators(relative).startsWith(prefix))
+		return relative;
+
+	return Settings::graderFilePath(taskName, relative);
+}
+
+// 交互库与主接口程序的候选列表都限定到 <题>/graders/；
+// 旧工程里指向其它目录的路径则在 graders/ 下确有同名文件时归一到新位置。
+void TaskEditWidget::refreshGraderRoots() {
+	if (! editTask)
+		return;
+
+	const QString taskName = currentTaskName();
+
+	if (taskName.isEmpty())
+		return;
+
+	ui->interactorPath->setRootDirectory(Settings::gradersPath(taskName));
+	ui->graderPath->setRootDirectory(Settings::gradersPath(taskName));
+
+	auto adopt = [&](const QString &stored, QLineEdit *edit) {
+		if (stored.isEmpty())
+			return;
+
+		const QString normalized = toGradersPath(stored, taskName);
+
+		if (normalized == stored)
+			return;
+
+		if (QFileInfo::exists(Settings::dataPath() + normalized))
+			edit->setText(normalized);
+	};
+
+	adopt(editTask->getInteractor(), ui->interactorPath);
+	adopt(editTask->getGrader(), ui->graderPath);
+}
+
+// 手填的路径也只会去 <题>/graders/ 找，这里把控件内容一并纠正过去。
+void TaskEditWidget::graderPathEditingFinished() {
+	if (! editTask)
+		return;
+
+	const QString taskName = currentTaskName();
+
+	if (taskName.isEmpty())
+		return;
+
+	const QList<QLineEdit *> edits = {ui->interactorPath, ui->graderPath};
+
+	for (QLineEdit *edit : edits) {
+		const QString text = edit->text();
+
+		if (text.isEmpty())
+			continue;
+
+		const QString normalized = toGradersPath(text, taskName);
+
+		if (normalized != text)
+			edit->setText(normalized);
+	}
+}
+
+auto TaskEditWidget::currentTaskName() const -> QString {
+	if (! editTask)
+		return {};
+
+	const QString sourceFileName = editTask->getSourceFileName();
+	return sourceFileName.isEmpty() ? editTask->getProblemTitle() : sourceFileName;
 }
 
 void TaskEditWidget::interactorNameChanged(const QString &text) {

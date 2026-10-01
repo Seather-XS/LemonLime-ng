@@ -41,6 +41,8 @@ class TaskEditWidget : public QWidget {
 	void rmGraderFilesAt(int);
 	void multiFilesRefresh();
 	void refreshComparisonMode(int);
+	void refreshGraderRoots();
+	QString currentTaskName() const;
 	QList<int> comparisonModes;
 
   private slots:
@@ -57,6 +59,7 @@ class TaskEditWidget : public QWidget {
 	void comparisonModeChanged();
 	void specialJudgeChanged(const QString &);
 	void interactorChanged(const QString &);
+	void graderPathEditingFinished();
 	void interactorNameChanged(const QString &);
 	void graderChanged(const QString &);
 	void refreshProblemTitle(const QString &);

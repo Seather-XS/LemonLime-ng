@@ -1112,225 +1112,225 @@ This cannot be undone.</source>
 <context>
     <name>ExportUtil</name>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="55"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="434"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="63"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="454"/>
         <source>Task</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="58"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="437"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="66"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="457"/>
         <source>Not judged</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="75"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="453"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="83"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="473"/>
         <source>Cannot find valid source file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="80"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="92"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="122"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="458"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="469"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="499"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="88"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="100"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="130"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="478"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="489"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="519"/>
         <source>Source file: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="83"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="460"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="91"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="480"/>
         <source>Compile time limit exceeded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="87"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="464"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="95"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="484"/>
         <source>Cannot run given compiler</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="94"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="471"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="102"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="491"/>
         <source>Compile error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="126"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="503"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="134"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="523"/>
         <source>Test Case</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="127"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="504"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="135"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="524"/>
         <source>Input File</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="128"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="505"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="136"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="525"/>
         <source>Result</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="129"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="506"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="137"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="526"/>
         <source>Time Used</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="130"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="507"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="138"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="527"/>
         <source>Memory Used</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="131"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="508"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="139"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="528"/>
         <source>Score</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="152"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="529"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="160"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="549"/>
         <source>Subtask Dependence Status</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="175"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="184"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="344"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="383"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="553"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="562"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="672"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="681"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="760"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="769"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="849"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="859"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="183"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="192"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="357"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="403"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="573"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="582"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="697"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="710"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="789"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="798"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="878"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="888"/>
         <source>Invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="218"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="588"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="226"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="608"/>
         <source>Return to top</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="234"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="415"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="596"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="696"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="703"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="774"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="782"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="867"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="876"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="882"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="242"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="435"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="616"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="725"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="732"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="803"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="811"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="896"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="905"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="911"/>
         <source>LemonLime</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="235"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="597"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="704"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="783"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="243"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="617"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="733"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="812"/>
         <source>Cannot open file %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="265"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="613"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="273"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="633"/>
         <source>Contest Result</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="297"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="645"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="305"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="665"/>
         <source>Rank List</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="298"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="306"/>
         <source>Click names or task scores to jump to details. Judged By LemonLime</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="300"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="648"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="741"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="825"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="308"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="668"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="770"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="854"/>
         <source>Rank</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="301"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="649"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="741"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="826"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="309"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="669"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="770"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="855"/>
         <source>Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="302"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="650"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="747"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="832"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="310"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="670"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="776"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="861"/>
         <source>Total Score</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="395"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="690"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="415"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="719"/>
         <source>Contestant: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="415"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="696"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="774"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="867"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="435"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="725"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="803"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="896"/>
         <source>Export is done</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="646"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="666"/>
         <source>Judged By LemonLime</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="876"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="905"/>
         <source>No contestant in current contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="882"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="911"/>
         <source>No task in current contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="886"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="915"/>
         <source>HTML Document (*.html *.htm);;CSV (*.csv)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="891"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="920"/>
         <source>;;Excel Workbook (*.xls)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="896"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="925"/>
         <source>Export Result</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="70"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="449"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="78"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="469"/>
         <source>Main grader (grader.*) cannot be found</source>
         <translation></translation>
     </message>
@@ -2493,7 +2493,6 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="954"/>
-        <location filename="../src/lemon.cpp" line="1496"/>
         <source>Manual</source>
         <translation></translation>
     </message>
@@ -3007,7 +3006,7 @@ No: remove it from the contest only.</source>
     <message>
         <location filename="../src/resultviewer.cpp" line="46"/>
         <location filename="../src/resultviewer.cpp" line="65"/>
-        <location filename="../src/resultviewer.cpp" line="307"/>
+        <location filename="../src/resultviewer.cpp" line="308"/>
         <source>Ignore Restrictions and Rejudge</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3038,43 +3037,42 @@ No: remove it from the contest only.</source>
     </message>
     <message>
         <location filename="../src/resultviewer.cpp" line="195"/>
-        <location filename="../src/resultviewer.cpp" line="223"/>
-        <location filename="../src/resultviewer.cpp" line="224"/>
-        <location filename="../src/resultviewer.cpp" line="233"/>
+        <location filename="../src/resultviewer.cpp" line="230"/>
         <location filename="../src/resultviewer.cpp" line="234"/>
         <location filename="../src/resultviewer.cpp" line="235"/>
-        <location filename="../src/resultviewer.cpp" line="254"/>
-        <location filename="../src/resultviewer.cpp" line="375"/>
+        <location filename="../src/resultviewer.cpp" line="236"/>
+        <location filename="../src/resultviewer.cpp" line="255"/>
+        <location filename="../src/resultviewer.cpp" line="376"/>
         <source>Invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="308"/>
+        <location filename="../src/resultviewer.cpp" line="309"/>
         <source>Please make sure the contestants&apos; code will not harm your judging machine before continuing to rejudge. Ignore the restrictions and rejudge?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="311"/>
+        <location filename="../src/resultviewer.cpp" line="312"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="312"/>
+        <location filename="../src/resultviewer.cpp" line="313"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="476"/>
+        <location filename="../src/resultviewer.cpp" line="477"/>
         <source>LemonLime</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="478"/>
+        <location filename="../src/resultviewer.cpp" line="479"/>
         <source>Are you sure to delete selected contestant(s)?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="481"/>
+        <location filename="../src/resultviewer.cpp" line="482"/>
         <source>Delete data in the disk as well</source>
         <translation></translation>
     </message>
@@ -3251,84 +3249,84 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="293"/>
-        <location filename="../src/statisticsbrowser.cpp" line="407"/>
+        <location filename="../src/statisticsbrowser.cpp" line="298"/>
+        <location filename="../src/statisticsbrowser.cpp" line="423"/>
         <source>No contest yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="302"/>
-        <location filename="../src/statisticsbrowser.cpp" line="415"/>
+        <location filename="../src/statisticsbrowser.cpp" line="307"/>
+        <location filename="../src/statisticsbrowser.cpp" line="431"/>
         <source>No task yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="308"/>
-        <location filename="../src/statisticsbrowser.cpp" line="420"/>
+        <location filename="../src/statisticsbrowser.cpp" line="313"/>
+        <location filename="../src/statisticsbrowser.cpp" line="436"/>
         <source>No contestant yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="314"/>
+        <location filename="../src/statisticsbrowser.cpp" line="319"/>
         <source>Some unhandled situation happened. May not all contestants are well judged, or not rejudged after changing testcases. Please refresh and rejudge.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="324"/>
+        <location filename="../src/statisticsbrowser.cpp" line="329"/>
         <source>Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="325"/>
+        <location filename="../src/statisticsbrowser.cpp" line="330"/>
         <source>Overall</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="347"/>
+        <location filename="../src/statisticsbrowser.cpp" line="352"/>
         <source>Warning: Judgement is not finished.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="354"/>
+        <location filename="../src/statisticsbrowser.cpp" line="359"/>
         <source>Problems</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="358"/>
+        <location filename="../src/statisticsbrowser.cpp" line="363"/>
         <source>Task</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="376"/>
+        <location filename="../src/statisticsbrowser.cpp" line="390"/>
         <source>Number of answer submitted</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="393"/>
-        <location filename="../src/statisticsbrowser.cpp" line="402"/>
-        <location filename="../src/statisticsbrowser.cpp" line="407"/>
-        <location filename="../src/statisticsbrowser.cpp" line="415"/>
-        <location filename="../src/statisticsbrowser.cpp" line="420"/>
+        <location filename="../src/statisticsbrowser.cpp" line="409"/>
+        <location filename="../src/statisticsbrowser.cpp" line="418"/>
+        <location filename="../src/statisticsbrowser.cpp" line="423"/>
+        <location filename="../src/statisticsbrowser.cpp" line="431"/>
+        <location filename="../src/statisticsbrowser.cpp" line="436"/>
         <source>LemonLime</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="394"/>
+        <location filename="../src/statisticsbrowser.cpp" line="410"/>
         <source>Cannot open file %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="402"/>
+        <location filename="../src/statisticsbrowser.cpp" line="418"/>
         <source>Export is done</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="424"/>
+        <location filename="../src/statisticsbrowser.cpp" line="440"/>
         <source>HTML Document (*.html)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="426"/>
+        <location filename="../src/statisticsbrowser.cpp" line="442"/>
         <source>Export Statistics</source>
         <translation></translation>
     </message>
@@ -3632,7 +3630,7 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/taskeditwidget.cpp" line="331"/>
+        <location filename="../src/taskeditwidget.cpp" line="337"/>
         <source>The comparison mode of this task is not supported any more.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3645,17 +3643,27 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/taskjudger.cpp" line="199"/>
+        <location filename="../src/core/taskjudger.cpp" line="141"/>
+        <source>The interactor %1 cannot be found in %2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/taskjudger.cpp" line="150"/>
+        <source>The grader %1 cannot be found in %2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/taskjudger.cpp" line="222"/>
         <source>Compiling...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/taskjudger.cpp" line="235"/>
+        <location filename="../src/core/taskjudger.cpp" line="258"/>
         <source>Main grader (grader.*) cannot be found</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/taskjudger.cpp" line="319"/>
+        <location filename="../src/core/taskjudger.cpp" line="342"/>
         <source>Compiled Successfully</source>
         <translation></translation>
     </message>

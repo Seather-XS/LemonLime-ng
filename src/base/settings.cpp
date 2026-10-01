@@ -623,6 +623,21 @@ auto Settings::dataPath() -> QString { return QString("problem") + QDir::separat
 
 auto Settings::sourcePath() -> QString { return QString("answers") + QDir::separator(); }
 
+// 交互库（交互题头文件）与校验器只允许放在 <题>/graders/ 下，路径相对于 dataPath()。
+auto Settings::gradersPath(const QString &taskName) -> QString {
+	if (taskName.isEmpty())
+		return {};
+
+	return taskName + QDir::separator() + QStringLiteral("graders") + QDir::separator();
+}
+
+auto Settings::graderFilePath(const QString &taskName, const QString &fileName) -> QString {
+	if (fileName.isEmpty())
+		return {};
+
+	return gradersPath(taskName) + QFileInfo(fileName).fileName();
+}
+
 // 快速导入：把原 Lemon 的 data/<题>/<文件> 放进 import/ 下，一键配置
 // 成 gengen 布局的 problem/<题>/data/<文件>。
 auto Settings::importPath() -> QString { return QString("import") + QDir::separator(); }
