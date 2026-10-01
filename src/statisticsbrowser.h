@@ -21,8 +21,6 @@ namespace Ui {
 class Contest;
 class TestCase;
 
-static QString nowBrowserText;
-
 class StatisticsBrowser : public QWidget {
 	Q_OBJECT
 
@@ -42,5 +40,8 @@ class StatisticsBrowser : public QWidget {
 	static QString getScoreNormalChart(const QMap<int, int> &, int, int);
 	static QString getTestcaseScoreChart(QList<TestCase *>, QList<QList<QList<int>>>,
 	                                     QList<QList<QList<ResultState>>>);
-	static void exportStatisticsHtml(QWidget *, const QString &);
+	/// 生成统计页 HTML；contestantList 决定统计范围（全体 = 总统计，某个赛区 = 赛区统计）。
+	static QString buildStatisticsHtml(Contest *, const QList<Contestant *> &,
+	                                   const QString &regionName = QString());
+	static bool writeHtml(QWidget *, const QString &fileName, const QString &content);
 };

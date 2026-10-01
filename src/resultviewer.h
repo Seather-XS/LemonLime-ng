@@ -41,6 +41,8 @@ class ResultViewer : public QTableWidget {
 	QAction *judgeIgnoreLimitsAction;
 	QAction *deleteContestantKeyAction;
 	void clearPath(const QString &);
+	/// 试题成绩第一列的列号：Rank / Name [/ Region] / Total Score 之后（启用赛区时为 4，否则 3）。
+	int taskColumnBase() const;
 	/// 当前选中区域对应该测的 (选手名, 试题下标) 列表。
 	QList<std::pair<QString, QVector<int>>> selectedJudgeList();
 

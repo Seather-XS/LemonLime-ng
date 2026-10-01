@@ -159,4 +159,8 @@ namespace Lemon::common {
 
 	bool FileExistsIn(const QDir &dir, const QString &fileName);
 
+	/// 把任意文本（例如赛区名）转成可以安全用作文件名的一部分：
+	/// 去掉 Windows 文件名不允许的字符，去掉结尾的点，空的话返回 fallback。
+	QString FileNameSafePart(const QString &name, const QString &fallback = QStringLiteral("region"));
+
 } // namespace Lemon::common

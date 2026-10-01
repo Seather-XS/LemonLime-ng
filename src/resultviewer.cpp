@@ -112,6 +112,11 @@ void ResultViewer::setContest(Contest *contest) {
 	connect(curContest, &Contest::taskJudgingFinished, this, &ResultViewer::refreshViewer);
 }
 
+int ResultViewer::taskColumnBase() const {
+	// 启用赛区时，选手名后多一列「赛区」，后面的列号整体右移一位。
+	return (curContest && curContest->getRegionEnabled()) ? 4 : 3;
+}
+
 void ResultViewer::refreshViewer() {
 	clear();
 	setRowCount(0);
@@ -120,8 +125,15 @@ void ResultViewer::refreshViewer() {
 	if (! curContest)
 		return;
 
+	// 启用赛区时，在选手名后面加一列「赛区」（显示与导出保持一致）。
+	const bool withRegion = curContest->getRegionEnabled();
 	QStringList headerList;
-	headerList << tr("Rank") << tr("Name") << tr("Total Score");
+	headerList << tr("Rank") << tr("Name");
+
+	if (withRegion)
+		headerList << tr("Region");
+
+	headerList << tr("Total Score");
 	QList<Task *> taskList = curContest->getTaskList();
 	Settings setting;
 	curContest->copySettings(setting);
@@ -146,7 +158,7 @@ void ResultViewer::refreshViewer() {
 	}
 
 	headerList << tr("Total Used Time (s)") << tr("Judging Time");
-	setColumnCount(taskList.size() + 5);
+	setColumnCount(taskList.size() + 5 + (withRegion ? 1 : 0));
 	setHorizontalHeaderLabels(headerList);
 	horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	QList<Contestant *> contestantList = curContest->getContestantList();
@@ -160,17 +172,27 @@ void ResultViewer::refreshViewer() {
 
 	setRowCount(contestantList.size());
 
+	const int regionShift = withRegion ? 1 : 0;
+	const int base = taskColumnBase();
+	const int scoreColumn = 2 + regionShift;
+	const int timeColumn = taskList.size() + 3 + regionShift;
+	const int judgingTimeColumn = taskList.size() + 4 + regionShift;
+
 	for (int i = 0; i < contestantList.size(); i++) {
 		setItem(i, 0, new QTableWidgetItem());
 		setItem(i, 1, new QTableWidgetItem(contestantList[i]->getContestantName()));
-		setItem(i, 2, new QTableWidgetItem());
+
+		if (withRegion)
+			setItem(i, 2, new QTableWidgetItem(contestantList[i]->getRegion()));
+
+		setItem(i, scoreColumn, new QTableWidgetItem());
 
 		for (int j = 0; j < taskList.size(); j++) {
-			setItem(i, j + 3, new QTableWidgetItem());
+			setItem(i, j + base, new QTableWidgetItem());
 			int score = contestantList[i]->getTaskScore(j);
 
 			if (score != -1) {
-				item(i, j + 3)->setData(Qt::DisplayRole, score);
+				item(i, j + base)->setData(Qt::DisplayRole, score);
 				QColor bg = QColor::fromHsl(0, 0, 255);
 
 				if (contestantList[i]->getDisqualifyState() == Contestant::ViolationDisqualified) {
@@ -186,54 +208,54 @@ void ResultViewer::refreshViewer() {
 				} else
 					bg = colors.getColorPer(score, fullScore[j]);
 
-				item(i, j + 3)->setBackground(bg);
+				item(i, j + base)->setBackground(bg);
 
 				// 被判定取消测试的选手：得分仍按 0 显示，悬停可看到原因（详情见双击）。
 				if (contestantList[i]->isDisqualified())
-					item(i, j + 3)->setToolTip(contestantList[i]->getDisqualifyMessage());
+					item(i, j + base)->setToolTip(contestantList[i]->getDisqualifyMessage());
 			} else {
-				item(i, j + 3)->setText(tr("Invalid"));
+				item(i, j + base)->setText(tr("Invalid"));
 			}
 		}
 
-		setItem(i, taskList.size() + 3, new QTableWidgetItem());
-		setItem(i, taskList.size() + 4, new QTableWidgetItem());
+		setItem(i, timeColumn, new QTableWidgetItem());
+		setItem(i, judgingTimeColumn, new QTableWidgetItem());
 		int totalScore = contestantList[i]->getTotalScore();
 		int totalUsedTime = contestantList[i]->getTotalUsedTime();
 		QDateTime judgingTime = contestantList[i]->getJudingTime();
 
 		if (totalScore != -1) {
-			item(i, 2)->setData(Qt::DisplayRole, totalScore);
+			item(i, scoreColumn)->setData(Qt::DisplayRole, totalScore);
 
 			// 违规 / 命名不合规都是 0 分，照常参与排名，只用颜色区分原因。
 			if (contestantList[i]->getDisqualifyState() == Contestant::ViolationDisqualified) {
-				item(i, 2)->setBackground(QColor(200, 60, 60));
-				item(i, 2)->setToolTip(contestantList[i]->getDisqualifyMessage());
+				item(i, scoreColumn)->setBackground(QColor(200, 60, 60));
+				item(i, scoreColumn)->setToolTip(contestantList[i]->getDisqualifyMessage());
 			} else if (contestantList[i]->getDisqualifyState() == Contestant::NamingDisqualified) {
-				item(i, 2)->setBackground(QColor(160, 90, 200));
-				item(i, 2)->setToolTip(contestantList[i]->getDisqualifyMessage());
+				item(i, scoreColumn)->setBackground(QColor(160, 90, 200));
+				item(i, scoreColumn)->setToolTip(contestantList[i]->getDisqualifyMessage());
 			} else
-				item(i, 2)->setBackground(colors.getColorGrand(totalScore, sfullScore));
+				item(i, scoreColumn)->setBackground(colors.getColorGrand(totalScore, sfullScore));
 
 			QFont font;
 			font.setBold(true);
-			item(i, 2)->setFont(font);
+			item(i, scoreColumn)->setFont(font);
 
 			// 被判定取消测试的选手：一题都没跑，所以用时为 0；时间就是他这一轮
 			// 被判定取消的时间，照常显示。
-			item(i, taskList.size() + 3)->setData(Qt::DisplayRole, double(totalUsedTime) / 1000);
+			item(i, timeColumn)->setData(Qt::DisplayRole, double(totalUsedTime) / 1000);
 
 			if (judgingTime.isValid())
-				item(i, taskList.size() + 4)
+				item(i, judgingTimeColumn)
 				    ->setData(Qt::DisplayRole, judgingTime.toString("yyyy-MM-dd hh:mm:ss"));
 			else
-				item(i, taskList.size() + 4)->setText(tr("Invalid"));
+				item(i, judgingTimeColumn)->setText(tr("Invalid"));
 
 			sortList.append(std::make_pair(-totalScore, contestantList[i]->getContestantName()));
 		} else {
-			item(i, 2)->setText(tr("Invalid"));
-			item(i, taskList.size() + 3)->setText(tr("Invalid"));
-			item(i, taskList.size() + 4)->setText(tr("Invalid"));
+			item(i, scoreColumn)->setText(tr("Invalid"));
+			item(i, timeColumn)->setText(tr("Invalid"));
+			item(i, judgingTimeColumn)->setText(tr("Invalid"));
 		}
 	}
 
@@ -331,12 +353,13 @@ auto ResultViewer::selectedJudgeList() -> QList<std::pair<QString, QVector<int>>
 	QMap<QString, QSet<int>> mapping;
 	QList<Task *> taskList = curContest->getTaskList();
 	int taskSize = taskList.size();
+	const int base = taskColumnBase();
 
 	for (auto &i : selectionRange) {
 		for (int j = i.topRow(); j <= i.bottomRow(); j++) {
 			for (int k = i.leftColumn(); k <= i.rightColumn(); k++) {
-				if (3 <= k && k < 3 + taskSize)
-					mapping[item(j, 1)->text()].insert(k - 3);
+				if (base <= k && k < base + taskSize)
+					mapping[item(j, 1)->text()].insert(k - base);
 				else {
 					for (int a = 0; a < taskSize; a++)
 						mapping[item(j, 1)->text()].insert(a);
@@ -371,9 +394,11 @@ void ResultViewer::judgeUnjudged() {
 	int contestantSize = contestantList.size();
 	int taskSize = taskList.size();
 
+	const int base = taskColumnBase();
+
 	for (int i = 0; i < contestantSize; i++) {
 		for (int j = 0; j < taskSize; j++) {
-			if (item(i, j + 3)->text() == tr("Invalid")) {
+			if (item(i, j + base)->text() == tr("Invalid")) {
 				mapping[item(i, 1)->text()].push_back(j);
 			}
 		}

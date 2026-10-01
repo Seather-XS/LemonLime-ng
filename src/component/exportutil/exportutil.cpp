@@ -10,6 +10,7 @@
 #include "exportutil.h"
 //
 #include "base/LemonType.hpp"
+#include "base/LemonUtils.hpp"
 #include "base/settings.h"
 #include "core/contest.h"
 #include "core/contestant.h"
@@ -307,6 +308,11 @@ void ExportUtil::exportHtml(QWidget *widget, Contest *contest, const QString &fi
 	out << R"(<p><table cellpadding="1" style="border-style: solid;"><tr>)";
 	out << QString(R"(<th class="th-0" scope="col">%1</th>)").arg(tr("Rank"));
 	out << QString(R"(<th class="th-0" scope="col">%1</th>)").arg(tr("Name"));
+
+	// 启用赛区时，选手名后加一列「赛区」，与软件里显示的成绩表一致。
+	if (contest->getRegionEnabled())
+		out << QString(R"(<th class="th-0" scope="col">%1</th>)").arg(tr("Region"));
+
 	out << QString(R"(<th class="th-1" scope="col">%1</th>)").arg(tr("Total Score"));
 
 	for (auto &i : taskList)
@@ -327,6 +333,10 @@ void ExportUtil::exportHtml(QWidget *widget, Contest *contest, const QString &fi
 		out << QString(R"(<td class="td-0"><a href="#c%1" class="a-0">%2</a></td>)")
 		           .arg(loc[contestant])
 		           .arg(i.second);
+
+		if (contest->getRegionEnabled())
+			out << QString(R"(<td class="td-0">%1</td>)").arg(contestant->getRegion());
+
 		int allScore = contestant->getTotalScore();
 
 		if (contestant->isDisqualified()) {
@@ -432,7 +442,9 @@ void ExportUtil::exportHtml(QWidget *widget, Contest *contest, const QString &fi
 	out << "</body>";
 	out << "</html>";
 	QApplication::restoreOverrideCursor();
-	QMessageBox::information(widget, tr("LemonLime"), tr("Export is done"), QMessageBox::Ok);
+	// 不在这里弹提示：一次「导出成绩」会写出总成绩单 + 每个赛区各一份，
+	// 统一由 exportResult() 在全部写完后弹一次「导出完成」（CLI 调用则完全不弹窗）。
+	Q_UNUSED(widget);
 }
 
 auto ExportUtil::getSmallerContestantHtmlCode(Contest *contest, Contestant *contestant) -> QString {
@@ -667,6 +679,10 @@ void ExportUtil::exportSmallerHtml(QWidget *widget, Contest *contest, const QStr
 	out << R"(<p><table border="1" cellpadding="1"><tr>)";
 	out << QString("<th scope=\"col\">%1</th>").arg(tr("Rank"));
 	out << QString("<th scope=\"col\">%1</th>").arg(tr("Name"));
+
+	if (contest->getRegionEnabled())
+		out << QString("<th scope=\"col\">%1</th>").arg(tr("Region"));
+
 	out << QString("<th scope=\"col\">%1</th>").arg(tr("Total Score"));
 
 	for (auto &i : taskList)
@@ -684,6 +700,10 @@ void ExportUtil::exportSmallerHtml(QWidget *widget, Contest *contest, const QStr
 		Contestant *contestant = contest->getContestant(i.second);
 		out << QString("<tr><td>%1</td>").arg(rankList[contestant->getContestantName()] + 1);
 		out << QString("<td><a href=\"#c%1\">%2</a></td>").arg(loc[contestant]).arg(i.second);
+
+		if (contest->getRegionEnabled())
+			out << QString("<td>%1</td>").arg(contestant->getRegion());
+
 		int allScore = contestant->getTotalScore();
 
 		if (contestant->isDisqualified()) {
@@ -722,7 +742,7 @@ void ExportUtil::exportSmallerHtml(QWidget *widget, Contest *contest, const QStr
 
 	out << "</body></html>";
 	QApplication::restoreOverrideCursor();
-	QMessageBox::information(widget, tr("LemonLime"), tr("Export is done"), QMessageBox::Ok);
+	// 提示框统一由 exportResult() 弹（一次导出会写出总成绩单 + 每个赛区各一份），这里不再单独提示。
 }
 
 void ExportUtil::exportCsv(QWidget *widget, Contest *contest, const QString &fileName) {
@@ -769,6 +789,9 @@ void ExportUtil::exportCsv(QWidget *widget, Contest *contest, const QString &fil
 
 	out << "\"" << tr("Rank") << "\"" << "," << "\"" << tr("Name") << "\"" << ",";
 
+	if (contest->getRegionEnabled())
+		out << "\"" << tr("Region") << "\"" << ",";
+
 	for (auto &i : taskList) {
 		out << "\"" << i->getProblemTitle() << "\"" << ",";
 	}
@@ -779,6 +802,9 @@ void ExportUtil::exportCsv(QWidget *widget, Contest *contest, const QString &fil
 		Contestant *contestant = contest->getContestant(i.second);
 		out << "\"" << rankList[contestant->getContestantName()] + 1 << "\"" << ",";
 		out << "\"" << i.second << "\"" << ",";
+
+		if (contest->getRegionEnabled())
+			out << "\"" << contestant->getRegion() << "\"" << ",";
 
 		for (int j = 0; j < taskList.size(); j++) {
 			int score = contestant->getTaskScore(j);
@@ -800,7 +826,9 @@ void ExportUtil::exportCsv(QWidget *widget, Contest *contest, const QString &fil
 	}
 
 	QApplication::restoreOverrideCursor();
-	QMessageBox::information(widget, tr("LemonLime"), tr("Export is done"), QMessageBox::Ok);
+
+	if (widget)
+		QMessageBox::information(widget, tr("LemonLime"), tr("Export is done"), QMessageBox::Ok);
 }
 
 #ifdef ENABLE_XLS_EXPORT
@@ -912,50 +940,36 @@ void ExportUtil::exportResult(QWidget *widget, Contest *contest) {
 		return;
 	}
 
-	QString filter = tr("HTML Document (*.html *.htm);;CSV (*.csv)");
-#ifdef ENABLE_XLS_EXPORT
-	QAxObject *excel = new QAxObject("Excel.Application", widget);
+	// 成绩单固定导到当前比赛日的 reports/ 目录（工作目录就是比赛日目录），不给改路径。
+	const QString reportsDir = QDir::currentPath() + QDir::separator() + QStringLiteral("reports");
 
-	if (! excel->isNull())
-		filter = filter + tr(";;Excel Workbook (*.xls)");
-
-	delete excel;
-#endif
-	QString fileName = QFileDialog::getSaveFileName(
-	    widget, tr("Export Result"), QDir::currentPath() + QDir::separator() + "result.html", filter);
-
-	if (fileName.isEmpty())
+	if (! QDir().mkpath(reportsDir)) {
+		QMessageBox::warning(widget, tr("LemonLime"),
+		                     tr("Cannot open file %1").arg(QDir::toNativeSeparators(reportsDir)),
+		                     QMessageBox::Ok);
 		return;
-	// TODO: refactor
-	if (QFileInfo(fileName).suffix() == "html") {
-		exportHtml(widget, contest, fileName);
+	}
 
-		// 启用赛区时，额外为每个赛区单独导出一份（赛区内单独排名）——gengen-tuack 语义。
-		if (contest->getRegionEnabled()) {
-			QMap<QString, QList<Contestant *>> byRegion;
+	const QString resultFile = reportsDir + QDir::separator() + QStringLiteral("result.html");
+	exportHtml(widget, contest, resultFile);
 
-			for (auto *contestant : contestantList) {
-				if (! contestant->getRegion().isEmpty())
-					byRegion[contestant->getRegion()].append(contestant);
-			}
+	// 启用赛区时，再为每个赛区单独导出一份（赛区内单独排名）：result-<赛区>.html
+	if (contest->getRegionEnabled()) {
+		QMap<QString, QList<Contestant *>> byRegion;
 
-			const QFileInfo info(fileName);
+		for (auto *contestant : contestantList) {
+			if (! contestant->getRegion().isEmpty())
+				byRegion[contestant->getRegion()].append(contestant);
+		}
 
-			for (auto it = byRegion.begin(); it != byRegion.end(); ++it) {
-				const QString regionFile = info.absolutePath() + QDir::separator() + info.completeBaseName() +
-				                           "-" + it.key() + "." + info.suffix();
-				exportHtml(widget, contest, regionFile, &it.value());
-			}
+		for (auto it = byRegion.begin(); it != byRegion.end(); ++it) {
+			const QString regionName =
+			    QStringLiteral("result-") + Lemon::common::FileNameSafePart(it.key()) + QStringLiteral(".html");
+			exportHtml(widget, contest, reportsDir + QDir::separator() + regionName, &it.value());
 		}
 	}
 
-	if (QFileInfo(fileName).suffix() == "htm")
-		exportSmallerHtml(widget, contest, fileName);
-
-	if (QFileInfo(fileName).suffix() == "csv")
-		exportCsv(widget, contest, fileName);
-#ifdef ENABLE_XLS_EXPORT
-	if (QFileInfo(fileName).suffix() == "xls")
-		exportXls(widget, contest, fileName);
-#endif
+	// 全部写完后只提示这一次（命令行导出时 widget 为空，不弹窗）。
+	if (widget)
+		QMessageBox::information(widget, tr("LemonLime"), tr("Export is done"), QMessageBox::Ok);
 }

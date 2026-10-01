@@ -25,13 +25,14 @@ class ExportUtil : public QObject {
   public:
 	explicit ExportUtil(QObject *parent = nullptr);
 	static void exportResult(QWidget *, Contest *);
+	// 这几种文件格式的导出也对外公开：命令行（--export-score）与批处理会直接用。
+	static void exportHtml(QWidget *, Contest *, const QString &, const QList<Contestant *> *subset = nullptr);
+	static void exportSmallerHtml(QWidget *, Contest *, const QString &);
+	static void exportCsv(QWidget *, Contest *, const QString &);
 
   private:
 	static QString getContestantHtmlCode(Contest *, Contestant *, int);
 	static QString getSmallerContestantHtmlCode(Contest *, Contestant *);
-	static void exportHtml(QWidget *, Contest *, const QString &, const QList<Contestant *> *subset = nullptr);
-	static void exportSmallerHtml(QWidget *, Contest *, const QString &);
-	static void exportCsv(QWidget *, Contest *, const QString &);
 #ifdef ENABLE_XLS_EXPORT
 	static void exportXls(QWidget *, Contest *, const QString &);
 #endif

@@ -9,6 +9,7 @@
 #include "ui_statisticsbrowser.h"
 //
 #include "base/LemonType.hpp"
+#include "base/LemonUtils.hpp"
 #include "base/settings.h"
 #include "core/contest.h"
 #include "core/contestant.h"
@@ -292,11 +293,8 @@ auto StatisticsBrowser::checkValid(QList<Task *> taskList, const QList<Contestan
 }
 
 void StatisticsBrowser::refresh() {
-	QString buffer;
-
 	if (! curContest) {
-		buffer = tr("No contest yet");
-		ui->textBrowser->setHtml(buffer);
+		ui->textBrowser->setHtml(tr("No contest yet"));
 		return;
 	}
 
@@ -304,29 +302,41 @@ void StatisticsBrowser::refresh() {
 	QList<Contestant *> contestantList = curContest->getContestantList();
 
 	if (taskList.empty()) {
-		buffer = tr("No task yet");
-		ui->textBrowser->setHtml(buffer);
+		ui->textBrowser->setHtml(tr("No task yet"));
 		return;
 	}
 
 	if (contestantList.empty()) {
-		buffer = tr("No contestant yet");
-		ui->textBrowser->setHtml(buffer);
+		ui->textBrowser->setHtml(tr("No contestant yet"));
 		return;
 	}
 
-	if (! checkValid(curContest->getTaskList(), curContest->getContestantList())) {
-		buffer = tr("Some unhandled situation happened. May not all contestants are well judged, or not "
-		            "rejudged after changing testcases. Please refresh and rejudge.");
-		ui->textBrowser->setHtml(buffer);
+	if (! checkValid(taskList, contestantList)) {
+		ui->textBrowser->setHtml(tr("Some unhandled situation happened. May not all contestants are well "
+		                            "judged, or not rejudged after changing testcases. Please refresh and "
+		                            "rejudge."));
 		return;
 	}
+
+	ui->textBrowser->setHtml(buildStatisticsHtml(curContest, contestantList));
+}
+
+// 统计的 HTML 按「选手集合」生成：全体选手就是总统计，某个赛区就是一个赛区的统计。
+auto StatisticsBrowser::buildStatisticsHtml(Contest *curContest, const QList<Contestant *> &contestantList,
+                                            const QString &regionName) -> QString {
+	QString buffer;
+	QList<Task *> taskList = curContest->getTaskList();
 
 	int totalScore = curContest->getTotalScore();
 	buffer += "<html><head>";
 	buffer += "<style type=\"text/css\">th, td {padding-left: 1em; padding-right: 1em;}</style>";
 	buffer += "</head><body>";
-	buffer += "<h1>" + QString("%1 %2").arg(tr("Contest")).arg(curContest->getContestTitle()) + "</h1>";
+	QString title = QString("%1 %2").arg(tr("Contest")).arg(curContest->getContestTitle());
+
+	if (! regionName.isEmpty())
+		title += QString(" (%1: %2)").arg(tr("Region")).arg(regionName);
+
+	buffer += "<h1>" + title + "</h1>";
 	buffer += "<h2>" + tr("Overall") + "</h2>";
 	bool haveError = false;
 	QMap<int, int> scoreCount;
@@ -398,29 +408,32 @@ void StatisticsBrowser::refresh() {
 	}
 
 	buffer += "</body></html>";
-	ui->textBrowser->setHtml(buffer);
-	nowBrowserText = buffer;
+	return buffer;
 }
 
-void StatisticsBrowser::exportStatisticsHtml(QWidget *widget, const QString &fileName) {
+auto StatisticsBrowser::writeHtml(QWidget *widget, const QString &fileName, const QString &content) -> bool {
 	QFile file(fileName);
 
 	if (! file.open(QFile::WriteOnly)) {
-		QMessageBox::warning(widget, tr("LemonLime"),
-		                     tr("Cannot open file %1").arg(QFileInfo(file).fileName()), QMessageBox::Ok);
-		return;
+		if (widget)
+			QMessageBox::warning(widget, tr("LemonLime"),
+			                     tr("Cannot open file %1").arg(QFileInfo(file).fileName()), QMessageBox::Ok);
+
+		return false;
 	}
 
 	QApplication::setOverrideCursor(Qt::WaitCursor);
 	QTextStream out(&file);
-	out << nowBrowserText;
+	out << content;
 	QApplication::restoreOverrideCursor();
-	QMessageBox::information(widget, tr("LemonLime"), tr("Export is done"), QMessageBox::Ok);
+	return true;
 }
 
 void StatisticsBrowser::exportStatistics(QWidget *widget, Contest *curContest) {
 	if (! curContest) {
-		QMessageBox::warning(widget, tr("LemonLime"), tr("No contest yet"), QMessageBox::Ok);
+		if (widget)
+			QMessageBox::warning(widget, tr("LemonLime"), tr("No contest yet"), QMessageBox::Ok);
+
 		return;
 	}
 
@@ -428,22 +441,67 @@ void StatisticsBrowser::exportStatistics(QWidget *widget, Contest *curContest) {
 	QList<Contestant *> contestantList = curContest->getContestantList();
 
 	if (taskList.empty()) {
-		QMessageBox::warning(widget, tr("LemonLime"), tr("No task yet"), QMessageBox::Ok);
+		if (widget)
+			QMessageBox::warning(widget, tr("LemonLime"), tr("No task yet"), QMessageBox::Ok);
+
 		return;
 	}
 
 	if (contestantList.empty()) {
-		QMessageBox::warning(widget, tr("LemonLime"), tr("No contestant yet"), QMessageBox::Ok);
+		if (widget)
+			QMessageBox::warning(widget, tr("LemonLime"), tr("No contestant yet"), QMessageBox::Ok);
+
 		return;
 	}
 
-	QString filter = tr("HTML Document (*.html)");
-	QString fileName = QFileDialog::getSaveFileName(
-	    widget, tr("Export Statistics"), QDir::currentPath() + QDir::separator() + "statistics.html", filter);
+	if (! checkValid(taskList, contestantList)) {
+		if (widget)
+			QMessageBox::warning(widget, tr("LemonLime"),
+			                     tr("Some unhandled situation happened. May not all contestants are well "
+			                        "judged, or not rejudged after changing testcases. Please refresh and "
+			                        "rejudge."),
+			                     QMessageBox::Ok);
 
-	if (fileName.isEmpty())
+		return;
+	}
+
+	// 统计图固定导到当前比赛日的 reports/ 目录（工作目录就是比赛日目录），不给改路径。
+	const QString reportsDir = QDir::currentPath() + QDir::separator() + QStringLiteral("reports");
+
+	if (! QDir().mkpath(reportsDir)) {
+		if (widget)
+			QMessageBox::warning(widget, tr("LemonLime"),
+			                     tr("Cannot open file %1").arg(QDir::toNativeSeparators(reportsDir)),
+			                     QMessageBox::Ok);
+
+		return;
+	}
+
+	// 总统计：全体选手。
+	if (! writeHtml(widget, reportsDir + QDir::separator() + QStringLiteral("statistics.html"),
+	                buildStatisticsHtml(curContest, contestantList)))
 		return;
 
-	if (QFileInfo(fileName).suffix() == "html")
-		exportStatisticsHtml(widget, fileName);
+	// 启用赛区时，再为每个赛区单独导出一份：statistics-<赛区>.html
+	if (curContest->getRegionEnabled()) {
+		QMap<QString, QList<Contestant *>> byRegion;
+
+		for (auto *contestant : contestantList) {
+			if (! contestant->getRegion().isEmpty())
+				byRegion[contestant->getRegion()].append(contestant);
+		}
+
+		for (auto it = byRegion.begin(); it != byRegion.end(); ++it) {
+			const QString regionFile = QStringLiteral("statistics-") +
+			                           Lemon::common::FileNameSafePart(it.key()) + QStringLiteral(".html");
+
+			if (! writeHtml(widget, reportsDir + QDir::separator() + regionFile,
+			                buildStatisticsHtml(curContest, it.value(), it.key())))
+				return;
+		}
+	}
+
+	// 全部写完后只提示这一次（命令行导出时 widget 为空，不弹窗）。
+	if (widget)
+		QMessageBox::information(widget, tr("LemonLime"), tr("Export is done"), QMessageBox::Ok);
 }

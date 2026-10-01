@@ -1128,19 +1128,19 @@ This cannot be undone.</source>
     <name>ExportUtil</name>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="63"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="454"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="463"/>
         <source>Task</source>
         <translation>试题</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="66"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="457"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="466"/>
         <source>Not judged</source>
         <translation>未测试</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="83"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="473"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="482"/>
         <source>Cannot find valid source file</source>
         <translation>未找到选手程序</translation>
     </message>
@@ -1148,69 +1148,69 @@ This cannot be undone.</source>
         <location filename="../src/component/exportutil/exportutil.cpp" line="88"/>
         <location filename="../src/component/exportutil/exportutil.cpp" line="100"/>
         <location filename="../src/component/exportutil/exportutil.cpp" line="130"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="478"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="489"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="519"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="487"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="498"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="528"/>
         <source>Source file: </source>
         <translation>源程序： </translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="91"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="480"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="489"/>
         <source>Compile time limit exceeded</source>
         <translation>编译超时</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="95"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="484"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="493"/>
         <source>Cannot run given compiler</source>
         <translation>给定编译器无法运行</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="102"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="491"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="500"/>
         <source>Compile error</source>
         <translation>编译错误</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="134"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="523"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="532"/>
         <source>Test Case</source>
         <translation>测试点</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="135"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="524"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="533"/>
         <source>Input File</source>
         <translation>输入文件</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="136"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="525"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="534"/>
         <source>Result</source>
         <translation>测试结果</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="137"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="526"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="535"/>
         <source>Time Used</source>
         <translation>运行用时</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="138"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="527"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="536"/>
         <source>Memory Used</source>
         <translation>内存消耗</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="139"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="528"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="537"/>
         <source>Score</source>
         <translation>得分</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="160"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="549"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="558"/>
         <source>Subtask Dependence Status</source>
         <oldsource>Subtask Dependence Score</oldsource>
         <translation>子任务依赖情况</translation>
@@ -1218,57 +1218,57 @@ This cannot be undone.</source>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="183"/>
         <location filename="../src/component/exportutil/exportutil.cpp" line="192"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="357"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="403"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="573"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="366"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="412"/>
         <location filename="../src/component/exportutil/exportutil.cpp" line="582"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="697"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="710"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="789"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="798"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="878"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="888"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="591"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="714"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="727"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="812"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="821"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="901"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="911"/>
         <source>Invalid</source>
         <translation>不可用</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="226"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="608"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="617"/>
         <source>Return to top</source>
         <translation>返回顶部</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="242"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="435"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="616"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="725"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="732"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="803"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="811"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="896"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="905"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="911"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="444"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="625"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="742"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="749"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="826"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="834"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="919"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="928"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="934"/>
         <source>LemonLime</source>
         <oldsource>Lemon</oldsource>
         <translation>LemonLime</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="243"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="617"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="733"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="812"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="626"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="750"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="835"/>
         <source>Cannot open file %1</source>
         <translation>无法打开%1</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="273"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="633"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="642"/>
         <source>Contest Result</source>
         <translation>比赛结果</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="305"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="665"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="674"/>
         <source>Rank List</source>
         <translation>排名表</translation>
     </message>
@@ -1279,75 +1279,82 @@ This cannot be undone.</source>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="308"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="668"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="770"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="854"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="677"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="787"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="877"/>
         <source>Rank</source>
         <translation>排名</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="309"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="669"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="770"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="855"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="678"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="787"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="878"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="310"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="670"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="776"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="861"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="313"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="681"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="790"/>
+        <source>Region</source>
+        <translation>赛区</translation>
+    </message>
+    <message>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="315"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="683"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="796"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="884"/>
         <source>Total Score</source>
         <translation>总分</translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="915"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="938"/>
         <source>HTML Document (*.html *.htm);;CSV (*.csv)</source>
         <translation>HTML文档 (*.html *htm);;逗号分隔符 (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="415"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="719"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="424"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="736"/>
         <source>Contestant: %1</source>
         <translation>选手：%1</translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="435"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="725"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="803"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="896"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="444"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="742"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="826"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="919"/>
         <source>Export is done</source>
         <translation>导出完成</translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="666"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="675"/>
         <source>Judged By LemonLime</source>
         <translation>使用 LemonLime 评测</translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="905"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="928"/>
         <source>No contestant in current contest</source>
         <translation>不存在选手</translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="911"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="934"/>
         <source>No task in current contest</source>
         <translation>不存在试题</translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="920"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="943"/>
         <source>;;Excel Workbook (*.xls)</source>
         <translation>;;Excel工作簿 (*.xls)</translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="925"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="948"/>
         <source>Export Result</source>
         <translation>导出成绩</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="78"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="469"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="478"/>
         <source>Main grader (grader.*) cannot be found</source>
         <translation>未找到主接口程序（grader.*）</translation>
     </message>
@@ -2119,8 +2126,8 @@ Depends: </source>
     <name>LemonLime</name>
     <message>
         <location filename="../src/forms/lemon.ui" line="20"/>
-        <location filename="../src/lemon.cpp" line="1002"/>
-        <location filename="../src/lemon.cpp" line="1158"/>
+        <location filename="../src/lemon.cpp" line="1049"/>
+        <location filename="../src/lemon.cpp" line="1205"/>
         <source>LemonLime</source>
         <translation>LemonLime</translation>
     </message>
@@ -2677,129 +2684,132 @@ Depends: </source>
         <translation>没有进行整理</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="636"/>
-        <location filename="../src/lemon.cpp" line="690"/>
-        <location filename="../src/lemon.cpp" line="699"/>
-        <location filename="../src/lemon.cpp" line="822"/>
-        <location filename="../src/lemon.cpp" line="833"/>
-        <location filename="../src/lemon.cpp" line="843"/>
-        <location filename="../src/lemon.cpp" line="855"/>
+        <location filename="../src/lemon.cpp" line="663"/>
+        <location filename="../src/lemon.cpp" line="711"/>
+        <location filename="../src/lemon.cpp" line="727"/>
+        <location filename="../src/lemon.cpp" line="736"/>
         <location filename="../src/lemon.cpp" line="868"/>
-        <location filename="../src/lemon.cpp" line="943"/>
-        <location filename="../src/lemon.cpp" line="1254"/>
-        <location filename="../src/lemon.cpp" line="1320"/>
+        <location filename="../src/lemon.cpp" line="879"/>
+        <location filename="../src/lemon.cpp" line="890"/>
+        <location filename="../src/lemon.cpp" line="900"/>
+        <location filename="../src/lemon.cpp" line="913"/>
+        <location filename="../src/lemon.cpp" line="990"/>
+        <location filename="../src/lemon.cpp" line="1308"/>
+        <location filename="../src/lemon.cpp" line="1374"/>
         <source>Error</source>
         <translation>出错了</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="636"/>
-        <location filename="../src/lemon.cpp" line="691"/>
-        <location filename="../src/lemon.cpp" line="822"/>
-        <location filename="../src/lemon.cpp" line="1254"/>
+        <location filename="../src/lemon.cpp" line="663"/>
+        <location filename="../src/lemon.cpp" line="728"/>
+        <location filename="../src/lemon.cpp" line="868"/>
+        <location filename="../src/lemon.cpp" line="1308"/>
         <source>Cannot open file %1</source>
         <translation>无法打开文件 %1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="637"/>
+        <location filename="../src/lemon.cpp" line="655"/>
+        <location filename="../src/lemon.cpp" line="664"/>
         <source>Save Failed</source>
         <translation>保存失败</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="655"/>
+        <location filename="../src/lemon.cpp" line="682"/>
         <source>Saved</source>
         <translation>已保存</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="700"/>
-        <location filename="../src/lemon.cpp" line="834"/>
-        <location filename="../src/lemon.cpp" line="844"/>
-        <location filename="../src/lemon.cpp" line="856"/>
-        <location filename="../src/lemon.cpp" line="869"/>
+        <location filename="../src/lemon.cpp" line="712"/>
+        <location filename="../src/lemon.cpp" line="737"/>
+        <location filename="../src/lemon.cpp" line="880"/>
+        <location filename="../src/lemon.cpp" line="890"/>
+        <location filename="../src/lemon.cpp" line="900"/>
+        <location filename="../src/lemon.cpp" line="913"/>
         <source>File %1 is broken</source>
         <translation>%1 已损坏</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="928"/>
-        <location filename="../src/lemon.cpp" line="1238"/>
+        <location filename="../src/lemon.cpp" line="975"/>
+        <location filename="../src/lemon.cpp" line="1285"/>
         <source>LemonLime - %1</source>
         <translation>LemonLime - %1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="930"/>
-        <location filename="../src/lemon.cpp" line="1240"/>
-        <location filename="../src/lemon.cpp" line="1471"/>
+        <location filename="../src/lemon.cpp" line="977"/>
+        <location filename="../src/lemon.cpp" line="1287"/>
+        <location filename="../src/lemon.cpp" line="1525"/>
         <source>LemonLime - %1 / %2</source>
         <translation>LemonLime - %1 / %2</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="943"/>
-        <location filename="../src/lemon.cpp" line="1320"/>
+        <location filename="../src/lemon.cpp" line="990"/>
+        <location filename="../src/lemon.cpp" line="1374"/>
         <source>Cannot make contest path</source>
         <translation>无法创建比赛目录</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1158"/>
+        <location filename="../src/lemon.cpp" line="1205"/>
         <source>No task found</source>
         <translation>找不到任何试题</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1215"/>
-        <location filename="../src/lemon.cpp" line="1220"/>
-        <location filename="../src/lemon.cpp" line="1224"/>
-        <location filename="../src/lemon.cpp" line="1460"/>
+        <location filename="../src/lemon.cpp" line="1262"/>
+        <location filename="../src/lemon.cpp" line="1267"/>
+        <location filename="../src/lemon.cpp" line="1271"/>
+        <location filename="../src/lemon.cpp" line="1514"/>
         <source>Rename Contest</source>
         <translation>重命名比赛</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1215"/>
+        <location filename="../src/lemon.cpp" line="1262"/>
         <source>No Contest Yet</source>
         <translation>还没有比赛</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1220"/>
-        <location filename="../src/lemon.cpp" line="1461"/>
+        <location filename="../src/lemon.cpp" line="1267"/>
+        <location filename="../src/lemon.cpp" line="1515"/>
         <source>Write the name you want.</source>
         <translation>输入你想要的名字。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1221"/>
+        <location filename="../src/lemon.cpp" line="1268"/>
         <source>New Name</source>
         <translation>新名字</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1224"/>
+        <location filename="../src/lemon.cpp" line="1271"/>
         <source>The name did not changes.</source>
         <translation>名字没有改变。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1303"/>
-        <location filename="../src/lemon.cpp" line="1313"/>
-        <location filename="../src/lemon.cpp" line="1425"/>
+        <location filename="../src/lemon.cpp" line="1357"/>
+        <location filename="../src/lemon.cpp" line="1367"/>
+        <location filename="../src/lemon.cpp" line="1479"/>
         <source>New Contest Day</source>
         <translation>新建比赛日</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1304"/>
+        <location filename="../src/lemon.cpp" line="1358"/>
         <source>The folder name cannot contain path separators.</source>
         <translation>文件夹名不能包含路径分隔符。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1314"/>
+        <location filename="../src/lemon.cpp" line="1368"/>
         <source>A contest day with this folder already exists.</source>
         <translation>已经存在使用这个文件夹的比赛日。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1425"/>
+        <location filename="../src/lemon.cpp" line="1479"/>
         <source>Please create or open a contest first</source>
         <translation>请先新建或打开一个比赛</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1440"/>
+        <location filename="../src/lemon.cpp" line="1494"/>
         <source>Remove Contest Day</source>
         <translation>移除比赛日</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1441"/>
+        <location filename="../src/lemon.cpp" line="1495"/>
         <source>Remove contest day &quot;%1&quot;?
 
 Yes: also delete its files.
@@ -2810,52 +2820,52 @@ No: remove it from the contest only.</source>
 否：仅从工程中移除。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1485"/>
+        <location filename="../src/lemon.cpp" line="1539"/>
         <source>Version: %1</source>
         <translation>版本：%1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1487"/>
+        <location filename="../src/lemon.cpp" line="1541"/>
         <source>This is a tiny judging environment for OI contest based on Project LemonPlus.</source>
         <translation>这是一个基于 LemonPlus 的简易 OI 竞赛测试环境。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1488"/>
+        <location filename="../src/lemon.cpp" line="1542"/>
         <source>Based on Project Lemon version 1.2 Beta by Zhipeng Jia, 2011</source>
         <translation>基于 Lemon v1.2 by Zhipeng Jia, 2011</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1489"/>
+        <location filename="../src/lemon.cpp" line="1543"/>
         <source>Based on Project LemonPlus by Dust1404, 2019</source>
         <translation>基于 LemonPlus by Dust1404, 2019</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1490"/>
+        <location filename="../src/lemon.cpp" line="1544"/>
         <source>Update by iotang and Coelacanthus</source>
         <translation>由 iotang 和 Coelacanthus 更新</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1491"/>
+        <location filename="../src/lemon.cpp" line="1545"/>
         <source>Build Info: %1</source>
         <translation>编译信息：%1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1492"/>
+        <location filename="../src/lemon.cpp" line="1546"/>
         <source>Build Extra Info: %1</source>
         <translation>额外编译信息：%1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1493"/>
+        <location filename="../src/lemon.cpp" line="1547"/>
         <source>Build Date: %1</source>
         <translation>构建日期：%1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1494"/>
+        <location filename="../src/lemon.cpp" line="1548"/>
         <source>This program is under the &lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;GPLv3&lt;/a&gt; license</source>
         <translation>本程序基于&lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;GPLv3&lt;/a&gt;许可协议</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1497"/>
+        <location filename="../src/lemon.cpp" line="1551"/>
         <source>About LemonLime</source>
         <translation>关于 LemonLime</translation>
     </message>
@@ -3179,74 +3189,79 @@ No: remove it from the contest only.</source>
     <message>
         <location filename="../src/resultviewer.cpp" line="46"/>
         <location filename="../src/resultviewer.cpp" line="65"/>
-        <location filename="../src/resultviewer.cpp" line="308"/>
+        <location filename="../src/resultviewer.cpp" line="330"/>
         <source>Ignore Restrictions and Rejudge</source>
         <translation>忽略限制重测</translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="124"/>
+        <location filename="../src/resultviewer.cpp" line="131"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="124"/>
+        <location filename="../src/resultviewer.cpp" line="131"/>
         <source>Rank</source>
         <translation>排名</translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="124"/>
+        <location filename="../src/resultviewer.cpp" line="134"/>
+        <source>Region</source>
+        <translation>赛区</translation>
+    </message>
+    <message>
+        <location filename="../src/resultviewer.cpp" line="136"/>
         <source>Total Score</source>
         <translation>总分</translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="148"/>
+        <location filename="../src/resultviewer.cpp" line="160"/>
         <source>Total Used Time (s)</source>
         <translation>总用时(s)</translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="148"/>
+        <location filename="../src/resultviewer.cpp" line="160"/>
         <source>Judging Time</source>
         <translation>测试时间</translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="195"/>
-        <location filename="../src/resultviewer.cpp" line="230"/>
-        <location filename="../src/resultviewer.cpp" line="234"/>
-        <location filename="../src/resultviewer.cpp" line="235"/>
-        <location filename="../src/resultviewer.cpp" line="236"/>
-        <location filename="../src/resultviewer.cpp" line="255"/>
-        <location filename="../src/resultviewer.cpp" line="376"/>
+        <location filename="../src/resultviewer.cpp" line="217"/>
+        <location filename="../src/resultviewer.cpp" line="252"/>
+        <location filename="../src/resultviewer.cpp" line="256"/>
+        <location filename="../src/resultviewer.cpp" line="257"/>
+        <location filename="../src/resultviewer.cpp" line="258"/>
+        <location filename="../src/resultviewer.cpp" line="277"/>
+        <location filename="../src/resultviewer.cpp" line="401"/>
         <source>Invalid</source>
         <translation>不可用</translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="309"/>
+        <location filename="../src/resultviewer.cpp" line="331"/>
         <source>Please make sure the contestants&apos; code will not harm your judging machine before continuing to rejudge. Ignore the restrictions and rejudge?</source>
         <translation>请你确认选手的代码不会对您的评测设备造成危害后再继续重测。确定要忽略限制重测吗？</translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="312"/>
+        <location filename="../src/resultviewer.cpp" line="334"/>
         <source>OK</source>
         <translation>确定</translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="313"/>
+        <location filename="../src/resultviewer.cpp" line="335"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="477"/>
+        <location filename="../src/resultviewer.cpp" line="502"/>
         <source>LemonLime</source>
         <oldsource>Lemon</oldsource>
         <translation>LemonLime</translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="479"/>
+        <location filename="../src/resultviewer.cpp" line="504"/>
         <source>Are you sure to delete selected contestant(s)?</source>
         <translation>确定删除选定的选手吗？</translation>
     </message>
     <message>
-        <location filename="../src/resultviewer.cpp" line="482"/>
+        <location filename="../src/resultviewer.cpp" line="507"/>
         <source>Delete data in the disk as well</source>
         <oldsource>Delete directories in the hard disk as well</oldsource>
         <translation>同时从硬盘中删除选手数据</translation>
@@ -3333,37 +3348,37 @@ No: remove it from the contest only.</source>
 <context>
     <name>StatementBuilder</name>
     <message>
-        <location filename="../src/core/statementbuilder.cpp" line="1510"/>
+        <location filename="../src/core/statementbuilder.cpp" line="1558"/>
         <source>A statement build is already running.</source>
         <translation>已经有一次题面构建在进行中。</translation>
     </message>
     <message>
-        <location filename="../src/core/statementbuilder.cpp" line="1518"/>
+        <location filename="../src/core/statementbuilder.cpp" line="1566"/>
         <source>Cannot find the statement templates (statement-templates).</source>
         <translation>找不到题面模板目录（statement-templates）。</translation>
     </message>
     <message>
-        <location filename="../src/core/statementbuilder.cpp" line="1525"/>
+        <location filename="../src/core/statementbuilder.cpp" line="1573"/>
         <source>pandoc not found in PATH.</source>
         <translation>在 PATH 中找不到 pandoc。</translation>
     </message>
     <message>
-        <location filename="../src/core/statementbuilder.cpp" line="1532"/>
+        <location filename="../src/core/statementbuilder.cpp" line="1580"/>
         <source>xelatex not found in PATH.</source>
         <translation>在 PATH 中找不到 xelatex。</translation>
     </message>
     <message>
-        <location filename="../src/core/statementbuilder.cpp" line="1541"/>
+        <location filename="../src/core/statementbuilder.cpp" line="1589"/>
         <source>Building with template &quot;%1&quot; ...</source>
         <translation>正在使用模板“%1”构建…</translation>
     </message>
     <message>
-        <location filename="../src/core/statementbuilder.cpp" line="1547"/>
+        <location filename="../src/core/statementbuilder.cpp" line="1595"/>
         <source>Building the statement PDF failed.</source>
         <translation>生成题面 PDF 失败。</translation>
     </message>
     <message>
-        <location filename="../src/core/statementbuilder.cpp" line="1551"/>
+        <location filename="../src/core/statementbuilder.cpp" line="1599"/>
         <source>Statement PDF written to %1</source>
         <translation>题面 PDF 已生成：%1</translation>
     </message>
@@ -3371,191 +3386,192 @@ No: remove it from the contest only.</source>
 <context>
     <name>StatementEditWidget</name>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="180"/>
+        <location filename="../src/statementeditwidget.cpp" line="195"/>
         <source>Template:</source>
         <translation>模板：</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="186"/>
+        <location filename="../src/statementeditwidget.cpp" line="201"/>
         <source>Import</source>
         <translation>导入</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="187"/>
+        <location filename="../src/statementeditwidget.cpp" line="202"/>
         <source>Load statement/statement.md into the editor.</source>
         <translation>把 statement/statement.md 读入编辑器。</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="188"/>
+        <location filename="../src/statementeditwidget.cpp" line="203"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="189"/>
+        <location filename="../src/statementeditwidget.cpp" line="204"/>
         <source>Export PDF</source>
         <translation>导出 PDF</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="190"/>
+        <location filename="../src/statementeditwidget.cpp" line="205"/>
         <source>Compile statement/statement.pdf with pandoc + xelatex.</source>
         <translation>用 pandoc + xelatex 编译出 statement/statement.pdf。</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="191"/>
+        <location filename="../src/statementeditwidget.cpp" line="206"/>
         <source>Open PDF</source>
         <translation>打开 PDF</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="220"/>
+        <location filename="../src/statementeditwidget.cpp" line="235"/>
         <source>Title / subtitle / day / date of the statement.</source>
         <translation>题面的标题、副标题、比赛日与日期。</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="222"/>
+        <location filename="../src/statementeditwidget.cpp" line="237"/>
         <source>Title</source>
         <translation>标题</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="222"/>
+        <location filename="../src/statementeditwidget.cpp" line="237"/>
         <source>Subtitle</source>
         <translation>副标题</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="222"/>
+        <location filename="../src/statementeditwidget.cpp" line="237"/>
         <source>Day</source>
         <translation>比赛日</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="222"/>
+        <location filename="../src/statementeditwidget.cpp" line="237"/>
         <source>Date</source>
         <translation>日期</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="239"/>
+        <location filename="../src/statementeditwidget.cpp" line="254"/>
         <source>Problem Title</source>
         <translation>试题标题</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="241"/>
+        <location filename="../src/statementeditwidget.cpp" line="256"/>
         <source>Title only, no leading #</source>
         <translation>只填标题，不要写 #</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="243"/>
+        <location filename="../src/statementeditwidget.cpp" line="260"/>
         <source>No leading &quot;#&quot; needed: it is added automatically.</source>
         <translation>标题不必写“#”，会自动加上。</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="266"/>
+        <location filename="../src/statementeditwidget.cpp" line="283"/>
         <source>Add a problem</source>
         <translation>新增试题</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="269"/>
+        <location filename="../src/statementeditwidget.cpp" line="286"/>
         <source>Remove the selected problem</source>
         <translation>删除选中的试题</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="284"/>
+        <location filename="../src/statementeditwidget.cpp" line="301"/>
         <source>Build log</source>
         <translation>构建日志</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="358"/>
+        <location filename="../src/statementeditwidget.cpp" line="375"/>
         <source>Compile the statement to see the preview here.</source>
         <translation>编译题面后，这里会显示 statement.pdf 的分页预览。</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="374"/>
+        <location filename="../src/statementeditwidget.cpp" line="391"/>
         <source>Basic Information</source>
         <translation>基础信息</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="376"/>
+        <location filename="../src/statementeditwidget.cpp" line="393"/>
         <source>Sections</source>
         <translation>区段</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="377"/>
+        <location filename="../src/statementeditwidget.cpp" line="394"/>
         <source>Problems</source>
         <translation>试题</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="572"/>
+        <location filename="../src/statementeditwidget.cpp" line="596"/>
         <source>Problem %1</source>
         <translation>第 %1 题</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="612"/>
+        <location filename="../src/statementeditwidget.cpp" line="636"/>
         <source>Filled the default sections for the noi / noi new template.</source>
         <translation>已按 noi / noi new 模板填入默认区段内容。</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="633"/>
-        <location filename="../src/statementeditwidget.cpp" line="654"/>
-        <location filename="../src/statementeditwidget.cpp" line="711"/>
+        <location filename="../src/statementeditwidget.cpp" line="657"/>
+        <location filename="../src/statementeditwidget.cpp" line="678"/>
+        <location filename="../src/statementeditwidget.cpp" line="735"/>
         <source>Statement</source>
         <translation>题面</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="633"/>
+        <location filename="../src/statementeditwidget.cpp" line="657"/>
         <source>A statement build is still running.</source>
         <translation>正在编译题面，请稍候。</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="638"/>
+        <location filename="../src/statementeditwidget.cpp" line="662"/>
         <source>Imported %1</source>
         <translation>已导入 %1</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="645"/>
+        <location filename="../src/statementeditwidget.cpp" line="174"/>
+        <location filename="../src/statementeditwidget.cpp" line="669"/>
         <source>Saved %1</source>
         <translation>已保存 %1</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="654"/>
+        <location filename="../src/statementeditwidget.cpp" line="678"/>
         <source>Cannot write %1</source>
         <translation>无法写入 %1</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="680"/>
-        <location filename="../src/statementeditwidget.cpp" line="681"/>
+        <location filename="../src/statementeditwidget.cpp" line="704"/>
+        <location filename="../src/statementeditwidget.cpp" line="705"/>
         <source>Building statement.pdf ...</source>
         <translation>正在生成 statement.pdf …</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="695"/>
+        <location filename="../src/statementeditwidget.cpp" line="719"/>
         <source>Exported %1</source>
         <translation>已导出 %1</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="699"/>
+        <location filename="../src/statementeditwidget.cpp" line="723"/>
         <source>Done.</source>
         <translation>完成。</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="701"/>
+        <location filename="../src/statementeditwidget.cpp" line="725"/>
         <source>Failed: %1</source>
         <translation>失败：%1</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="702"/>
-        <location filename="../src/statementeditwidget.cpp" line="703"/>
+        <location filename="../src/statementeditwidget.cpp" line="726"/>
+        <location filename="../src/statementeditwidget.cpp" line="727"/>
         <source>Building statement.pdf failed.</source>
         <translation>生成 statement.pdf 失败。</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="711"/>
+        <location filename="../src/statementeditwidget.cpp" line="735"/>
         <source>%1 does not exist yet.</source>
         <translation>%1 还不存在。</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="721"/>
+        <location filename="../src/statementeditwidget.cpp" line="745"/>
         <source>New Problem</source>
         <translation>新题目</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="787"/>
+        <location filename="../src/statementeditwidget.cpp" line="811"/>
         <source>(unsaved changes)</source>
         <translation>（有未保存的改动）</translation>
     </message>

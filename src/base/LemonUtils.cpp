@@ -18,4 +18,20 @@ namespace Lemon::common {
 		return GetFileList(dir).contains(fileName);
 	}
 
+	QString FileNameSafePart(const QString &name, const QString &fallback) {
+		QString result = name.trimmed();
+		static const QString forbidden = QStringLiteral("\\/:*?\"<>|");
+
+		for (const QChar bad : forbidden)
+			result.replace(bad, QChar('_'));
+
+		result = result.trimmed();
+
+		// Windows 下文件名不能以点结尾
+		while (result.endsWith(QChar('.')))
+			result.chop(1);
+
+		return result.isEmpty() ? fallback : result;
+	}
+
 } // namespace Lemon::common
