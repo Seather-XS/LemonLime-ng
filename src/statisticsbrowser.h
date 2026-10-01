@@ -12,6 +12,7 @@
 #include "core/contestant.h"
 #include "core/task.h"
 #include "core/testcase.h"
+#include <QTimer>
 #include <QWidget>
 
 namespace Ui {
@@ -30,12 +31,18 @@ class StatisticsBrowser : public QWidget {
 	static void exportStatistics(QWidget *, Contest *);
 	~StatisticsBrowser();
 
+	void showEvent(QShowEvent *) override;
+
   public slots:
 	void refresh();
 
   private:
 	Ui::StatisticsBrowser *ui;
 	Contest *curContest;
+	/// 选项卡没显示时先不算：统计要遍历所有选手 × 所有测试点，大比赛很贵。
+	bool needsRefresh{false};
+	/// 切过来之后延迟一点再算，先把界面画出来。
+	QTimer *refreshTimer{nullptr};
 	static bool checkValid(QList<Task *>, const QList<Contestant *> &);
 	static QString getScoreNormalChart(const QMap<int, int> &, int, int);
 	static QString getTestcaseScoreChart(QList<TestCase *>, QList<QList<QList<int>>>,

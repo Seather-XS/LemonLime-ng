@@ -21,6 +21,8 @@ class ResultViewer : public QTableWidget {
   public:
 	explicit ResultViewer(QWidget *parent = nullptr);
 	void changeEvent(QEvent *);
+	/// 切到本选项卡时才把攒下的刷新补上（没显示时不重建表格）。
+	void showEvent(QShowEvent *) override;
 	void contextMenuEvent(QContextMenuEvent *);
 	void setContest(Contest *);
 
@@ -35,6 +37,8 @@ class ResultViewer : public QTableWidget {
 
   private:
 	Contest *curContest;
+	/// 选项卡没显示时收到的刷新请求先攒着，切过来（showEvent）再重建。
+	bool needsRefresh{false};
 	QAction *deleteContestantAction;
 	QAction *detailInformationAction;
 	QAction *judgeSelectedAction;

@@ -28,6 +28,12 @@
 StatisticsBrowser::StatisticsBrowser(QWidget *parent) : QWidget(parent), ui(new Ui::StatisticsBrowser) {
 	ui->setupUi(this);
 	curContest = nullptr;
+
+	// 切到统计选项卡后延迟一点再算：统计要遍历所有选手 × 所有测试点，先把界面画出来。
+	refreshTimer = new QTimer(this);
+	refreshTimer->setSingleShot(true);
+	refreshTimer->setInterval(250);
+	connect(refreshTimer, &QTimer::timeout, this, &StatisticsBrowser::refresh);
 }
 
 StatisticsBrowser::~StatisticsBrowser() { delete ui; }
@@ -293,6 +299,16 @@ auto StatisticsBrowser::checkValid(QList<Task *> taskList, const QList<Contestan
 }
 
 void StatisticsBrowser::refresh() {
+	// 没显示出来就先不算（比如刚打开比赛日时这个选项卡还在后台）：
+	// 统计要把所有选手 × 所有测试点都算一遍，大比赛很贵。等切过来再算。
+	if (! isVisible()) {
+		needsRefresh = true;
+		return;
+	}
+
+	refreshTimer->stop();
+	needsRefresh = false;
+
 	if (! curContest) {
 		ui->textBrowser->setHtml(tr("No contest yet"));
 		return;
@@ -319,6 +335,13 @@ void StatisticsBrowser::refresh() {
 	}
 
 	ui->textBrowser->setHtml(buildStatisticsHtml(curContest, contestantList));
+}
+
+void StatisticsBrowser::showEvent(QShowEvent *event) {
+	QWidget::showEvent(event);
+
+	if (needsRefresh)
+		refreshTimer->start();
 }
 
 // 统计的 HTML 按「选手集合」生成：全体选手就是总统计，某个赛区就是一个赛区的统计。

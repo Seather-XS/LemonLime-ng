@@ -16,6 +16,7 @@
 #include "base/settings.h"
 #include "component/exportutil/exportutil.h"
 #include "core/contest.h"
+#include "core/packagebuilder.h"
 #include "core/statementbuilder.h"
 #include "resultviewer.h"
 #include "spdlog/sinks/daily_file_sink.h"
@@ -174,6 +175,93 @@ int main(int argc, char *argv[]) {
 		QDir::setCurrent(QFileInfo(dayFile).absolutePath());
 		ExportUtil::exportResult(nullptr, &contest);
 		StatisticsBrowser::exportStatistics(nullptr, &contest);
+		return 0;
+	}
+
+	// 隐藏入口：命令行把比赛日打包成 .zip（与界面「导出」选项卡同一段逻辑）。
+	// 用法：lemon.exe --export-package <比赛日.cdf> [--kind contestant|testdata] [--wrap] [--nested]
+	//        [--no-per-task] [--no-structure] [--samples] [--password <密码>]
+	//   生成 <比赛日目录>/export/<比赛日名>.zip
+	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--export-package")) {
+		QApplication app(argc, argv);
+		const QString dayFile = QString::fromLocal8Bit(argv[2]);
+		QFile day(dayFile);
+
+		if (! day.open(QIODevice::ReadOnly)) {
+			LOG("export-package: cannot open", dayFile);
+			return 2;
+		}
+
+		bool wrap = false;
+		bool nested = false;
+		bool perTask = true;
+		bool structure = true;
+		bool samples = false;
+		QString password;
+		PackageBuilder::Kind kind = PackageBuilder::ContestantPackage;
+
+		for (int i = 3; i < argc; i++) {
+			const QString option = QString::fromLocal8Bit(argv[i]);
+
+			if (option == QLatin1String("--wrap"))
+				wrap = true;
+			else if (option == QLatin1String("--nested"))
+				nested = true;
+			else if (option == QLatin1String("--no-per-task"))
+				perTask = false;
+			else if (option == QLatin1String("--no-structure"))
+				structure = false;
+			else if (option == QLatin1String("--samples"))
+				samples = true;
+			else if (option == QLatin1String("--kind") && i + 1 < argc) {
+				const QString value = QString::fromLocal8Bit(argv[++i]);
+
+				if (value == QLatin1String("testdata"))
+					kind = PackageBuilder::TestDataPackage;
+				else if (value == QLatin1String("answers"))
+					kind = PackageBuilder::AnswersPackage;
+				else
+					kind = PackageBuilder::ContestantPackage;
+			} else if (option == QLatin1String("--password") && i + 1 < argc)
+				password = QString::fromLocal8Bit(argv[++i]);
+		}
+
+		Settings settings;
+		settings.loadSettings();
+		Contest contest(nullptr);
+		contest.setSettings(&settings);
+
+		if (contest.readFromJson(QJsonDocument::fromJson(day.readAll()).object()) == -1) {
+			LOG("export-package: broken contest file", dayFile);
+			return 3;
+		}
+
+		const QString dayDirectory = QFileInfo(dayFile).absolutePath();
+		PackageBuilder builder;
+		builder.setKind(kind);
+		builder.setDayFile(dayFile);
+		builder.setContest(&contest);
+		builder.setWrapInFolder(wrap);
+		builder.setNestedZip(nested);
+		builder.setOneFolderPerTask(perTask);
+		builder.setKeepStructure(structure);
+		builder.setIncludeSamples(samples);
+		builder.setPassword(password);
+		builder.setOutputFile(builder.defaultOutputFile());
+		QFile logFile(QDir(dayDirectory).absoluteFilePath(QStringLiteral("export-log.txt")));
+		logFile.open(QIODevice::WriteOnly | QIODevice::Text);
+		QTextStream logStream(&logFile);
+		QObject::connect(&builder, &PackageBuilder::logMessage,
+		                 [&logStream](const QString &line) { logStream << line << '\n'; logStream.flush(); });
+
+		if (kind == PackageBuilder::TestDataPackage)
+			logStream << "duplicate task files: " << (builder.hasDuplicateTaskFiles() ? "yes" : "no") << '\n';
+
+		if (! builder.build()) {
+			logStream << QStringLiteral("ERROR: ") << builder.lastError() << '\n';
+			return 1;
+		}
+
 		return 0;
 	}
 

@@ -1112,233 +1112,455 @@ This cannot be undone.</source>
 <context>
     <name>ExportUtil</name>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="63"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="463"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="64"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="466"/>
         <source>Task</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="66"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="466"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="67"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="469"/>
         <source>Not judged</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="83"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="482"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="84"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="485"/>
         <source>Cannot find valid source file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="88"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="100"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="130"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="487"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="498"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="528"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="89"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="101"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="131"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="490"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="501"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="531"/>
         <source>Source file: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="91"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="489"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="92"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="492"/>
         <source>Compile time limit exceeded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="95"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="493"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="96"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="496"/>
         <source>Cannot run given compiler</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="102"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="500"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="103"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="503"/>
         <source>Compile error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="134"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="532"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="135"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="535"/>
         <source>Test Case</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="135"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="533"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="136"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="536"/>
         <source>Input File</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="136"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="534"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="137"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="537"/>
         <source>Result</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="137"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="535"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="138"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="538"/>
         <source>Time Used</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="138"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="536"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="139"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="539"/>
         <source>Memory Used</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="139"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="537"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="140"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="540"/>
         <source>Score</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="160"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="558"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="161"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="561"/>
         <source>Subtask Dependence Status</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="183"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="192"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="366"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="412"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="582"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="591"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="714"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="727"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="812"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="821"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="901"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="911"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="184"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="193"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="367"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="413"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="585"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="594"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="717"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="730"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="815"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="824"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="906"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="916"/>
         <source>Invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="226"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="617"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="227"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="620"/>
         <source>Return to top</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="242"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="444"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="625"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="742"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="749"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="826"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="834"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="919"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="928"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="934"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="243"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="628"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="752"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="831"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="839"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="924"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="933"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="939"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="947"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="974"/>
         <source>LemonLime</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="243"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="626"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="750"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="835"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="244"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="629"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="753"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="840"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="948"/>
         <source>Cannot open file %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="273"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="642"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="274"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="645"/>
         <source>Contest Result</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="305"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="674"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="306"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="677"/>
         <source>Rank List</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="306"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="307"/>
         <source>Click names or task scores to jump to details. Judged By LemonLime</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="308"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="677"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="787"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="877"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="309"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="680"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="790"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="882"/>
         <source>Rank</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="309"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="678"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="787"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="878"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="310"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="681"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="790"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="883"/>
         <source>Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="313"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="681"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="790"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="314"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="684"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="793"/>
         <source>Region</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="315"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="683"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="796"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="884"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="316"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="686"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="799"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="889"/>
         <source>Total Score</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="424"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="736"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="425"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="739"/>
         <source>Contestant: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="444"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="742"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="826"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="919"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="831"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="924"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="974"/>
         <source>Export is done</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="675"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="678"/>
         <source>Judged By LemonLime</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="928"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="933"/>
         <source>No contestant in current contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="934"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="939"/>
         <source>No task in current contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="938"/>
-        <source>HTML Document (*.html *.htm);;CSV (*.csv)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="943"/>
-        <source>;;Excel Workbook (*.xls)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="948"/>
-        <source>Export Result</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="78"/>
-        <location filename="../src/component/exportutil/exportutil.cpp" line="478"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="79"/>
+        <location filename="../src/component/exportutil/exportutil.cpp" line="481"/>
         <source>Main grader (grader.*) cannot be found</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ExportWidget</name>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="135"/>
+        <location filename="../src/exportwidget.cpp" line="250"/>
+        <source>Package type:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="141"/>
+        <location filename="../src/exportwidget.cpp" line="265"/>
+        <source>Refresh</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="142"/>
+        <location filename="../src/exportwidget.cpp" line="266"/>
+        <source>List the files that will be packed.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="143"/>
+        <location filename="../src/exportwidget.cpp" line="267"/>
+        <source>Export .zip</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="154"/>
+        <location filename="../src/exportwidget.cpp" line="251"/>
+        <source>Output:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="196"/>
+        <location filename="../src/exportwidget.cpp" line="263"/>
+        <source>Package contents</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="218"/>
+        <location filename="../src/exportwidget.cpp" line="264"/>
+        <source>Export log</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="301"/>
+        <source>One subfolder per task (named after the task&apos;s folder), containing the files directly inside that task&apos;s &lt;b&gt;down/&lt;/b&gt; folder (subfolders are skipped). The statement PDF is placed in the zip root.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="268"/>
+        <source>Path in package</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="268"/>
+        <source>Source on disk</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="435"/>
+        <source>No contest</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="474"/>
+        <source>%1 file(s), %2 folder(s)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="483"/>
+        <source>The statement PDF is missing; export it in the Statement tab first if you need it.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="405"/>
+        <location filename="../src/exportwidget.cpp" line="493"/>
+        <location filename="../src/exportwidget.cpp" line="506"/>
+        <location filename="../src/exportwidget.cpp" line="521"/>
+        <location filename="../src/exportwidget.cpp" line="527"/>
+        <source>Export</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="507"/>
+        <source>The statement PDF (%1) does not exist yet, so the package will not contain the statement.
+Export anyway?</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="521"/>
+        <source>Export failed: %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="528"/>
+        <source>Export is done</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="164"/>
+        <location filename="../src/exportwidget.cpp" line="252"/>
+        <source>Options</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="166"/>
+        <location filename="../src/exportwidget.cpp" line="253"/>
+        <location filename="../src/exportwidget.cpp" line="292"/>
+        <source>Wrap everything in a folder named after the contest day file</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="180"/>
+        <location filename="../src/exportwidget.cpp" line="261"/>
+        <source>Encrypt with a password (ZipCrypto)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="184"/>
+        <source>Password:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="189"/>
+        <location filename="../src/exportwidget.cpp" line="262"/>
+        <source>Show</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="493"/>
+        <source>Please type a password first.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="169"/>
+        <location filename="../src/exportwidget.cpp" line="294"/>
+        <source>Nest an inner zip named %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="170"/>
+        <location filename="../src/exportwidget.cpp" line="256"/>
+        <location filename="../src/exportwidget.cpp" line="296"/>
+        <source>The outer .zip will hold nothing but the inner zip; all the content lives inside it.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="172"/>
+        <location filename="../src/exportwidget.cpp" line="257"/>
+        <source>Give each task its own folder</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="175"/>
+        <location filename="../src/exportwidget.cpp" line="258"/>
+        <source>Keep the original folder structure (data/, graders/, ...)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="178"/>
+        <location filename="../src/exportwidget.cpp" line="259"/>
+        <source>Also export the sample data (down/)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="254"/>
+        <location filename="../src/exportwidget.cpp" line="293"/>
+        <source>Adds one more level: the .zip contains a &lt;day&gt;/ folder holding everything.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="260"/>
+        <source>The sample data is taken from each task&apos;s down/ folder, keeping the structure.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="284"/>
+        <source>Also wrap everything in a folder named after the contest day file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="285"/>
+        <source>Gives &lt;day&gt;/ and, when regions are enabled, &lt;day&gt;/&lt;region&gt;/ for every region.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="288"/>
+        <source>Answers of every contestant: one folder per contestant with all of their source files. With regions enabled you can group them into region folders and/or one inner zip per region. The &lt;day&gt;/ wrapper is optional.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="298"/>
+        <source>Test data of every task: the whole &lt;b&gt;data/&lt;/b&gt; and &lt;b&gt;graders/&lt;/b&gt; folders (plus &lt;b&gt;down/&lt;/b&gt; when the sample data is included). The statement PDF is not packed.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="318"/>
+        <source>Some tasks use the same data file names, so every task must keep its own folder.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="320"/>
+        <source>Each task gets its own folder inside the package.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="332"/>
+        <source>The sample data keeps the folder structure, so this cannot be turned off.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="334"/>
+        <source>Keeps data/, graders/ and down/ inside each task folder.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="406"/>
+        <source>Some tasks use the same data file names, so they cannot share one folder.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="167"/>
+        <source>Adds one more level: &lt;day&gt;.zip contains a &lt;day&gt;/ folder holding everything.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="286"/>
+        <source>Give every region its own inner zip</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="287"/>
+        <source>The outer answers.zip will also hold one &lt;region&gt;.zip per region.</source>
         <translation></translation>
     </message>
 </context>
@@ -2099,8 +2321,8 @@ Depends: </source>
     <name>LemonLime</name>
     <message>
         <location filename="../src/forms/lemon.ui" line="20"/>
-        <location filename="../src/lemon.cpp" line="1049"/>
-        <location filename="../src/lemon.cpp" line="1205"/>
+        <location filename="../src/lemon.cpp" line="1054"/>
+        <location filename="../src/lemon.cpp" line="1210"/>
         <source>LemonLime</source>
         <translation></translation>
     </message>
@@ -2161,7 +2383,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="277"/>
-        <location filename="../src/forms/lemon.ui" line="930"/>
+        <location filename="../src/forms/lemon.ui" line="950"/>
         <source>Cleanup the files of all contestants...</source>
         <translation></translation>
     </message>
@@ -2172,7 +2394,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="316"/>
-        <location filename="../src/forms/lemon.ui" line="945"/>
+        <location filename="../src/forms/lemon.ui" line="965"/>
         <source>Refresh the contestant list...</source>
         <translation></translation>
     </message>
@@ -2183,7 +2405,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="348"/>
-        <location filename="../src/forms/lemon.ui" line="728"/>
+        <location filename="../src/forms/lemon.ui" line="748"/>
         <source>Judge unjudged...</source>
         <translation></translation>
     </message>
@@ -2194,7 +2416,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="377"/>
-        <location filename="../src/forms/lemon.ui" line="643"/>
+        <location filename="../src/forms/lemon.ui" line="663"/>
         <source>Judge selected area...</source>
         <translation></translation>
     </message>
@@ -2205,7 +2427,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="406"/>
-        <location filename="../src/forms/lemon.ui" line="658"/>
+        <location filename="../src/forms/lemon.ui" line="678"/>
         <source>Judge all contestants...</source>
         <translation></translation>
     </message>
@@ -2235,554 +2457,554 @@ Depends: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="481"/>
+        <location filename="../src/forms/lemon.ui" line="501"/>
         <source>Open / Close / Rename contest and etc</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="484"/>
+        <location filename="../src/forms/lemon.ui" line="504"/>
         <source>&amp;File</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="488"/>
+        <location filename="../src/forms/lemon.ui" line="508"/>
         <source>Switch &amp;Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="508"/>
+        <location filename="../src/forms/lemon.ui" line="528"/>
         <source>&amp;Control</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="531"/>
+        <location filename="../src/forms/lemon.ui" line="551"/>
         <source>&amp;Tools</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="544"/>
+        <location filename="../src/forms/lemon.ui" line="564"/>
         <source>&amp;Help</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="548"/>
+        <location filename="../src/forms/lemon.ui" line="568"/>
         <source>LemonLime Guides...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="551"/>
+        <location filename="../src/forms/lemon.ui" line="571"/>
         <source>&amp;Guides</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="577"/>
+        <location filename="../src/forms/lemon.ui" line="597"/>
         <source>&amp;New Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="580"/>
+        <location filename="../src/forms/lemon.ui" line="600"/>
         <source>Make a new contest...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="589"/>
+        <location filename="../src/forms/lemon.ui" line="609"/>
         <source>&amp;Open Existing Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="592"/>
+        <location filename="../src/forms/lemon.ui" line="612"/>
         <source>Open an existing contest...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="601"/>
+        <location filename="../src/forms/lemon.ui" line="621"/>
         <source>E&amp;xit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="604"/>
+        <location filename="../src/forms/lemon.ui" line="624"/>
         <source>Exit LemonLime...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="613"/>
+        <location filename="../src/forms/lemon.ui" line="633"/>
         <source>&amp;Settings</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="616"/>
+        <location filename="../src/forms/lemon.ui" line="636"/>
         <source>LemonLime Settings...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="625"/>
+        <location filename="../src/forms/lemon.ui" line="645"/>
         <source>&amp;About</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="628"/>
+        <location filename="../src/forms/lemon.ui" line="648"/>
         <source>About LemonLime...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="640"/>
+        <location filename="../src/forms/lemon.ui" line="660"/>
         <source>&amp;Judge Selected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="655"/>
+        <location filename="../src/forms/lemon.ui" line="675"/>
         <source>Judge &amp;All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="667"/>
+        <location filename="../src/forms/lemon.ui" line="687"/>
         <source>&amp;Close Current Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="670"/>
+        <location filename="../src/forms/lemon.ui" line="690"/>
         <source>Close this contest...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="687"/>
+        <location filename="../src/forms/lemon.ui" line="707"/>
         <source>Add &amp;Tasks from import/</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="690"/>
+        <location filename="../src/forms/lemon.ui" line="710"/>
         <source>Read the import folder (Lemon data layout) and add tasks automatically...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="698"/>
+        <location filename="../src/forms/lemon.ui" line="718"/>
         <source>&amp;Make Self-testing Folder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="710"/>
+        <location filename="../src/forms/lemon.ui" line="730"/>
         <source>&amp;Export Result</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="713"/>
+        <location filename="../src/forms/lemon.ui" line="733"/>
         <source>Export the result...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="725"/>
+        <location filename="../src/forms/lemon.ui" line="745"/>
         <source>Judge &amp;Unjudged</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="737"/>
+        <location filename="../src/forms/lemon.ui" line="757"/>
         <source>Open Current Contest &amp;Folder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="740"/>
+        <location filename="../src/forms/lemon.ui" line="760"/>
         <source>Open the folder of this contest with file manager...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="749"/>
+        <location filename="../src/forms/lemon.ui" line="769"/>
         <source>&amp;Save Current Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="752"/>
+        <location filename="../src/forms/lemon.ui" line="772"/>
         <source>Save this contest...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="757"/>
+        <location filename="../src/forms/lemon.ui" line="777"/>
         <source>Interaction</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="760"/>
+        <location filename="../src/forms/lemon.ui" line="780"/>
         <source>How to make Interaction Tasks...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="765"/>
+        <location filename="../src/forms/lemon.ui" line="785"/>
         <source>Subtasks</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="768"/>
+        <location filename="../src/forms/lemon.ui" line="788"/>
         <source>How to make Subtasks...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="773"/>
-        <location filename="../src/lemon.cpp" line="346"/>
-        <location filename="../src/lemon.cpp" line="364"/>
-        <location filename="../src/lemon.cpp" line="368"/>
-        <location filename="../src/lemon.cpp" line="376"/>
-        <location filename="../src/lemon.cpp" line="382"/>
-        <location filename="../src/lemon.cpp" line="540"/>
-        <location filename="../src/lemon.cpp" line="542"/>
+        <location filename="../src/forms/lemon.ui" line="793"/>
+        <location filename="../src/lemon.cpp" line="347"/>
+        <location filename="../src/lemon.cpp" line="365"/>
+        <location filename="../src/lemon.cpp" line="369"/>
+        <location filename="../src/lemon.cpp" line="377"/>
+        <location filename="../src/lemon.cpp" line="383"/>
+        <location filename="../src/lemon.cpp" line="541"/>
+        <location filename="../src/lemon.cpp" line="543"/>
         <source>Clean up Files</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="776"/>
+        <location filename="../src/forms/lemon.ui" line="796"/>
         <source>What is Cleanup Files...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="781"/>
+        <location filename="../src/forms/lemon.ui" line="801"/>
         <source>Compile Features</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="784"/>
+        <location filename="../src/forms/lemon.ui" line="804"/>
         <source>The difference in compiling between Lemon and LemonLime...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="789"/>
+        <location filename="../src/forms/lemon.ui" line="809"/>
         <source>Skip</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="792"/>
+        <location filename="../src/forms/lemon.ui" line="812"/>
         <source>What is Skip...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="797"/>
+        <location filename="../src/forms/lemon.ui" line="817"/>
         <source>Special Judge</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="800"/>
+        <location filename="../src/forms/lemon.ui" line="820"/>
         <source>How to write Special Judge...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="805"/>
+        <location filename="../src/forms/lemon.ui" line="825"/>
         <source>Single &amp;Judge</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="810"/>
+        <location filename="../src/forms/lemon.ui" line="830"/>
         <source>Export Result</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="813"/>
+        <location filename="../src/forms/lemon.ui" line="833"/>
         <source>New features of Exporting Result...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="822"/>
+        <location filename="../src/forms/lemon.ui" line="842"/>
         <source>More</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="825"/>
+        <location filename="../src/forms/lemon.ui" line="845"/>
         <source>Online Guides...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="837"/>
+        <location filename="../src/forms/lemon.ui" line="857"/>
         <source>Judge &amp;No Source</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="840"/>
+        <location filename="../src/forms/lemon.ui" line="860"/>
         <source>Judge &quot;No Source&quot;...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="852"/>
+        <location filename="../src/forms/lemon.ui" line="872"/>
         <source>Judge &amp;Compile Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="855"/>
+        <location filename="../src/forms/lemon.ui" line="875"/>
         <source>Judge &quot;Compile Error&quot;, &quot;Compile Time Limit Exceeded&quot;, etc...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="864"/>
+        <location filename="../src/forms/lemon.ui" line="884"/>
         <source>C&amp;hange Contest Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="867"/>
+        <location filename="../src/forms/lemon.ui" line="887"/>
         <source>Change the name of this contest...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="876"/>
+        <location filename="../src/forms/lemon.ui" line="896"/>
         <source>Rename &amp;Contest (Project)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="879"/>
+        <location filename="../src/forms/lemon.ui" line="899"/>
         <source>Rename the whole contest (the project title)...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="888"/>
+        <location filename="../src/forms/lemon.ui" line="908"/>
         <source>Remove Contest Da&amp;y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="891"/>
+        <location filename="../src/forms/lemon.ui" line="911"/>
         <source>Remove the current contest day from the contest...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="900"/>
+        <location filename="../src/forms/lemon.ui" line="920"/>
         <source>New Contest &amp;Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="903"/>
+        <location filename="../src/forms/lemon.ui" line="923"/>
         <source>Create a new contest day inside the current contest...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="912"/>
+        <location filename="../src/forms/lemon.ui" line="932"/>
         <source>Contest &amp;Day Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="915"/>
+        <location filename="../src/forms/lemon.ui" line="935"/>
         <source>Configure regions, violation checking and contestant folder naming...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="927"/>
+        <location filename="../src/forms/lemon.ui" line="947"/>
         <source>Clean Up &amp;Files</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="942"/>
+        <location filename="../src/forms/lemon.ui" line="962"/>
         <source>&amp;Refresh</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="950"/>
+        <location filename="../src/forms/lemon.ui" line="970"/>
         <source>Communication</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="953"/>
+        <location filename="../src/forms/lemon.ui" line="973"/>
         <source>How to make Communication Tasks...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="965"/>
+        <location filename="../src/forms/lemon.ui" line="985"/>
         <source>Export &amp;Statistics</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/forms/lemon.ui" line="974"/>
+        <location filename="../src/forms/lemon.ui" line="994"/>
         <source>Manual</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="343"/>
+        <location filename="../src/lemon.cpp" line="344"/>
         <source>Are you sure to Clean up Files?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="344"/>
+        <location filename="../src/lemon.cpp" line="345"/>
         <source>Reading guide are recommended.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="362"/>
+        <location filename="../src/lemon.cpp" line="363"/>
         <source>Making backup files to dir &lt;br&gt; `%1&apos;?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="368"/>
+        <location filename="../src/lemon.cpp" line="369"/>
         <source>Aborted.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="377"/>
+        <location filename="../src/lemon.cpp" line="378"/>
         <source>Aborted: `%1&apos; already exist.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="383"/>
+        <location filename="../src/lemon.cpp" line="384"/>
         <source>Aborted: Cannot make dir `%1&apos;.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="388"/>
+        <location filename="../src/lemon.cpp" line="389"/>
         <source>Making Backup...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="409"/>
+        <location filename="../src/lemon.cpp" line="410"/>
         <source>Cleaning</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="416"/>
+        <location filename="../src/lemon.cpp" line="417"/>
         <source>Working on it...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="421"/>
+        <location filename="../src/lemon.cpp" line="422"/>
         <source>Fetching Data...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="429"/>
+        <location filename="../src/lemon.cpp" line="430"/>
         <source>Initing...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="461"/>
+        <location filename="../src/lemon.cpp" line="462"/>
         <source>Now Cleaning...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="539"/>
+        <location filename="../src/lemon.cpp" line="540"/>
         <source>Finished.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="542"/>
+        <location filename="../src/lemon.cpp" line="543"/>
         <source>Aborted</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="663"/>
-        <location filename="../src/lemon.cpp" line="711"/>
-        <location filename="../src/lemon.cpp" line="727"/>
-        <location filename="../src/lemon.cpp" line="736"/>
-        <location filename="../src/lemon.cpp" line="868"/>
-        <location filename="../src/lemon.cpp" line="879"/>
-        <location filename="../src/lemon.cpp" line="890"/>
-        <location filename="../src/lemon.cpp" line="900"/>
-        <location filename="../src/lemon.cpp" line="913"/>
-        <location filename="../src/lemon.cpp" line="990"/>
-        <location filename="../src/lemon.cpp" line="1308"/>
-        <location filename="../src/lemon.cpp" line="1374"/>
+        <location filename="../src/lemon.cpp" line="664"/>
+        <location filename="../src/lemon.cpp" line="712"/>
+        <location filename="../src/lemon.cpp" line="728"/>
+        <location filename="../src/lemon.cpp" line="737"/>
+        <location filename="../src/lemon.cpp" line="869"/>
+        <location filename="../src/lemon.cpp" line="880"/>
+        <location filename="../src/lemon.cpp" line="891"/>
+        <location filename="../src/lemon.cpp" line="901"/>
+        <location filename="../src/lemon.cpp" line="914"/>
+        <location filename="../src/lemon.cpp" line="994"/>
+        <location filename="../src/lemon.cpp" line="1313"/>
+        <location filename="../src/lemon.cpp" line="1379"/>
         <source>Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="663"/>
-        <location filename="../src/lemon.cpp" line="728"/>
-        <location filename="../src/lemon.cpp" line="868"/>
-        <location filename="../src/lemon.cpp" line="1308"/>
+        <location filename="../src/lemon.cpp" line="664"/>
+        <location filename="../src/lemon.cpp" line="729"/>
+        <location filename="../src/lemon.cpp" line="869"/>
+        <location filename="../src/lemon.cpp" line="1313"/>
         <source>Cannot open file %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="655"/>
-        <location filename="../src/lemon.cpp" line="664"/>
+        <location filename="../src/lemon.cpp" line="656"/>
+        <location filename="../src/lemon.cpp" line="665"/>
         <source>Save Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="682"/>
+        <location filename="../src/lemon.cpp" line="683"/>
         <source>Saved</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="712"/>
-        <location filename="../src/lemon.cpp" line="737"/>
-        <location filename="../src/lemon.cpp" line="880"/>
-        <location filename="../src/lemon.cpp" line="890"/>
-        <location filename="../src/lemon.cpp" line="900"/>
-        <location filename="../src/lemon.cpp" line="913"/>
+        <location filename="../src/lemon.cpp" line="713"/>
+        <location filename="../src/lemon.cpp" line="738"/>
+        <location filename="../src/lemon.cpp" line="881"/>
+        <location filename="../src/lemon.cpp" line="891"/>
+        <location filename="../src/lemon.cpp" line="901"/>
+        <location filename="../src/lemon.cpp" line="914"/>
         <source>File %1 is broken</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="975"/>
-        <location filename="../src/lemon.cpp" line="1285"/>
+        <location filename="../src/lemon.cpp" line="976"/>
+        <location filename="../src/lemon.cpp" line="1290"/>
         <source>LemonLime - %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="977"/>
-        <location filename="../src/lemon.cpp" line="1287"/>
-        <location filename="../src/lemon.cpp" line="1525"/>
+        <location filename="../src/lemon.cpp" line="978"/>
+        <location filename="../src/lemon.cpp" line="1292"/>
+        <location filename="../src/lemon.cpp" line="1530"/>
         <source>LemonLime - %1 / %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="990"/>
-        <location filename="../src/lemon.cpp" line="1374"/>
+        <location filename="../src/lemon.cpp" line="994"/>
+        <location filename="../src/lemon.cpp" line="1379"/>
         <source>Cannot make contest path</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1205"/>
+        <location filename="../src/lemon.cpp" line="1210"/>
         <source>No task found</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1262"/>
         <location filename="../src/lemon.cpp" line="1267"/>
-        <location filename="../src/lemon.cpp" line="1271"/>
-        <location filename="../src/lemon.cpp" line="1514"/>
+        <location filename="../src/lemon.cpp" line="1272"/>
+        <location filename="../src/lemon.cpp" line="1276"/>
+        <location filename="../src/lemon.cpp" line="1519"/>
         <source>Rename Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1262"/>
+        <location filename="../src/lemon.cpp" line="1267"/>
         <source>No Contest Yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1267"/>
-        <location filename="../src/lemon.cpp" line="1515"/>
+        <location filename="../src/lemon.cpp" line="1272"/>
+        <location filename="../src/lemon.cpp" line="1520"/>
         <source>Write the name you want.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1268"/>
+        <location filename="../src/lemon.cpp" line="1273"/>
         <source>New Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1271"/>
+        <location filename="../src/lemon.cpp" line="1276"/>
         <source>The name did not changes.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1357"/>
-        <location filename="../src/lemon.cpp" line="1367"/>
-        <location filename="../src/lemon.cpp" line="1479"/>
+        <location filename="../src/lemon.cpp" line="1362"/>
+        <location filename="../src/lemon.cpp" line="1372"/>
+        <location filename="../src/lemon.cpp" line="1484"/>
         <source>New Contest Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1358"/>
+        <location filename="../src/lemon.cpp" line="1363"/>
         <source>The folder name cannot contain path separators.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1368"/>
+        <location filename="../src/lemon.cpp" line="1373"/>
         <source>A contest day with this folder already exists.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1479"/>
+        <location filename="../src/lemon.cpp" line="1484"/>
         <source>Please create or open a contest first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1494"/>
+        <location filename="../src/lemon.cpp" line="1499"/>
         <source>Remove Contest Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1495"/>
+        <location filename="../src/lemon.cpp" line="1500"/>
         <source>Remove contest day &quot;%1&quot;?
 
 Yes: also delete its files.
@@ -2790,52 +3012,52 @@ No: remove it from the contest only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1539"/>
+        <location filename="../src/lemon.cpp" line="1544"/>
         <source>Version: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1541"/>
+        <location filename="../src/lemon.cpp" line="1546"/>
         <source>This is a tiny judging environment for OI contest based on Project LemonPlus.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1542"/>
+        <location filename="../src/lemon.cpp" line="1547"/>
         <source>Based on Project Lemon version 1.2 Beta by Zhipeng Jia, 2011</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1543"/>
+        <location filename="../src/lemon.cpp" line="1548"/>
         <source>Based on Project LemonPlus by Dust1404, 2019</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1544"/>
+        <location filename="../src/lemon.cpp" line="1549"/>
         <source>Update by iotang and Coelacanthus</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1545"/>
+        <location filename="../src/lemon.cpp" line="1550"/>
         <source>Build Info: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1546"/>
+        <location filename="../src/lemon.cpp" line="1551"/>
         <source>Build Extra Info: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1547"/>
+        <location filename="../src/lemon.cpp" line="1552"/>
         <source>Build Date: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1548"/>
+        <location filename="../src/lemon.cpp" line="1553"/>
         <source>This program is under the &lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;GPLv3&lt;/a&gt; license</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1551"/>
+        <location filename="../src/lemon.cpp" line="1556"/>
         <source>About LemonLime</source>
         <translation></translation>
     </message>
@@ -3010,6 +3232,106 @@ No: remove it from the contest only.</source>
     <message>
         <location filename="../src/forms/optionsdialog.ui" line="40"/>
         <source>Compiler</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>PackageBuilder</name>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="390"/>
+        <source>Contestant Directory</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="569"/>
+        <location filename="../src/core/packagebuilder.cpp" line="713"/>
+        <location filename="../src/core/packagebuilder.cpp" line="788"/>
+        <source>No contest</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="595"/>
+        <source>Statement PDF not found: %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="553"/>
+        <source>No down folder for task %1: %2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="618"/>
+        <location filename="../src/core/packagebuilder.cpp" line="776"/>
+        <location filename="../src/core/packagebuilder.cpp" line="859"/>
+        <location filename="../src/core/packagebuilder.cpp" line="922"/>
+        <source>%1: %2 file(s)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="986"/>
+        <source>Nothing to export</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="993"/>
+        <source>Cannot make folder %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="998"/>
+        <source>Cannot overwrite %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="1002"/>
+        <source>Writing %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="373"/>
+        <location filename="../src/core/packagebuilder.cpp" line="1007"/>
+        <source>Cannot open file %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="1049"/>
+        <source>Done: %1 folder(s), %2 file(s)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="134"/>
+        <source>Cannot write the archive</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="390"/>
+        <source>Test Data</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="651"/>
+        <source>No %1 folder for task %2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="760"/>
+        <location filename="../src/core/packagebuilder.cpp" line="906"/>
+        <source>Duplicate file name skipped: %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="1033"/>
+        <source>%1: %2 folder(s), %3 file(s)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="390"/>
+        <source>Answers</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="802"/>
+        <source>No contestant in current contest</source>
         <translation></translation>
     </message>
 </context>
@@ -3571,166 +3893,160 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="68"/>
+        <location filename="../src/statisticsbrowser.cpp" line="69"/>
         <source>Score</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="69"/>
+        <location filename="../src/statisticsbrowser.cpp" line="70"/>
         <source>Count</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="70"/>
+        <location filename="../src/statisticsbrowser.cpp" line="71"/>
         <source>Ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="71"/>
+        <location filename="../src/statisticsbrowser.cpp" line="72"/>
         <source>Prefix</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="72"/>
+        <location filename="../src/statisticsbrowser.cpp" line="73"/>
         <source>Suffix</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="98"/>
-        <location filename="../src/statisticsbrowser.cpp" line="119"/>
+        <location filename="../src/statisticsbrowser.cpp" line="99"/>
+        <location filename="../src/statisticsbrowser.cpp" line="120"/>
         <source>Average</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="100"/>
+        <location filename="../src/statisticsbrowser.cpp" line="101"/>
         <source>Standard Deviation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="101"/>
+        <location filename="../src/statisticsbrowser.cpp" line="102"/>
         <source>Score Discrimination Power</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="113"/>
+        <location filename="../src/statisticsbrowser.cpp" line="114"/>
         <source>No.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="114"/>
+        <location filename="../src/statisticsbrowser.cpp" line="115"/>
         <source>Input</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="115"/>
+        <location filename="../src/statisticsbrowser.cpp" line="116"/>
         <source>Output</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="116"/>
+        <location filename="../src/statisticsbrowser.cpp" line="117"/>
         <source>Pure</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="117"/>
+        <location filename="../src/statisticsbrowser.cpp" line="118"/>
         <source>Far</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="118"/>
+        <location filename="../src/statisticsbrowser.cpp" line="119"/>
         <source>Lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="205"/>
-        <location filename="../src/statisticsbrowser.cpp" line="207"/>
+        <location filename="../src/statisticsbrowser.cpp" line="206"/>
+        <location filename="../src/statisticsbrowser.cpp" line="208"/>
         <source>Files</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="298"/>
-        <location filename="../src/statisticsbrowser.cpp" line="423"/>
+        <location filename="../src/statisticsbrowser.cpp" line="306"/>
+        <location filename="../src/statisticsbrowser.cpp" line="451"/>
         <source>No contest yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="307"/>
-        <location filename="../src/statisticsbrowser.cpp" line="431"/>
+        <location filename="../src/statisticsbrowser.cpp" line="314"/>
+        <location filename="../src/statisticsbrowser.cpp" line="461"/>
         <source>No task yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="313"/>
-        <location filename="../src/statisticsbrowser.cpp" line="436"/>
+        <location filename="../src/statisticsbrowser.cpp" line="319"/>
+        <location filename="../src/statisticsbrowser.cpp" line="468"/>
         <source>No contestant yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="319"/>
+        <location filename="../src/statisticsbrowser.cpp" line="324"/>
+        <location filename="../src/statisticsbrowser.cpp" line="476"/>
         <source>Some unhandled situation happened. May not all contestants are well judged, or not rejudged after changing testcases. Please refresh and rejudge.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="329"/>
+        <location filename="../src/statisticsbrowser.cpp" line="350"/>
         <source>Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="330"/>
+        <location filename="../src/statisticsbrowser.cpp" line="356"/>
         <source>Overall</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="352"/>
+        <location filename="../src/statisticsbrowser.cpp" line="378"/>
         <source>Warning: Judgement is not finished.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="359"/>
+        <location filename="../src/statisticsbrowser.cpp" line="385"/>
         <source>Problems</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="363"/>
+        <location filename="../src/statisticsbrowser.cpp" line="389"/>
         <source>Task</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="390"/>
+        <location filename="../src/statisticsbrowser.cpp" line="416"/>
         <source>Number of answer submitted</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="409"/>
-        <location filename="../src/statisticsbrowser.cpp" line="418"/>
-        <location filename="../src/statisticsbrowser.cpp" line="423"/>
-        <location filename="../src/statisticsbrowser.cpp" line="431"/>
-        <location filename="../src/statisticsbrowser.cpp" line="436"/>
+        <location filename="../src/statisticsbrowser.cpp" line="435"/>
+        <location filename="../src/statisticsbrowser.cpp" line="451"/>
+        <location filename="../src/statisticsbrowser.cpp" line="461"/>
+        <location filename="../src/statisticsbrowser.cpp" line="468"/>
+        <location filename="../src/statisticsbrowser.cpp" line="475"/>
+        <location filename="../src/statisticsbrowser.cpp" line="489"/>
+        <location filename="../src/statisticsbrowser.cpp" line="522"/>
         <source>LemonLime</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="410"/>
+        <location filename="../src/statisticsbrowser.cpp" line="436"/>
+        <location filename="../src/statisticsbrowser.cpp" line="490"/>
         <source>Cannot open file %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="418"/>
+        <location filename="../src/statisticsbrowser.cpp" line="522"/>
         <source>Export is done</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statisticsbrowser.cpp" line="440"/>
-        <source>HTML Document (*.html)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/statisticsbrowser.cpp" line="442"/>
-        <source>Export Statistics</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/statisticsbrowser.cpp" line="337"/>
+        <location filename="../src/statisticsbrowser.cpp" line="353"/>
         <source>Region</source>
         <translation></translation>
     </message>
@@ -4217,332 +4533,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/forms/welcomedialog.ui" line="39"/>
         <source>New</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>ExportWidget</name>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="45"/>
-        <location filename="../src/exportwidget.cpp" line="108"/>
-        <source>Package type:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="51"/>
-        <location filename="../src/exportwidget.cpp" line="112"/>
-        <source>Refresh</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="52"/>
-        <location filename="../src/exportwidget.cpp" line="113"/>
-        <source>List the files that will be packed.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="53"/>
-        <location filename="../src/exportwidget.cpp" line="114"/>
-        <source>Export .zip</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="64"/>
-        <location filename="../src/exportwidget.cpp" line="109"/>
-        <source>Output:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="74"/>
-        <location filename="../src/exportwidget.cpp" line="110"/>
-        <source>Package contents</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="91"/>
-        <location filename="../src/exportwidget.cpp" line="111"/>
-        <source>Export log</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="115"/>
-        <source>One subfolder per task (named after the task&apos;s folder), containing the files directly inside that task&apos;s &lt;b&gt;down/&lt;/b&gt; folder (subfolders are skipped). The statement PDF is placed in the zip root.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="118"/>
-        <source>Path in package</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="118"/>
-        <source>Source on disk</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="155"/>
-        <source>No contest</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="193"/>
-        <source>%1 file(s), %2 folder(s)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="199"/>
-        <source>The statement PDF is missing; export it in the Statement tab first if you need it.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="216"/>
-        <location filename="../src/exportwidget.cpp" line="231"/>
-        <location filename="../src/exportwidget.cpp" line="237"/>
-        <source>Export</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="217"/>
-        <source>The statement PDF (%1) does not exist yet, so the package will not contain the statement.
-Export anyway?</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="231"/>
-        <source>Export failed: %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="238"/>
-        <source>Export is done</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="114"/>
-        <location filename="../src/exportwidget.cpp" line="181"/>
-        <source>Options</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="116"/>
-        <location filename="../src/exportwidget.cpp" line="182"/>
-        <source>Wrap everything in a folder named after the contest day file</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="122"/>
-        <location filename="../src/exportwidget.cpp" line="186"/>
-        <source>Encrypt with a password (ZipCrypto)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="126"/>
-        <source>Password:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="131"/>
-        <location filename="../src/exportwidget.cpp" line="187"/>
-        <source>Show</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="297"/>
-        <source>Please type a password first.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="169"/>
-        <location filename="../src/exportwidget.cpp" line="281"/>
-        <source>Nest an inner zip named %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="170"/>
-        <location filename="../src/exportwidget.cpp" line="256"/>
-        <source>The outer .zip will hold nothing but the inner zip; all the content lives inside it.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="172"/>
-        <location filename="../src/exportwidget.cpp" line="257"/>
-        <source>Give each task its own folder</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="175"/>
-        <location filename="../src/exportwidget.cpp" line="258"/>
-        <source>Keep the original folder structure (data/, graders/, ...)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="178"/>
-        <location filename="../src/exportwidget.cpp" line="259"/>
-        <source>Also export the sample data (down/)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="254"/>
-        <source>Adds one more level: the .zip contains a &lt;day&gt;/ folder holding everything.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="260"/>
-        <source>The sample data is taken from each task&apos;s down/ folder, keeping the structure.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="284"/>
-        <source>Test data of every task: the whole &lt;b&gt;data/&lt;/b&gt; and &lt;b&gt;graders/&lt;/b&gt; folders (plus &lt;b&gt;down/&lt;/b&gt; when the sample data is included). The statement PDF is not packed.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="303"/>
-        <source>Some tasks use the same data file names, so every task must keep its own folder.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="305"/>
-        <source>Each task gets its own folder inside the package.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="317"/>
-        <source>The sample data keeps the folder structure, so this cannot be turned off.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="319"/>
-        <source>Keeps data/, graders/ and down/ inside each task folder.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="391"/>
-        <source>Some tasks use the same data file names, so they cannot share one folder.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="286"/>
-        <source>Give every region its own inner zip</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="287"/>
-        <source>The outer answers.zip will also hold one &lt;region&gt;.zip per region.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="284"/>
-        <source>Also wrap everything in a folder named after the contest day file</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="285"/>
-        <source>Gives &lt;day&gt;/ and, when regions are enabled, &lt;day&gt;/&lt;region&gt;/ for every region.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="288"/>
-        <source>Answers of every contestant: one folder per contestant with all of their source files. With regions enabled you can group them into region folders and/or one inner zip per region. The &lt;day&gt;/ wrapper is optional.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>PackageBuilder</name>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="22"/>
-        <source>Contestant Directory</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="53"/>
-        <source>No contest</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="66"/>
-        <source>Statement PDF not found: %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="83"/>
-        <source>No down folder for task %1: %2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="94"/>
-        <source>%1: %2 file(s)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="123"/>
-        <source>Nothing to export</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="130"/>
-        <source>Cannot make folder %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="135"/>
-        <source>Cannot overwrite %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="139"/>
-        <source>Writing %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="156"/>
-        <source>Cannot open file %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="166"/>
-        <location filename="../src/core/packagebuilder.cpp" line="175"/>
-        <source>Cannot write %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="179"/>
-        <source>Done: %1 folder(s), %2 file(s)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="129"/>
-        <source>Cannot write the archive</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="387"/>
-        <source>Test Data</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="630"/>
-        <source>No %1 folder for task %2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="739"/>
-        <source>Duplicate file name skipped: %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="859"/>
-        <source>%1: %2 folder(s), %3 file(s)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="390"/>
-        <source>Answers</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="806"/>
-        <source>No contestant in current contest</source>
         <translation></translation>
     </message>
 </context>

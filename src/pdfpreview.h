@@ -41,6 +41,8 @@ class PdfPreviewWidget : public QWidget {
   protected:
 	/// 在预览区里 Ctrl+滚轮 = 缩放。
 	bool eventFilter(QObject *watched, QEvent *event) override;
+	/// 选项卡切到题面时才真正渲染（渲染很贵，打开比赛日时它还在后台）。
+	void showEvent(QShowEvent *) override;
 
   private:
 	void render();
@@ -63,4 +65,6 @@ class PdfPreviewWidget : public QWidget {
 	QTimer *renderTimer{};
 	QList<QLabel *> pageLabels;
 	QTemporaryDir tempDir;
+	/// 拿到 PDF 时没显示，就先攒着，等 showEvent 再渲染。
+	bool pendingRender{false};
 };

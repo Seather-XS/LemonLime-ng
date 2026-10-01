@@ -31,6 +31,10 @@ auto Task::getTestCaseList() const -> const QList<TestCase *> & { return testCas
 
 auto Task::getProblemTitle() const -> const QString & { return problemTitle; }
 
+auto Task::getDirectoryName() const -> QString {
+	return sourceFileName.isEmpty() ? problemTitle : sourceFileName;
+}
+
 auto Task::getSubFolderCheck() const -> bool { return subFolderCheck; }
 
 auto Task::getSourceFileName() const -> const QString & { return sourceFileName; }
@@ -189,7 +193,7 @@ void Task::copyTo(Task *to) {
 }
 
 void Task::prepareInteraction() {
-	const QString base = sourceFileName.isEmpty() ? problemTitle : sourceFileName;
+	const QString base = getDirectoryName();
 
 	if (base.isEmpty())
 		return;

@@ -39,6 +39,8 @@ class LemonLime : public QMainWindow {
 	Contest *curContest;
 	Settings *settings;
 	QFileSystemWatcher *dataDirWatcher;
+	/// 数据目录一动就炸出一堆信号（判题时文件一直在写），攒一下再重建监听。
+	QTimer *dataWatcherTimer{nullptr};
 	QString curFile;
 	// 三层结构：比赛(Contest) → 比赛日(Day) → 试题(Task)。
 	// projectFile 为工程根目录下 contest.conf 的绝对路径；以单个 .cdf 打开时为空。
@@ -53,6 +55,8 @@ class LemonLime : public QMainWindow {
 	void judgeExtButtonFlip(bool);
 	void loadUiLanguage();
 	void insertWatchPath(const QString &, QFileSystemWatcher *);
+	/// 真正重建数据目录监听（由 dataWatcherTimer 去抖后调用）。
+	void rebuildDataWatcher();
 	void newContest(const QString &, const QString &, const QString &);
 	void saveContest(const QString &);
 	void loadContest(const QString &);

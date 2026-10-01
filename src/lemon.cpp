@@ -25,6 +25,7 @@
 #include "core/testcase.h"
 #include "daydialog.h"
 #include "detaildialog.h"
+#include "exportwidget.h"
 #include "newcontestdialog.h"
 #include "opencontestdialog.h"
 #include "optionsdialog.h"
@@ -57,6 +58,11 @@ LemonLime::LemonLime(QWidget *parent) : QMainWindow(parent), ui(new Ui::LemonLim
 	ui->actionChangeContestName->setEnabled(false);
 	ui->actionContestSettings->setEnabled(false);
 	dataDirWatcher = nullptr;
+	// 数据目录监听的去抖定时器：目录一变就打标记，400ms 后统一重建一次。
+	dataWatcherTimer = new QTimer(this);
+	dataWatcherTimer->setSingleShot(true);
+	dataWatcherTimer->setInterval(400);
+	connect(dataWatcherTimer, &QTimer::timeout, this, &LemonLime::rebuildDataWatcher);
 	settings->loadSettings();
 	TaskMenu = new QMenu();
 	signalMapper = new QSignalMapper();
@@ -187,12 +193,20 @@ void LemonLime::insertWatchPath(const QString &curDir, QFileSystemWatcher *watch
 }
 
 void LemonLime::resetDataWatcher() {
+	// 目录内容一变（判题时数据文件一直在写）就会收到通知。
+	// 重建 watcher 要遍历 problem/ 下所有目录，还会连带触发各个文件补全框重扫一遍，
+	// 所以这里只打一个标记，攒 400ms 再统一做一次。
+	if (dataWatcherTimer)
+		dataWatcherTimer->start();
+}
+
+void LemonLime::rebuildDataWatcher() {
 	delete dataDirWatcher;
 	dataDirWatcher = new QFileSystemWatcher(this);
 	insertWatchPath(Settings::dataPath(), dataDirWatcher);
+	// 只挂到去抖入口，避免每个文件的变动都全量重扫一遍。
 	connect(dataDirWatcher, &QFileSystemWatcher::directoryChanged, this, &LemonLime::resetDataWatcher);
-	connect(dataDirWatcher, &QFileSystemWatcher::fileChanged, this, &LemonLime::dataPathChanged);
-	connect(dataDirWatcher, &QFileSystemWatcher::directoryChanged, this, &LemonLime::dataPathChanged);
+	connect(dataDirWatcher, &QFileSystemWatcher::fileChanged, this, &LemonLime::resetDataWatcher);
 	emit dataPathChanged();
 }
 
@@ -288,7 +302,7 @@ void LemonLime::refreshButtonClicked() {
 	curContest->refreshContestantList();
 	ui->resultViewer->refreshViewer();
 	ui->statisticsBrowser->refresh();
-	judgeExtButtonFlip(ui->resultViewer->rowCount() > 0);
+	judgeExtButtonFlip(curContest && ! curContest->getContestantList().isEmpty());
 	ui->cleanupAction->setEnabled(true);
 	ui->refreshAction->setEnabled(true);
 }
@@ -565,7 +579,7 @@ void LemonLime::tabIndexChanged(int index) {
 			ui->judgeButton->setEnabled(false);
 		}
 
-		judgeExtButtonFlip(ui->resultViewer->rowCount() > 0);
+		judgeExtButtonFlip(curContest && ! curContest->getContestantList().isEmpty());
 		ui->cleanupAction->setEnabled(true);
 		ui->refreshAction->setEnabled(true);
 	}
@@ -624,7 +638,7 @@ void LemonLime::viewerSelectionChanged() {
 }
 
 void LemonLime::contestantDeleted() {
-	judgeExtButtonFlip(ui->resultViewer->rowCount() > 0);
+	judgeExtButtonFlip(curContest && ! curContest->getContestantList().isEmpty());
 	ui->cleanupAction->setEnabled(true);
 	ui->refreshAction->setEnabled(true);
 }
@@ -979,6 +993,9 @@ void LemonLime::loadDay(const QString &filePath) {
 	ui->tabWidget->setCurrentIndex(0);
 	// 题面：加载当前比赛日的 statement/statement.md
 	ui->statementEdit->reload();
+	// 导出：重新列出当前比赛日能打包的内容
+	ui->exportWidget->setDayFile(curFile);
+	ui->exportWidget->setContest(curContest);
 	QApplication::restoreOverrideCursor();
 	LOG("Contest -", curContest->getContestTitle(), "loaded successfully");
 }
@@ -1028,6 +1045,7 @@ void LemonLime::closeAction() {
 	ui->taskEdit->setEditTask(nullptr);
 	ui->resultViewer->setContest(nullptr);
 	ui->statisticsBrowser->setContest(nullptr);
+	ui->exportWidget->setContest(nullptr);
 	delete curContest;
 	curContest = nullptr;
 	ui->tabWidget->setCurrentIndex(0);

@@ -37,6 +37,8 @@ class Task : public QObject {
 
 	const QList<TestCase *> &getTestCaseList() const;
 	const QString &getProblemTitle() const;
+	/// 题目在磁盘上的目录名：优先用源文件名（如 plus），为空时退回去用标题。
+	QString getDirectoryName() const;
 	bool getSubFolderCheck() const;
 	const QString &getSourceFileName() const;
 	const QString &getInputFileName() const;

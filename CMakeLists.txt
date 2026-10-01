@@ -56,6 +56,23 @@ add_definitions(-DQT_NO_FOREACH)
 
 list(APPEND LEMON_QT_LIBS ${LEMON_QT_LIBNAME}::Core ${LEMON_QT_LIBNAME}::Gui ${LEMON_QT_LIBNAME}::Widgets)
 
+# 导出 .zip 用到 Qt 私有的 QZipWriter（Qt6Core.dll 里已导出，这里只需要它的头文件目录）。
+if(TARGET ${LEMON_QT_LIBNAME}::CorePrivate)
+    list(APPEND LEMON_QT_LIBS ${LEMON_QT_LIBNAME}::CorePrivate)
+else()
+    message(WARNING "${LEMON_QT_LIBNAME}::CorePrivate not found: .zip export may not build")
+endif()
+
+# 加密 zip 里的 deflate 压缩用 zlib；没找到就只是不压缩（依然能加密、能解压）。
+find_package(ZLIB)
+if(ZLIB_FOUND)
+    add_compile_definitions(LEMON_HAVE_ZLIB)
+    list(APPEND LEMON_QT_LIBS ZLIB::ZLIB)
+    message(STATUS "zlib found: encrypted .zip will be deflate-compressed")
+else()
+    message(STATUS "zlib not found: encrypted .zip will be stored without compression")
+endif()
+
 set(SINGLEAPPLICATION_DIR ${CMAKE_SOURCE_DIR}/3rdparty/SingleApplication)
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 add_subdirectory(3rdparty/SingleApplication)

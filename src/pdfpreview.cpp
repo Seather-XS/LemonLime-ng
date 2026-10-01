@@ -145,7 +145,22 @@ void PdfPreviewWidget::setMessage(const QString &text) {
 
 void PdfPreviewWidget::setPdf(const QString &path) {
 	pdfPath = path;
-	render();
+
+	// 渲染要起 pdftocairo 把每页转成 PNG 再读成 QPixmap，大题干能卡好几秒。
+	// 选项卡没显示就先记下来，等切过来（showEvent）再渲染。
+	if (isVisible()) {
+		render();
+	} else {
+		pendingRender = true;
+		setMessage(tr("Rendering ..."));
+	}
+}
+
+void PdfPreviewWidget::showEvent(QShowEvent *event) {
+	QWidget::showEvent(event);
+
+	if (pendingRender)
+		scheduleRender();
 }
 
 QString PdfPreviewWidget::findRenderer() const {
@@ -166,6 +181,8 @@ int PdfPreviewWidget::renderDpi() const {
 }
 
 void PdfPreviewWidget::render() {
+	pendingRender = false;
+
 	if (pdfPath.isEmpty()) {
 		setMessage(tr("Compile the statement to see the preview here."));
 		return;

@@ -48,10 +48,9 @@ MarkdownHighlighter::MarkdownHighlighter(QTextDocument *parent) : QSyntaxHighlig
 
 	mathFormat.setForeground(QColor(0x8a, 0x2b, 0xe2));
 
-	// 行内代码：浅灰底 + 深棕字。statement-editor 的编辑器是深色底，所以那边用黄色字色；
-	// 这里是浅色底，直接用黄色会看不见，改成黄底又会把表格涂满，故取常见的浅灰底样式。
+	// 行内代码：只改字色，不加背景色（背景色会把行内代码所在的整段/表格格子涂满，很难看）。
+	// statement-editor 的编辑器是深色底，所以那边用黄色字色；这里是浅色底，用深棕字。
 	codeFormat.setForeground(QColor(0x7a, 0x50, 0x00));
-	codeFormat.setBackground(QColor(0xf0, 0xf0, 0xf0));
 
 	fenceFormat.setForeground(QColor(0x80, 0x80, 0x80));
 }

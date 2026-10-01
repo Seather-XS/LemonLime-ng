@@ -1329,8 +1329,8 @@ This cannot be undone.</source>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="675"/>
-        <source>Judged By LemonLime</source>
-        <translation>使用 LemonLime 评测</translation>
+        <source>Judged By LemonLime-ng</source>
+        <translation>使用 LemonLime-ng 评测</translation>
     </message>
     <message>
         <location filename="../src/component/exportutil/exportutil.cpp" line="928"/>
@@ -2869,6 +2869,16 @@ No: remove it from the contest only.</source>
         <source>About LemonLime</source>
         <translation>关于 LemonLime</translation>
     </message>
+    <message>
+        <location filename="../src/forms/lemon.ui" line="463"/>
+        <source>Export</source>
+        <translation>导出</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/lemon.ui" line="475"/>
+        <source>Pack this contest day into .zip files for the target platforms...</source>
+        <translation>把当前比赛日打包成各平台要的 .zip...</translation>
+    </message>
 </context>
 <context>
     <name>NewContestDialog</name>
@@ -3755,6 +3765,11 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../src/statisticsbrowser.cpp" line="337"/>
+        <source>Region</source>
+        <translation>赛区</translation>
+    </message>
 </context>
 <context>
     <name>SummaryTree</name>
@@ -4242,6 +4257,333 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/forms/welcomedialog.ui" line="39"/>
         <source>New</source>
         <translation>新建</translation>
+    </message>
+</context>
+<context>
+    <name>ExportWidget</name>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="45"/>
+        <location filename="../src/exportwidget.cpp" line="108"/>
+        <source>Package type:</source>
+        <translation>包类型：</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="51"/>
+        <location filename="../src/exportwidget.cpp" line="112"/>
+        <source>Refresh</source>
+        <translation>刷新</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="52"/>
+        <location filename="../src/exportwidget.cpp" line="113"/>
+        <source>List the files that will be packed.</source>
+        <translation>列出将要打包的文件。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="53"/>
+        <location filename="../src/exportwidget.cpp" line="114"/>
+        <source>Export .zip</source>
+        <translation>导出 .zip</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="64"/>
+        <location filename="../src/exportwidget.cpp" line="109"/>
+        <source>Output:</source>
+        <translation>输出：</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="74"/>
+        <location filename="../src/exportwidget.cpp" line="110"/>
+        <source>Package contents</source>
+        <translation>打包内容</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="91"/>
+        <location filename="../src/exportwidget.cpp" line="111"/>
+        <source>Export log</source>
+        <translation>导出日志</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="115"/>
+        <source>One subfolder per task (named after the task&apos;s folder), containing the files directly inside that task&apos;s &lt;b&gt;down/&lt;/b&gt; folder (subfolders are skipped). The statement PDF is placed in the zip root.</source>
+        <translation>每道题一个子目录（用题目目录名），放入该题 &lt;b&gt;down/&lt;/b&gt; 目录下的文件（不包含子目录里的文件）；题面 PDF 放在压缩包根目录。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="118"/>
+        <source>Path in package</source>
+        <translation>包内路径</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="118"/>
+        <source>Source on disk</source>
+        <translation>磁盘来源</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="155"/>
+        <source>No contest</source>
+        <translation>尚未打开比赛</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="193"/>
+        <source>%1 file(s), %2 folder(s)</source>
+        <translation>%1 个文件，%2 个目录</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="199"/>
+        <source>The statement PDF is missing; export it in the Statement tab first if you need it.</source>
+        <translation>题面 PDF 不存在；如果需要，请先在「题面」选项卡里导出。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="216"/>
+        <location filename="../src/exportwidget.cpp" line="231"/>
+        <location filename="../src/exportwidget.cpp" line="237"/>
+        <source>Export</source>
+        <translation>导出</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="217"/>
+        <source>The statement PDF (%1) does not exist yet, so the package will not contain the statement.
+Export anyway?</source>
+        <translation>题面 PDF（%1）还不存在，压缩包里将不含题面。
+仍要导出吗？</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="231"/>
+        <source>Export failed: %1</source>
+        <translation>导出失败：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="238"/>
+        <source>Export is done</source>
+        <translation>导出完成</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="114"/>
+        <location filename="../src/exportwidget.cpp" line="181"/>
+        <source>Options</source>
+        <translation>选项</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="116"/>
+        <location filename="../src/exportwidget.cpp" line="182"/>
+        <source>Wrap everything in a folder named after the contest day file</source>
+        <translation>把所有内容套进与比赛日文件同名的目录</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="122"/>
+        <location filename="../src/exportwidget.cpp" line="186"/>
+        <source>Encrypt with a password (ZipCrypto)</source>
+        <translation>使用密码加密（ZipCrypto）</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="126"/>
+        <source>Password:</source>
+        <translation>密码：</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="131"/>
+        <location filename="../src/exportwidget.cpp" line="187"/>
+        <source>Show</source>
+        <translation>显示</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="297"/>
+        <source>Please type a password first.</source>
+        <translation>请先输入密码。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="169"/>
+        <location filename="../src/exportwidget.cpp" line="281"/>
+        <source>Nest an inner zip named %1</source>
+        <translation>内层压缩包命名为 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="170"/>
+        <location filename="../src/exportwidget.cpp" line="256"/>
+        <source>The outer .zip will hold nothing but the inner zip; all the content lives inside it.</source>
+        <translation>外层 .zip 里只有内层压缩包，其它内容都在里面。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="172"/>
+        <location filename="../src/exportwidget.cpp" line="257"/>
+        <source>Give each task its own folder</source>
+        <translation>每道题单独一个目录</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="175"/>
+        <location filename="../src/exportwidget.cpp" line="258"/>
+        <source>Keep the original folder structure (data/, graders/, ...)</source>
+        <translation>保留原来的目录结构（data/、graders/ 等）</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="178"/>
+        <location filename="../src/exportwidget.cpp" line="259"/>
+        <source>Also export the sample data (down/)</source>
+        <translation>一并导出样例数据（down/）</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="254"/>
+        <source>Adds one more level: the .zip contains a &lt;day&gt;/ folder holding everything.</source>
+        <translation>多套一层：.zip 里是一个 &lt;day&gt;/ 目录，所有内容都在里面。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="260"/>
+        <source>The sample data is taken from each task&apos;s down/ folder, keeping the structure.</source>
+        <translation>样例数据取自每道题的 down/ 目录，并保留目录结构。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="284"/>
+        <source>Test data of every task: the whole &lt;b&gt;data/&lt;/b&gt; and &lt;b&gt;graders/&lt;/b&gt; folders (plus &lt;b&gt;down/&lt;/b&gt; when the sample data is included). The statement PDF is not packed.</source>
+        <translation>每道题的测试数据：完整的 &lt;b&gt;data/&lt;/b&gt; 与 &lt;b&gt;graders/&lt;/b&gt; 目录（勾选样例数据时再加 &lt;b&gt;down/&lt;/b&gt;）。不含题面 PDF。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="303"/>
+        <source>Some tasks use the same data file names, so every task must keep its own folder.</source>
+        <translation>有试题的数据文件重名，因此每道题必须单独一个目录。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="305"/>
+        <source>Each task gets its own folder inside the package.</source>
+        <translation>每道题在压缩包里单独一个目录。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="317"/>
+        <source>The sample data keeps the folder structure, so this cannot be turned off.</source>
+        <translation>样例数据会保留目录结构，因此不能关闭。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="319"/>
+        <source>Keeps data/, graders/ and down/ inside each task folder.</source>
+        <translation>每道题目录里保留 data/、graders/、down/ 这几层。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="391"/>
+        <source>Some tasks use the same data file names, so they cannot share one folder.</source>
+        <translation>有试题的数据文件重名，不能放在同一个目录里。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="286"/>
+        <source>Give every region its own inner zip</source>
+        <translation>每个赛区单独一个内层压缩包</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="287"/>
+        <source>The outer answers.zip will also hold one &lt;region&gt;.zip per region.</source>
+        <translation>answers.zip 里还会为每个赛区放一个 &lt;region&gt;.zip。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="284"/>
+        <source>Also wrap everything in a folder named after the contest day file</source>
+        <translation>再套一层与比赛日同名的目录</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="285"/>
+        <source>Gives &lt;day&gt;/ and, when regions are enabled, &lt;day&gt;/&lt;region&gt;/ for every region.</source>
+        <translation>得到 &lt;day&gt;/；启用赛区时每个赛区再占一层：&lt;day&gt;/&lt;region&gt;/。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="288"/>
+        <source>Answers of every contestant: one folder per contestant with all of their source files. With regions enabled you can group them into region folders and/or one inner zip per region. The &lt;day&gt;/ wrapper is optional.</source>
+        <translation>每位选手一个目录，里面是他全部题目的源代码。启用赛区时可按赛区分组：赛区同名文件夹、或每个赛区一个内层压缩包（可同时开）；&lt;day&gt;/ 那层可选。</translation>
+    </message>
+</context>
+<context>
+    <name>PackageBuilder</name>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="22"/>
+        <source>Contestant Directory</source>
+        <translation>选手目录</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="53"/>
+        <source>No contest</source>
+        <translation>尚未打开比赛</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="66"/>
+        <source>Statement PDF not found: %1</source>
+        <translation>找不到题面 PDF：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="83"/>
+        <source>No down folder for task %1: %2</source>
+        <translation>题目 %1 没有 down 目录：%2</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="94"/>
+        <source>%1: %2 file(s)</source>
+        <translation>%1：%2 个文件</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="123"/>
+        <source>Nothing to export</source>
+        <translation>没有可导出的内容</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="130"/>
+        <source>Cannot make folder %1</source>
+        <translation>无法创建目录 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="135"/>
+        <source>Cannot overwrite %1</source>
+        <translation>无法覆盖 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="139"/>
+        <source>Writing %1</source>
+        <translation>正在写入 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="156"/>
+        <source>Cannot open file %1</source>
+        <translation>无法打开文件 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="166"/>
+        <location filename="../src/core/packagebuilder.cpp" line="175"/>
+        <source>Cannot write %1</source>
+        <translation>无法写入 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="179"/>
+        <source>Done: %1 folder(s), %2 file(s)</source>
+        <translation>完成：%1 个目录，%2 个文件</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="129"/>
+        <source>Cannot write the archive</source>
+        <translation>无法写入压缩包</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="387"/>
+        <source>Test Data</source>
+        <translation>测试数据</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="630"/>
+        <source>No %1 folder for task %2</source>
+        <translation>题目 %2 没有 %1 目录</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="739"/>
+        <source>Duplicate file name skipped: %1</source>
+        <translation>文件重名已跳过：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="859"/>
+        <source>%1: %2 folder(s), %3 file(s)</source>
+        <translation>%1：%2 个目录，%3 个文件</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="390"/>
+        <source>Answers</source>
+        <translation>选手代码</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="806"/>
+        <source>No contestant in current contest</source>
+        <translation>当前比赛还没有选手</translation>
     </message>
 </context>
 </TS>

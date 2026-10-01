@@ -66,6 +66,14 @@ void ResultViewer::changeEvent(QEvent *event) {
 	}
 }
 
+void ResultViewer::showEvent(QShowEvent *event) {
+	QTableWidget::showEvent(event);
+
+	// 选项卡切过来时，把之前攒下的刷新补上。
+	if (needsRefresh)
+		refreshViewer();
+}
+
 void ResultViewer::contextMenuEvent(QContextMenuEvent * /*event*/) {
 	QList<QTableWidgetSelectionRange> selectionRange = selectedRanges();
 
@@ -118,6 +126,14 @@ int ResultViewer::taskColumnBase() const {
 }
 
 void ResultViewer::refreshViewer() {
+	// 选项卡没显示时先不重建：大比赛要造几千个单元格，此时用户也看不到。
+	// （命令行里用的 viewer 没有父窗口，不受影响，照旧立即重建。）
+	if (! isVisible() && parentWidget()) {
+		needsRefresh = true;
+		return;
+	}
+
+	needsRefresh = false;
 	clear();
 	setRowCount(0);
 	setColumnCount(0);

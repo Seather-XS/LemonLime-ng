@@ -458,6 +458,26 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="exportTab">
+       <attribute name="title">
+        <string>Export</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="ExportWidget" name="exportWidget" native="true">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="statusTip">
+           <string>Pack this contest day into .zip files for the target platforms...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -1009,6 +1029,12 @@
    <class>StatementEditWidget</class>
    <extends>QWidget</extends>
    <header>statementeditwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ExportWidget</class>
+   <extends>QWidget</extends>
+   <header>exportwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
