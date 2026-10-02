@@ -905,9 +905,9 @@ namespace {
 
 	/// build() 无论从哪个分支返回都把 building 复位。
 	struct FlagGuard {
-		bool &flag;
-		explicit FlagGuard(bool &value) : flag(value) { flag = true; }
-		~FlagGuard() { flag = false; }
+		std::atomic<bool> &flag;
+		explicit FlagGuard(std::atomic<bool> &value) : flag(value) { flag.store(true); }
+		~FlagGuard() { flag.store(false); }
 	};
 
 	int runTool(const QString &program, const QStringList &arguments, const QString &workingDirectory,
@@ -1554,7 +1554,7 @@ void StatementBuilder::fail(const QString &message) { errorText = message; }
 bool StatementBuilder::build() {
 	errorText.clear();
 
-	if (building) {
+	if (building.load()) {
 		fail(tr("A statement build is already running."));
 		return false;
 	}

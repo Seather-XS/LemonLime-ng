@@ -11,6 +11,7 @@
 #include "core/contest.h"
 #include "core/contestant.h"
 #include "core/task.h"
+#include "core/testcase.h"
 //
 #include <QBuffer>
 #include <QDateTime>
@@ -693,9 +694,72 @@ auto PackageBuilder::taskConfigKey(const Task *task) -> QString {
 	    .arg(task->getGraderFilesPath().join(QChar(',')));
 }
 
+namespace {
+	/// .cdf 里存的是相对 `problem/` 的测试数据路径（形如 `<题>/data/sub/1.in`）；
+	/// 取出 `problem/<题>/data/` 之后的部分，就是相对 data/ 的路径（`sub/1.in`）。
+	QString dataPathRelativeToTask(const Task *task, const QString &stored) {
+		const QString taskName = task->getDirectoryName();
+		const QString path = QDir::fromNativeSeparators(stored);
+
+		if (taskName.isEmpty() || path.isEmpty())
+			return {};
+
+		const QString marker = taskName + QStringLiteral("/data/");
+		const int at = path.indexOf(marker);
+
+		if (at >= 0)
+			return path.mid(at + marker.size());
+
+		// 老工程可能只存了 `<题>/<文件>`，甚至只有文件名；都按 data/ 下的文件处理。
+		QString rest = path;
+		const QString taskPrefix = taskName + QChar('/');
+
+		if (rest.startsWith(taskPrefix))
+			rest = rest.mid(taskPrefix.size());
+
+		if (rest.startsWith(QStringLiteral("data/")))
+			rest = rest.mid(5);
+
+		// 兜底：绝对路径只取文件名。
+		if (rest.startsWith(QChar('/')) || rest.contains(QChar(':')))
+			rest = QFileInfo(rest).fileName();
+
+		return rest;
+	}
+
+	/// 一道题所有测试点引用到的数据文件（相对 `<题>/data/`，去重并按字典序）。
+	QStringList referencedDataFiles(const Task *task) {
+		QSet<QString> used;
+
+		for (auto *testCase : task->getTestCaseList()) {
+			if (! testCase)
+				continue;
+
+			for (const QString &stored : testCase->getInputFiles()) {
+				const QString relative = dataPathRelativeToTask(task, stored);
+
+				if (! relative.isEmpty())
+					used.insert(relative);
+			}
+
+			for (const QString &stored : testCase->getOutputFiles()) {
+				const QString relative = dataPathRelativeToTask(task, stored);
+
+				if (! relative.isEmpty())
+					used.insert(relative);
+			}
+		}
+
+		QStringList result(used.begin(), used.end());
+		std::sort(result.begin(), result.end());
+		return result;
+	}
+} // namespace
+
 // 测试数据包：一道题要打包的文件（相对题目录的路径, 磁盘路径）。
-// data/ 一定有；graders/ 只带评测真正用得上的那几个文件（见 graderFilesForTask）；
-// down/（样例数据）只有勾了才带上；gen/、tests/ 这类中间产物不导出。
+// data/ 只带测试点真正引用到的输入 / 输出文件（这些路径就记在 .cdf 里，出题人丢在 data/
+// 里但没挂到测试点上的中间产物不导出）；graders/ 只带评测真正用得上的那几个文件
+// （见 graderFilesForTask）；down/（样例数据）只有勾了才带上；gen/、tests/ 这类中间产物不导出。
 auto PackageBuilder::collectTestDataFiles(const Task *task, bool quiet) -> QList<QPair<QString, QString>> {
 	QList<QPair<QString, QString>> files;
 
@@ -704,10 +768,14 @@ auto PackageBuilder::collectTestDataFiles(const Task *task, bool quiet) -> QList
 
 	const QString taskName = task->getDirectoryName();
 
-	// 缓存键带上「保留结构 / 样例数据」、题目配置和比赛日：重名检查和收集计划共用同一次扫描。
+	// data/ 下真正被测试点引用的文件（相对 <题>/data/）。
+	const QStringList usedData = referencedDataFiles(task);
+
+	// 缓存键带上「保留结构 / 样例数据」、题目配置、比赛日与被引用的数据文件：
+	// 重名检查和收集计划共用同一次扫描。
 	const QString cacheKey = taskName + QChar('|') + (structure ? QChar('1') : QChar('0')) +
 	                         (samples ? QChar('1') : QChar('0')) + QChar('|') + taskConfigKey(task) +
-	                         QChar('|') + dayRoot();
+	                         QChar('|') + dayRoot() + QChar('|') + usedData.join(QChar('\n'));
 
 	if (taskFileCache.contains(cacheKey))
 		return taskFileCache.value(cacheKey);
@@ -715,44 +783,46 @@ auto PackageBuilder::collectTestDataFiles(const Task *task, bool quiet) -> QList
 	const QString taskRoot =
 	    QDir(dayRoot()).absoluteFilePath(Settings::dataPath() + taskName + QDir::separator());
 
-	// 保留结构时原样搬过去（data/xxx）；不保留时都铺到题目录下（xxx）。
-	// 只有 data/ 是整个目录带上，其它都是按需挑文件。
-	struct Part {
-		QString folder; ///< 题目录下的哪个子目录
-		QString prefix; ///< 包内的目录前缀（空表示铺到题目录下）
-		bool recursive; ///< 是否连子目录一起收
-	};
+	const QDir dataDir(taskRoot + QStringLiteral("data"));
 
-	QList<Part> parts = {
-	    {QStringLiteral("data"), structure ? QStringLiteral("data") : QString(), true},
-	};
+	if (! dataDir.exists()) {
+		if (! quiet)
+			emit logMessage(tr("No %1 folder for task %2").arg(QStringLiteral("data"), taskName));
+	} else if (usedData.isEmpty() && ! quiet) {
+		emit logMessage(tr("Task %1 has no test case referencing data/ files").arg(taskName));
+	}
 
-	if (samples)
-		// 样例数据只收 down/ 本层的文件：down/ 里的子目录（例如按测试点分的子目录）
-		// 是出题人自己的中间产物，不往包里带。
-		parts.append({QStringLiteral("down"), QStringLiteral("down"), false});
+	for (const QString &relative : usedData) {
+		const QString diskPath = dataDir.absoluteFilePath(relative);
 
-	for (const auto &part : parts) {
-		const QDir dir(taskRoot + part.folder);
-
-		if (! dir.exists()) {
-			// down/ 没有很正常，不打扰；data/ 缺了提醒一句。
-			if (! quiet && part.folder != QLatin1String("down"))
-				emit logMessage(tr("No %1 folder for task %2").arg(part.folder, taskName));
+		if (! QFileInfo::exists(diskPath)) {
+			if (! quiet)
+				emit logMessage(tr("%1 of task %2 was not found in data/").arg(relative, taskName));
 
 			continue;
 		}
 
-		QDirIterator iterator(dir.path(), QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot,
-		                      part.recursive ? QDirIterator::Subdirectories : QDirIterator::NoIteratorFlags);
+		// 保留结构时照搬 data/ 下的相对路径（子目录也带上）；不保留时只留文件名
+		// （撞名会被跳过并记日志）。
+		const QString archiveRelative =
+		    structure ? QStringLiteral("data") + QChar('/') + relative : QFileInfo(relative).fileName();
+		files.append({archiveRelative, diskPath});
+	}
 
-		while (iterator.hasNext()) {
-			iterator.next();
-			const QString name = dir.relativeFilePath(iterator.filePath());
-			// 保留结构时连 data/ 里的子目录一起照搬；不保留时只留文件名（撞名会被跳过并记日志）。
-			const QString relative = part.prefix.isEmpty() ? QFileInfo(name).fileName()
-			                                               : part.prefix + QChar('/') + name;
-			files.append({relative, iterator.filePath()});
+	if (samples) {
+		// 样例数据只收 down/ 本层的文件：down/ 里的子目录（例如按测试点分的子目录）
+		// 是出题人自己的中间产物，不往包里带。
+		const QDir downDir(taskRoot + QStringLiteral("down"));
+
+		if (downDir.exists()) {
+			QDirIterator iterator(downDir.path(), QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot,
+			                      QDirIterator::NoIteratorFlags);
+
+			while (iterator.hasNext()) {
+				iterator.next();
+				const QString name = downDir.relativeFilePath(iterator.filePath());
+				files.append({QStringLiteral("down") + QChar('/') + name, iterator.filePath()});
+			}
 		}
 	}
 

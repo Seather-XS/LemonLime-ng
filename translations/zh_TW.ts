@@ -3046,16 +3046,6 @@ No: remove it from the contest only.</source>
         <translation>PDF 預覽</translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="51"/>
-        <source>Zoom:</source>
-        <translation>縮放：</translation>
-    </message>
-    <message>
-        <location filename="../src/pdfpreview.cpp" line="57"/>
-        <source>Zoom (Ctrl + mouse wheel)</source>
-        <translation>縮放（Ctrl + 滾輪）</translation>
-    </message>
-    <message>
         <location filename="../src/pdfpreview.cpp" line="59"/>
         <source>Refresh</source>
         <translation>重新整理</translation>
@@ -3084,8 +3074,8 @@ No: remove it from the contest only.</source>
     </message>
     <message>
         <location filename="../src/pdfpreview.cpp" line="240"/>
-        <source>%1 page(s) · zoom %2</source>
-        <translation>共 %1 頁 · 縮放 %2</translation>
+        <source>%1 page(s)</source>
+        <translation>共 %1 頁</translation>
     </message>
     <message>
         <location filename="../src/pdfpreview.cpp" line="238"/>
@@ -4478,16 +4468,6 @@ p, li { white-space: pre-wrap; }
         <translation>正在列出...%1 個檔案</translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="238"/>
-        <source>Answers of every contestant: one folder per contestant with all of their source files. With regions enabled every region always gets its own folder (and can additionally be packed into a &lt;region&gt;.zip). The &lt;day&gt;/ wrapper is optional.</source>
-        <translation>每位選手一個目錄，裡面是他全部題目的原始碼。啟用賽區時每個賽區固定佔一個目錄（另外可選再打包成 &lt;region&gt;.zip）；&lt;day&gt;/ 那層可選。</translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="249"/>
-        <source>Test data of every task: the whole &lt;b&gt;data/&lt;/b&gt; folder. From &lt;b&gt;graders/&lt;/b&gt; only the files the task really needs are packed (the interactive library, or the checker source of a special judged task). &lt;b&gt;gen/&lt;/b&gt; and &lt;b&gt;tests/&lt;/b&gt; are never packed, and neither is the statement PDF. &lt;b&gt;down/&lt;/b&gt; is added when the sample data is included (only the files directly inside it; subfolders are skipped).</source>
-        <translation>每題的測試資料：完整的 &lt;b&gt;data/&lt;/b&gt; 目錄；&lt;b&gt;graders/&lt;/b&gt; 只帶這題真正用得上的檔案（互動題的互動庫，或使用檢查器的題目的檢查器原始碼）。&lt;b&gt;gen/&lt;/b&gt;、&lt;b&gt;tests/&lt;/b&gt; 與題面 PDF 都不會打包；勾選樣例資料時再加上 &lt;b&gt;down/&lt;/b&gt; 本層的檔案（不遞迴子目錄）。</translation>
-    </message>
-    <message>
         <location filename="../src/exportwidget.cpp" line="637"/>
         <source>The statement file is missing; export it in the Statement tab first if you need it.</source>
         <translation>題面檔案不存在；如果需要，請先在「題面」索引標籤裡導出。</translation>
@@ -4502,11 +4482,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/exportwidget.cpp" line="224"/>
         <source>Which file under statement/ goes into the package (the PDF name is set in the Statement tab).</source>
         <translation>打包用 statement/ 下的哪個檔案（PDF 檔名在「題面」索引標籤裡設定）。</translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="272"/>
-        <source>One subfolder per task (named after the task&apos;s folder), containing the files directly inside that task&apos;s &lt;b&gt;down/&lt;/b&gt; folder (subfolders are skipped). The statement file selected below is placed in the zip root.</source>
-        <translation>每道題一個子目錄（用題目目錄名），放入該題 &lt;b&gt;down/&lt;/b&gt; 目錄下的檔案（不含子目錄裡的檔案）；下面選中的題面檔案放在壓縮檔根目錄。</translation>
     </message>
     <message>
         <location filename="../src/exportwidget.cpp" line="376"/>

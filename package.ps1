@@ -304,7 +304,8 @@ if ($KeepEverything) {
             Write-Step '重新生成构建系统（只 configure，不编译）'
 
             $savedCmakePath = $env:Path
-            $env:Path = (Split-Path $CmakeBin -Parent) + ';' + $ToolchainBin + ';' + $env:Path
+            # ToolchainBin 在前，保证选中的 g++ 和 Qt 预编译库是同一套（见 build.ps1）。
+            $env:Path = $ToolchainBin + ';' + (Split-Path $CmakeBin -Parent) + ';' + $env:Path
 
             try {
                 $ltoValue = if ($ltoOn) { 'ON' } else { 'OFF' }

@@ -214,7 +214,15 @@ void StatementEditWidget::setupPdfPreviewTimer() {
 	connect(pdfPreviewTimer, &QTimer::timeout, this, &StatementEditWidget::applyPdfNameToPreview);
 }
 
-StatementEditWidget::~StatementEditWidget() { delete builder; }
+StatementEditWidget::~StatementEditWidget() {
+	// 后台还在编译就等它跑完：别让线程继续访问即将析构的 builder 与成员。
+	if (buildThread) {
+		buildThread->wait();
+		delete buildThread;
+	}
+
+	delete builder;
+}
 
 void StatementEditWidget::changeEvent(QEvent *event) {
 	if (event->type() == QEvent::LanguageChange) {
@@ -716,7 +724,7 @@ void StatementEditWidget::templateChanged() {
 }
 
 void StatementEditWidget::importClicked() {
-	if (builder->isBuilding()) {
+	if (buildThread || builder->isBuilding()) {
 		QMessageBox::information(this, tr("Statement"), tr("A statement build is still running."));
 		return;
 	}
@@ -752,7 +760,7 @@ bool StatementEditWidget::saveToDisk() {
 }
 
 void StatementEditWidget::exportClicked() {
-	if (builder->isBuilding())
+	if (buildThread)
 		return;
 
 	storeEditor();
@@ -761,39 +769,52 @@ void StatementEditWidget::exportClicked() {
 		return;
 
 	const QString target = QFileInfo(pdfPath()).absoluteFilePath();
+	buildTarget = target;
 	logView->clear();
 	importButton->setEnabled(false);
 	saveButton->setEnabled(false);
 	exportButton->setEnabled(false);
 	setStatus(tr("Building %1 ...").arg(QFileInfo(target).fileName()));
 	preview->setMessage(tr("Building %1 ...").arg(QFileInfo(target).fileName()));
-	QCoreApplication::processEvents();
 
 	builder->setTemplate(templateBox->currentText());
 	builder->setSourceFile(markdownPath());
 	builder->setOutputBase(QFileInfo(target).absolutePath() + QChar('/') + QFileInfo(target).completeBaseName());
 
-	const bool ok = builder->build();
+	// pandoc + 两遍 xelatex 要跑好几秒甚至更久。放在后台线程里跑，界面才不会在这期间卡死；
+	// builder 的 logMessage 是 AutoConnection，跨线程会自动排队回主线程，日志照样实时刷出来。
+	buildOk = false;
+	buildThread = QThread::create([this] { buildOk = builder->build(); });
+	connect(buildThread, &QThread::finished, this, &StatementEditWidget::statementBuildFinished);
+	buildThread->start();
+}
+
+void StatementEditWidget::statementBuildFinished() {
+	QThread *thread = buildThread;
+	buildThread = nullptr;
+
+	if (thread)
+		thread->deleteLater();
 
 	importButton->setEnabled(true);
 	saveButton->setEnabled(true);
 	exportButton->setEnabled(true);
 
-	if (! ok) {
+	if (! buildOk) {
 		appendLog(tr("Failed: %1").arg(builder->lastError()));
-		setStatus(tr("Building %1 failed.").arg(QFileInfo(target).fileName()));
-		preview->setMessage(tr("Building %1 failed.").arg(QFileInfo(target).fileName()));
+		setStatus(tr("Building %1 failed.").arg(QFileInfo(buildTarget).fileName()));
+		preview->setMessage(tr("Building %1 failed.").arg(QFileInfo(buildTarget).fileName()));
 		return;
 	}
 
-	setStatus(tr("Exported %1").arg(pdfPath()));
-	preview->setPdf(pdfPath());
+	setStatus(tr("Exported %1").arg(buildTarget));
+	preview->setPdf(buildTarget);
 
 	if (! logView->toPlainText().isEmpty())
 		appendLog(tr("Done."));
 
 	// 按钮只有这一个：编译完直接打开（系统默认的 PDF 阅读器）。
-	QDesktopServices::openUrl(QUrl::fromLocalFile(target));
+	QDesktopServices::openUrl(QUrl::fromLocalFile(buildTarget));
 }
 
 void StatementEditWidget::pdfNameChanged() {

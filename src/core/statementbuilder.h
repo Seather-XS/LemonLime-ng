@@ -10,6 +10,8 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+//
+#include <atomic>
 
 /**
  * 题面 PDF 构建引擎。
@@ -37,8 +39,8 @@ class StatementBuilder : public QObject {
 
 	/// 同步构建；失败时 `lastError()` 给出原因，构建日志通过 logMessage() 发出。
 	bool build();
-	/// 是否正在构建（供界面禁用按钮用）。
-	bool isBuilding() const { return building; }
+	/// 是否正在构建（供界面禁用按钮用）。可能从其他线程读写，所以用原子量。
+	bool isBuilding() const { return building.load(); }
 
 	QString lastError() const { return errorText; }
 
@@ -53,5 +55,5 @@ class StatementBuilder : public QObject {
 	QString sourceFile;
 	QString outputBase;
 	QString errorText;
-	bool building{false};
+	std::atomic<bool> building{false};
 };

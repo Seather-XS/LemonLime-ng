@@ -103,7 +103,6 @@ class ExportWidget : public QWidget {
 	bool duplicatesLocked{false};
 	QComboBox *kindBox{nullptr};
 	QLabel *typeLabel{nullptr};
-	QLabel *hintLabel{nullptr};
 	QLabel *outputTitleLabel{nullptr};
 	QLabel *outputLabel{nullptr};
 	QGroupBox *optionsBox{nullptr};

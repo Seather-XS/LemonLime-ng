@@ -3021,16 +3021,6 @@ No: remove it from the contest only.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="51"/>
-        <source>Zoom:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/pdfpreview.cpp" line="57"/>
-        <source>Zoom (Ctrl + mouse wheel)</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/pdfpreview.cpp" line="59"/>
         <source>Refresh</source>
         <translation></translation>
@@ -3059,7 +3049,7 @@ No: remove it from the contest only.</source>
     </message>
     <message>
         <location filename="../src/pdfpreview.cpp" line="240"/>
-        <source>%1 page(s) · zoom %2</source>
+        <source>%1 page(s)</source>
         <translation></translation>
     </message>
     <message>
@@ -4444,16 +4434,6 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="238"/>
-        <source>Answers of every contestant: one folder per contestant with all of their source files. With regions enabled every region always gets its own folder (and can additionally be packed into a &lt;region&gt;.zip). The &lt;day&gt;/ wrapper is optional.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="249"/>
-        <source>Test data of every task: the whole &lt;b&gt;data/&lt;/b&gt; folder. From &lt;b&gt;graders/&lt;/b&gt; only the files the task really needs are packed (the interactive library, or the checker source of a special judged task). &lt;b&gt;gen/&lt;/b&gt; and &lt;b&gt;tests/&lt;/b&gt; are never packed, and neither is the statement PDF. &lt;b&gt;down/&lt;/b&gt; is added when the sample data is included (only the files directly inside it; subfolders are skipped).</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/exportwidget.cpp" line="637"/>
         <source>The statement file is missing; export it in the Statement tab first if you need it.</source>
         <translation></translation>
@@ -4467,11 +4447,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/exportwidget.cpp" line="224"/>
         <source>Which file under statement/ goes into the package (the PDF name is set in the Statement tab).</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="272"/>
-        <source>One subfolder per task (named after the task&apos;s folder), containing the files directly inside that task&apos;s &lt;b&gt;down/&lt;/b&gt; folder (subfolders are skipped). The statement file selected below is placed in the zip root.</source>
         <translation></translation>
     </message>
     <message>

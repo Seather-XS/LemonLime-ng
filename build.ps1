@@ -85,7 +85,10 @@ Write-Step '检查工具链'
 if (-not (Test-Path $CmakeBin)) { throw "找不到 cmake：$CmakeBin（用 -CmakeBin 指定）" }
 if (-not (Test-Path $QtDir)) { throw "找不到 Qt：$QtDir（用 -QtDir 指定）" }
 
-$env:Path = (Split-Path $CmakeBin -Parent) + ';' + $ToolchainBin + ';' + $env:Path
+# 注意顺序：ToolchainBin（Qt 自带的 MinGW，和 Qt 预编译库同一套 ABI）必须排在
+# cmake 所在目录前面。否则若 cmake 目录里也带了 g++（比如 C:\mingw64\bin），
+# 会选中版本不一致的编译器，链接 Qt 静态库时报 __imp___argc 之类的错误。
+$env:Path = $ToolchainBin + ';' + (Split-Path $CmakeBin -Parent) + ';' + $env:Path
 
 if (-not (Get-Command ninja.exe -ErrorAction SilentlyContinue)) { throw 'PATH 里找不到 ninja.exe' }
 if (-not (Get-Command g++.exe -ErrorAction SilentlyContinue)) { throw 'PATH 里找不到 g++.exe' }

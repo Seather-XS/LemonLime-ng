@@ -8,8 +8,6 @@
 //
 #include "base/ProcessUtil.hpp"
 //
-#include <QComboBox>
-#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -22,11 +20,13 @@
 #include <QStandardPaths>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <QWheelEvent>
 //
 #include <algorithm>
 
 namespace {
+	/// 预览缩放固定为 75%（与原来的「75%」档位效果一致）。界面上不再提供缩放控件。
+	constexpr int previewZoomPercent = 75;
+
 	/// `page-3.png` → 3，用于按页码而不是字典序排序。
 	int pageNumberOf(const QString &fileName) {
 		const QString base = QFileInfo(fileName).completeBaseName();
@@ -48,14 +48,6 @@ PdfPreviewWidget::PdfPreviewWidget(QWidget *parent) : QWidget(parent) {
 	auto *header = new QHBoxLayout();
 	header->addWidget(new QLabel(tr("PDF Preview"), this));
 	header->addStretch();
-	header->addWidget(new QLabel(tr("Zoom:"), this));
-	zoomBox = new QComboBox(this);
-	zoomBox->addItems({QStringLiteral("50%"), QStringLiteral("75%"), QStringLiteral("100%"),
-	                   QStringLiteral("125%"), QStringLiteral("150%"), QStringLiteral("200%"),
-	                   QStringLiteral("300%")});
-	zoomBox->setCurrentText(QStringLiteral("100%"));
-	zoomBox->setToolTip(tr("Zoom (Ctrl + mouse wheel)"));
-	header->addWidget(zoomBox);
 	auto *refreshButton = new QPushButton(tr("Refresh"), this);
 	header->addWidget(refreshButton);
 	layout->addLayout(header);
@@ -77,46 +69,22 @@ PdfPreviewWidget::PdfPreviewWidget(QWidget *parent) : QWidget(parent) {
 	infoLabel = new QLabel(this);
 	layout->addWidget(infoLabel);
 
-	connect(zoomBox, &QComboBox::currentTextChanged, this, [this] { scheduleRender(); });
 	connect(refreshButton, &QPushButton::clicked, this, [this] { render(); });
 
-	// 连续滚轮缩放时不必每一格都重渲染，攒一小会儿再跑一次。
+	// 切到题面选项卡时不立刻渲染，稍等一下，避免来回切标签时反复跑 pdftocairo。
 	renderTimer = new QTimer(this);
 	renderTimer->setSingleShot(true);
 	renderTimer->setInterval(300);
 	connect(renderTimer, &QTimer::timeout, this, [this] { render(); });
 
-	// 预览区里的 Ctrl+滚轮 = 缩放（不按 Ctrl 时仍是普通滚动）。
-	scroll->viewport()->installEventFilter(this);
-	scroll->installEventFilter(this);
-
 	setMessage(tr("Compile the statement to see the preview here."));
 }
+
+PdfPreviewWidget::~PdfPreviewWidget() { abortRender(); }
 
 void PdfPreviewWidget::scheduleRender() {
 	if (renderTimer)
 		renderTimer->start();
-}
-
-void PdfPreviewWidget::stepZoom(int delta) {
-	const int index = zoomBox->currentIndex();
-	const int next = qBound(0, index + delta, zoomBox->count() - 1);
-
-	if (next != index)
-		zoomBox->setCurrentIndex(next);
-}
-
-bool PdfPreviewWidget::eventFilter(QObject *watched, QEvent *event) {
-	if (event->type() == QEvent::Wheel) {
-		auto *wheel = static_cast<QWheelEvent *>(event);
-
-		if (wheel->modifiers().testFlag(Qt::ControlModifier)) {
-			stepZoom(wheel->angleDelta().y() > 0 ? 1 : -1);
-			return true;
-		}
-	}
-
-	return QWidget::eventFilter(watched, event);
 }
 
 void PdfPreviewWidget::clearPages() {
@@ -140,6 +108,10 @@ void PdfPreviewWidget::clear() {
 }
 
 void PdfPreviewWidget::setMessage(const QString &text) {
+	// 换提示文字通常意味着要显示别的东西了（比如「正在编译」），
+	// 顺手停掉还在跑的渲染，免得它稍后把提示顶掉。
+	abortRender();
+
 	message = text;
 	clearPages();
 	messageLabel->setText(text);
@@ -183,8 +155,21 @@ QString PdfPreviewWidget::findRenderer() const {
 }
 
 int PdfPreviewWidget::renderDpi() const {
-	const int percent = zoomBox->currentText().remove(QChar('%')).toInt();
-	return qMax(48, 96 * percent / 100);
+	// 缩放固定：96 * 75 / 100 = 72。
+	return qMax(48, 96 * previewZoomPercent / 100);
+}
+
+// 停掉还没跑完的渲染：先断开信号，否则 kill 后还会触发 finishRender 把新一波的结果顶掉。
+void PdfPreviewWidget::abortRender() {
+	if (! renderProcess)
+		return;
+
+	QProcess *process = renderProcess;
+	renderProcess = nullptr;
+	process->disconnect(this);
+	process->kill();
+	process->waitForFinished(3000);
+	delete process;
 }
 
 void PdfPreviewWidget::render() {
@@ -200,18 +185,20 @@ void PdfPreviewWidget::render() {
 		return;
 	}
 
-	// 重新渲染后尽量把视图留在原来的位置（要在清空页面之前记下比例）
-	QScrollBar *bar = scroll->verticalScrollBar();
-	const double fraction = bar->maximum() > 0 ? double(bar->value()) / double(bar->maximum()) : 0.0;
-
-	clearPages();
-
 	const QString renderer = findRenderer();
 
 	if (renderer.isEmpty()) {
 		setMessage(tr("pdftocairo / pdftoppm not found in PATH, so the PDF cannot be previewed."));
 		return;
 	}
+
+	// 重新渲染后尽量把视图留在原来的位置（要在清空页面之前记下比例）
+	QScrollBar *bar = scroll->verticalScrollBar();
+	pendingScrollFraction = bar->maximum() > 0 ? double(bar->value()) / double(bar->maximum()) : 0.0;
+
+	// 上一次还没跑完就先停掉，避免两次输出乱在一起
+	abortRender();
+	clearPages();
 
 	QDir().mkpath(tempDir.path());
 
@@ -220,17 +207,42 @@ void PdfPreviewWidget::render() {
 		QFile::remove(tempDir.path() + QChar('/') + old);
 
 	messageLabel->setText(tr("Rendering ..."));
-	QCoreApplication::processEvents();
 
-	QProcess process;
-	Lemon::common::suppressConsoleWindow(process);
-	process.setWorkingDirectory(tempDir.path());
-	process.start(renderer, {QStringLiteral("-png"), QStringLiteral("-r"), QString::number(renderDpi()),
-	                         QDir::toNativeSeparators(QFileInfo(pdfPath).absoluteFilePath()),
-	                         tempDir.path() + QStringLiteral("/page")});
+	// pdftocairo 渲染大题干要好几秒。这里用异步信号等它结束，
+	// 不能再用 waitForFinished()——那会像以前一样把整个界面卡死。
+	renderProcess = new QProcess(this);
+	Lemon::common::suppressConsoleWindow(*renderProcess);
+	renderProcess->setWorkingDirectory(tempDir.path());
 
-	if (! process.waitForStarted(15000) || ! process.waitForFinished(-1)) {
-		process.kill();
+	connect(renderProcess, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
+		// 起不来（比如路径失效）时不会发 finished，只能在这里收拾；
+		// 其它错误（崩溃）会接着发 finished，交给 finishRender() 统一处理。
+		if (error != QProcess::FailedToStart || ! renderProcess)
+			return;
+
+		renderProcess->disconnect(this);
+		renderProcess->deleteLater();
+		renderProcess = nullptr;
+		setMessage(tr("Rendering the PDF preview failed."));
+	});
+	connect(renderProcess, &QProcess::finished, this, &PdfPreviewWidget::finishRender);
+
+	renderProcess->start(renderer, {QStringLiteral("-png"), QStringLiteral("-r"), QString::number(renderDpi()),
+	                                QDir::toNativeSeparators(QFileInfo(pdfPath).absoluteFilePath()),
+	                                tempDir.path() + QStringLiteral("/page")});
+}
+
+void PdfPreviewWidget::finishRender() {
+	QProcess *process = renderProcess;
+	renderProcess = nullptr;
+
+	if (! process)
+		return; // 已经被 abortRender() 接管
+
+	const bool ok = process->exitStatus() == QProcess::NormalExit && process->exitCode() == 0;
+	process->deleteLater();
+
+	if (! ok) {
 		setMessage(tr("Rendering the PDF preview failed."));
 		return;
 	}
@@ -261,9 +273,10 @@ void PdfPreviewWidget::render() {
 		pageLabels.append(label);
 	}
 
-	infoLabel->setText(tr("%1 page(s) · zoom %2").arg(pageLabels.size()).arg(zoomBox->currentText()));
+	infoLabel->setText(tr("%1 page(s)").arg(pageLabels.size()));
 	messageLabel->clear();
 
+	const double fraction = pendingScrollFraction;
 	QTimer::singleShot(0, this, [this, fraction] {
 		QScrollBar *scrollBar = scroll->verticalScrollBar();
 		scrollBar->setValue(qRound(fraction * scrollBar->maximum()));

@@ -97,11 +97,6 @@ void ExportWidget::buildUi() {
 	topBar->addWidget(exportButton);
 	layout->addLayout(topBar);
 
-	hintLabel = new QLabel(this);
-	hintLabel->setWordWrap(true);
-	hintLabel->setStyleSheet(QStringLiteral("color: gray;"));
-	layout->addWidget(hintLabel);
-
 	auto *outputBar = new QHBoxLayout();
 	outputTitleLabel = new QLabel(tr("Output:"), this);
 	outputBar->addWidget(outputTitleLabel);
@@ -246,32 +241,18 @@ void ExportWidget::syncOptionWidgets() {
 	statementLabel->setVisible(! testData && ! answers);
 	statementBox->setVisible(! testData && ! answers);
 
-	// 名字与说明都随包类型变。
+	// 名字随包类型变。
 	if (answers) {
 		wrapBox->setText(tr("Also wrap everything in a folder named after the contest day file"));
 		wrapBox->setToolTip(tr("Gives <day>/ and, when regions are enabled, <day>/<region>/ for every region."));
 		nestedBox->setText(tr("Give every region its own inner zip"));
 		nestedBox->setToolTip(tr("The outer answers.zip will also hold one <region>.zip per region."));
-		hintLabel->setText(tr("Answers of every contestant: one folder per contestant with all of their "
-		                      "source files. With regions enabled every region always gets its own folder "
-		                      "(and can additionally be packed into a <region>.zip). The <day>/ wrapper is "
-		                      "optional."));
 	} else {
 		wrapBox->setText(tr("Wrap everything in a folder named after the contest day file"));
 		wrapBox->setToolTip(tr("Adds one more level: the .zip contains a <day>/ folder holding everything."));
 		nestedBox->setText(tr("Nest an inner zip named %1").arg(builder->innerArchiveName()));
 		nestedBox->setToolTip(
 		    tr("The outer .zip will hold nothing but the inner zip; all the content lives inside it."));
-		hintLabel->setText(testData
-		                       ? tr("Test data of every task: the whole <b>data/</b> folder. From <b>graders/</b> "
-		                            "only the files the task really needs are packed (the interactive library, "
-		                            "or the checker source of a special judged task). <b>gen/</b> and "
-		                            "<b>tests/</b> are never packed, and neither is the statement PDF. "
-		                            "<b>down/</b> is added when the sample data is included (only the files "
-		                            "directly inside it; subfolders are skipped).")
-		                       : tr("One subfolder per task (named after the task's folder), containing the files "
-		                            "directly inside that task's <b>down/</b> folder (subfolders are skipped). The "
-		                            "statement file selected below is placed in the zip root."));
 	}
 
 	if (! testData)

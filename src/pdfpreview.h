@@ -13,7 +13,7 @@
 #include <QTemporaryDir>
 #include <QWidget>
 
-class QComboBox;
+class QProcess;
 class QScrollArea;
 class QTimer;
 class QVBoxLayout;
@@ -30,6 +30,7 @@ class PdfPreviewWidget : public QWidget {
 
   public:
 	explicit PdfPreviewWidget(QWidget *parent = nullptr);
+	~PdfPreviewWidget() override;
 
 	/// 显示一句占位文字（还没编译、正在编译、渲染器缺失……）。
 	void setMessage(const QString &message);
@@ -48,17 +49,17 @@ class PdfPreviewWidget : public QWidget {
 	QString currentInfoText() const;
 
   protected:
-	/// 在预览区里 Ctrl+滚轮 = 缩放。
-	bool eventFilter(QObject *watched, QEvent *event) override;
 	/// 选项卡切到题面时才真正渲染（渲染很贵，打开比赛日时它还在后台）。
 	void showEvent(QShowEvent *) override;
 
   private:
 	void render();
-	/// 连续滚轮时延迟一点再重渲染，避免每一格都跑一次 pdftocairo。
+	/// pdftocairo / pdftoppm 渲染结束后的回调（异步，不阻塞界面）。
+	void finishRender();
+	/// 停掉还没跑完的渲染进程。
+	void abortRender();
+	/// 延迟一点再渲染（切到题面选项卡时用），避免来回切标签反复跑 pdftocairo。
 	void scheduleRender();
-	/// 按缩放档位步进（delta 为 +1 / -1）。
-	void stepZoom(int delta);
 	void clearPages();
 	QString findRenderer() const;
 	int renderDpi() const;
@@ -69,11 +70,14 @@ class PdfPreviewWidget : public QWidget {
 	QScrollArea *scroll{};
 	QWidget *pagesWidget{};
 	QVBoxLayout *pagesLayout{};
-	QComboBox *zoomBox{};
 	QLabel *infoLabel{};
 	QTimer *renderTimer{};
+	/// 异步渲染用的进程（pdftocairo / pdftoppm）。
+	QProcess *renderProcess{};
 	QList<QLabel *> pageLabels;
 	QTemporaryDir tempDir;
+	/// 渲染前记下的滚动位置比例，渲染完再恢复。
+	double pendingScrollFraction{0.0};
 	/// 拿到 PDF 时没显示，就先攒着，等 showEvent 再渲染。
 	bool pendingRender{false};
 };

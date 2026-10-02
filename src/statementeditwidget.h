@@ -25,6 +25,7 @@ class PdfPreviewWidget;
 class MarkdownHighlighter;
 class FindReplaceBar;
 class StatementBuilder;
+class QThread;
 class Contest;
 
 /**
@@ -73,6 +74,8 @@ class StatementEditWidget : public QWidget {
 	void saveClicked();
 	/// 编译并打开 PDF（工具条上只有一个按钮）。
 	void exportClicked();
+	/// 后台编译结束：恢复按钮、刷新日志与预览（在编译线程发 finished 后于主线程调用）。
+	void statementBuildFinished();
 	/// 模板改了：存进比赛日，并刷新输入框旁边的预览名字。
 	void pdfNameChanged();
 	void addProblem();
@@ -131,6 +134,10 @@ class StatementEditWidget : public QWidget {
 	/// 改文件名时预览要读盘（甚至起 pdftocairo），敲字期间攒一下再换。
 	QTimer *pdfPreviewTimer{};
 	StatementBuilder *builder{};
+	/// 题面 PDF 在后台线程里编译，xelatex 期间不阻塞界面。
+	QThread *buildThread{};
+	bool buildOk{false};
+	QString buildTarget;
 	Contest *curContest{};
 	QString dayFileName;
 	QString dayTitle;
