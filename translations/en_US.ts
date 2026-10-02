@@ -3043,11 +3043,6 @@ No: remove it from the contest only.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="175"/>
-        <source>statement.pdf does not exist yet.</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/pdfpreview.cpp" line="188"/>
         <source>pdftocairo / pdftoppm not found in PATH, so the PDF cannot be previewed.</source>
         <translation></translation>
@@ -3063,13 +3058,18 @@ No: remove it from the contest only.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="221"/>
-        <source>Nothing could be rendered from statement.pdf.</source>
+        <location filename="../src/pdfpreview.cpp" line="240"/>
+        <source>%1 page(s) · zoom %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="240"/>
-        <source>%1 page(s) · zoom %2</source>
+        <location filename="../src/pdfpreview.cpp" line="238"/>
+        <source>Nothing could be rendered from %1.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="192"/>
+        <source>%1 does not exist yet.</source>
         <translation></translation>
     </message>
 </context>
@@ -3384,21 +3384,6 @@ No: remove it from the contest only.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="204"/>
-        <source>Export PDF</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/statementeditwidget.cpp" line="205"/>
-        <source>Compile statement/statement.pdf with pandoc + xelatex.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/statementeditwidget.cpp" line="206"/>
-        <source>Open PDF</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/statementeditwidget.cpp" line="235"/>
         <source>Title / subtitle / day / date of the statement.</source>
         <translation></translation>
@@ -3512,12 +3497,6 @@ No: remove it from the contest only.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="704"/>
-        <location filename="../src/statementeditwidget.cpp" line="705"/>
-        <source>Building statement.pdf ...</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/statementeditwidget.cpp" line="719"/>
         <source>Exported %1</source>
         <translation></translation>
@@ -3533,12 +3512,6 @@ No: remove it from the contest only.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="726"/>
-        <location filename="../src/statementeditwidget.cpp" line="727"/>
-        <source>Building statement.pdf failed.</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/statementeditwidget.cpp" line="735"/>
         <source>%1 does not exist yet.</source>
         <translation></translation>
@@ -3551,6 +3524,46 @@ No: remove it from the contest only.</source>
     <message>
         <location filename="../src/statementeditwidget.cpp" line="811"/>
         <source>(unsaved changes)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="762"/>
+        <location filename="../src/statementeditwidget.cpp" line="763"/>
+        <source>Building %1 ...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="778"/>
+        <location filename="../src/statementeditwidget.cpp" line="779"/>
+        <source>Building %1 failed.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="809"/>
+        <source>-&gt; %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="234"/>
+        <location filename="../src/statementeditwidget.cpp" line="389"/>
+        <source>Export and Open PDF</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="235"/>
+        <location filename="../src/statementeditwidget.cpp" line="390"/>
+        <source>Compile the statement PDF with pandoc + xelatex, then open it.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="243"/>
+        <source>PDF file name:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="246"/>
+        <location filename="../src/statementeditwidget.cpp" line="391"/>
+        <source>File name of the exported PDF (no extension). Placeholders: &lt;day&gt; = contest day file name, &lt;title-day&gt; = contest day title, &lt;title&gt; = contest title.</source>
         <translation></translation>
     </message>
 </context>
@@ -4265,11 +4278,6 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="115"/>
-        <source>One subfolder per task (named after the task&apos;s folder), containing the files directly inside that task&apos;s &lt;b&gt;down/&lt;/b&gt; folder (subfolders are skipped). The statement PDF is placed in the zip root.</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/exportwidget.cpp" line="118"/>
         <source>Path in package</source>
         <translation></translation>
@@ -4290,21 +4298,10 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="199"/>
-        <source>The statement PDF is missing; export it in the Statement tab first if you need it.</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/exportwidget.cpp" line="216"/>
         <location filename="../src/exportwidget.cpp" line="231"/>
         <location filename="../src/exportwidget.cpp" line="237"/>
         <source>Export</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="217"/>
-        <source>The statement PDF (%1) does not exist yet, so the package will not contain the statement.
-Export anyway?</source>
         <translation></translation>
     </message>
     <message>
@@ -4392,11 +4389,6 @@ Export anyway?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="284"/>
-        <source>Test data of every task: the whole &lt;b&gt;data/&lt;/b&gt; and &lt;b&gt;graders/&lt;/b&gt; folders (plus &lt;b&gt;down/&lt;/b&gt; when the sample data is included). The statement PDF is not packed.</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/exportwidget.cpp" line="303"/>
         <source>Some tasks use the same data file names, so every task must keep its own folder.</source>
         <translation></translation>
@@ -4446,6 +4438,53 @@ Export anyway?</source>
         <source>Answers of every contestant: one folder per contestant with all of their source files. With regions enabled you can group them into region folders and/or one inner zip per region. The &lt;day&gt;/ wrapper is optional.</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="445"/>
+        <source>Listing... %1 file(s)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="238"/>
+        <source>Answers of every contestant: one folder per contestant with all of their source files. With regions enabled every region always gets its own folder (and can additionally be packed into a &lt;region&gt;.zip). The &lt;day&gt;/ wrapper is optional.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="249"/>
+        <source>Test data of every task: the whole &lt;b&gt;data/&lt;/b&gt; folder. From &lt;b&gt;graders/&lt;/b&gt; only the files the task really needs are packed (the interactive library, or the checker source of a special judged task). &lt;b&gt;gen/&lt;/b&gt; and &lt;b&gt;tests/&lt;/b&gt; are never packed, and neither is the statement PDF. &lt;b&gt;down/&lt;/b&gt; is added when the sample data is included (only the files directly inside it; subfolders are skipped).</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="637"/>
+        <source>The statement file is missing; export it in the Statement tab first if you need it.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="134"/>
+        <location filename="../src/exportwidget.cpp" line="223"/>
+        <source>Statement file:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="224"/>
+        <source>Which file under statement/ goes into the package (the PDF name is set in the Statement tab).</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="272"/>
+        <source>One subfolder per task (named after the task&apos;s folder), containing the files directly inside that task&apos;s &lt;b&gt;down/&lt;/b&gt; folder (subfolders are skipped). The statement file selected below is placed in the zip root.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="376"/>
+        <source>missing</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="661"/>
+        <source>The statement file (%1) does not exist yet, so the package will not contain the statement.
+Export anyway?</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>PackageBuilder</name>
@@ -4457,11 +4496,6 @@ Export anyway?</source>
     <message>
         <location filename="../src/core/packagebuilder.cpp" line="53"/>
         <source>No contest</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="66"/>
-        <source>Statement PDF not found: %1</source>
         <translation></translation>
     </message>
     <message>
@@ -4543,6 +4577,16 @@ Export anyway?</source>
     <message>
         <location filename="../src/core/packagebuilder.cpp" line="806"/>
         <source>No contestant in current contest</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="661"/>
+        <source>%1 of task %2 was not found in graders/</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="585"/>
+        <source>Statement file not found: %1</source>
         <translation></translation>
     </message>
 </context>

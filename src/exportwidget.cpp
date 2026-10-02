@@ -30,6 +30,8 @@
 #include <QTimer>
 #include <QTreeWidget>
 #include <QVBoxLayout>
+//
+#include <algorithm>
 
 namespace {
 	/// 树节点：记住自己是不是目录，排序时目录排在文件前面（和资源管理器一样）。
@@ -52,63 +54,7 @@ namespace {
 	};
 
 	/// 按包内路径逐级建目录节点，把条目挂进树里（像文件资源管理器那样嵌套）。
-	class PackageTree {
-	  public:
-		PackageTree(QTreeWidget *tree, QTreeWidgetItem *root) : tree(tree), root(root) {}
-
-		void add(const QList<PackageBuilder::Item> &items) {
-			for (const PackageBuilder::Item &item : items) {
-				const int slash = item.archivePath.lastIndexOf(QChar('/'));
-
-				if (item.isDirectory) {
-					folderNode(item.archivePath);
-					continue;
-				}
-
-				const QString folder = slash < 0 ? QString() : item.archivePath.left(slash);
-				const QString name = slash < 0 ? item.archivePath : item.archivePath.mid(slash + 1);
-				QTreeWidgetItem *parent = folderNode(folder);
-				auto *node = parent ? new PackageItem(parent, {name, QString()})
-				                    : new PackageItem(tree, {name, QString()});
-				node->setFolder(false);
-				node->setIcon(0, tree->style()->standardIcon(QStyle::SP_FileIcon));
-				node->setText(1, QDir::toNativeSeparators(item.sourcePath));
-				++fileTotal;
-			}
-		}
-
-		int files() const { return fileTotal; }
-		int folders() const { return folderTotal; }
-
-		/// 取（必要时逐级创建）某个目录对应的节点；空路径表示根。
-		QTreeWidgetItem *folderNode(const QString &path) {
-			if (path.isEmpty())
-				return root;
-
-			if (folderNodes.contains(path))
-				return folderNodes.value(path);
-
-			const int slash = path.lastIndexOf(QChar('/'));
-			const QString parentPath = slash < 0 ? QString() : path.left(slash);
-			const QString name = slash < 0 ? path : path.mid(slash + 1);
-
-			QTreeWidgetItem *parent = folderNode(parentPath);
-			auto *node = parent ? new PackageItem(parent, {name, QString()})
-			                    : new PackageItem(tree, {name, QString()});
-			node->setFolder(true);
-			node->setIcon(0, tree->style()->standardIcon(QStyle::SP_DirIcon));
-			folderNodes.insert(path, node);
-			++folderTotal;
-			return node;
-		}
-
-	  private:
-		QTreeWidget *tree;
-		QTreeWidgetItem *root;
-		QMap<QString, QTreeWidgetItem *> folderNodes;
-		int fileTotal{0};
-		int folderTotal{0};
-	};
+	/// 具体插入由 ExportWidget 分批驱动（见 buildTreeStep()），这里只提供节点类型。
 } // namespace
 
 ExportWidget::ExportWidget(QWidget *parent) : QWidget(parent) {
@@ -121,6 +67,12 @@ ExportWidget::ExportWidget(QWidget *parent) : QWidget(parent) {
 	refreshTimer->setSingleShot(true);
 	refreshTimer->setInterval(250);
 	connect(refreshTimer, &QTimer::timeout, this, &ExportWidget::refresh);
+
+	// 预览树分批建：一次插上千个节点会先把界面卡住几秒，所以让出一帧再继续。
+	treeTimer = new QTimer(this);
+	treeTimer->setSingleShot(true);
+	treeTimer->setInterval(0);
+	connect(treeTimer, &QTimer::timeout, this, &ExportWidget::buildTreeStep);
 
 	// 这里不调 refresh()：此时还没打开任何比赛日，QDir::currentPath() 不是比赛日目录。
 }
@@ -155,7 +107,7 @@ void ExportWidget::buildUi() {
 	outputBar->addWidget(outputTitleLabel);
 	outputLabel = new QLabel(this);
 	outputLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-	// 输出路径固定为 <比赛日>/export/<比赛日>.zip，不给改。
+	// 输出路径固定为 <比赛日>/dist/export/<比赛日>.zip，不给改。
 	outputLabel->setStyleSheet(QStringLiteral("color: gray;"));
 	outputBar->addWidget(outputLabel, 1);
 	layout->addLayout(outputBar);
@@ -163,8 +115,8 @@ void ExportWidget::buildUi() {
 	// ---- 打包选项 ----
 	optionsBox = new QGroupBox(tr("Options"), this);
 	auto *optionsLayout = new QVBoxLayout(optionsBox);
+	// 提示文字统一由 retranslate() 负责，免得出现两个只差几个字的句子要翻译两遍。
 	wrapBox = new QCheckBox(tr("Wrap everything in a folder named after the contest day file"), optionsBox);
-	wrapBox->setToolTip(tr("Adds one more level: <day>.zip contains a <day>/ folder holding everything."));
 	optionsLayout->addWidget(wrapBox);
 	nestedBox = new QCheckBox(tr("Nest an inner zip named %1").arg(builder->innerArchiveName()), optionsBox);
 	nestedBox->setToolTip(tr("The outer .zip will hold nothing but the inner zip; all the content lives inside it."));
@@ -177,6 +129,15 @@ void ExportWidget::buildUi() {
 	optionsLayout->addWidget(structureBox);
 	samplesBox = new QCheckBox(tr("Also export the sample data (down/)"), optionsBox);
 	optionsLayout->addWidget(samplesBox);
+	// 题面文件：只在「选手目录」包里才有意义（题面文件名不一定叫 statement.pdf）。
+	auto *statementRow = new QHBoxLayout();
+	statementLabel = new QLabel(tr("Statement file:"), optionsBox);
+	statementRow->addWidget(statementLabel);
+	statementBox = new QComboBox(optionsBox);
+	statementBox->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+	statementBox->setMinimumContentsLength(24);
+	statementRow->addWidget(statementBox, 1);
+	optionsLayout->addLayout(statementRow);
 	encryptBox = new QCheckBox(tr("Encrypt with a password (ZipCrypto)"), optionsBox);
 	optionsLayout->addWidget(encryptBox);
 	auto *passwordRow = new QHBoxLayout();
@@ -236,6 +197,7 @@ void ExportWidget::buildUi() {
 	connect(perTaskBox, &QCheckBox::toggled, this, &ExportWidget::perTaskToggled);
 	connect(structureBox, &QCheckBox::toggled, this, [this] { optionsChanged(); });
 	connect(samplesBox, &QCheckBox::toggled, this, &ExportWidget::samplesToggled);
+	connect(statementBox, &QComboBox::currentTextChanged, this, &ExportWidget::statementChanged);
 	connect(encryptBox, &QCheckBox::toggled, this, [this] { optionsChanged(); });
 	// 密码不影响打包内容，只是存在 builder 里，不必重建树（否则每敲一个字符都重算一遍）。
 	connect(passwordEdit, &QLineEdit::textChanged, this, &ExportWidget::passwordChanged);
@@ -258,6 +220,9 @@ void ExportWidget::retranslate() {
 	structureBox->setText(tr("Keep the original folder structure (data/, graders/, ...)"));
 	samplesBox->setText(tr("Also export the sample data (down/)"));
 	samplesBox->setToolTip(tr("The sample data is taken from each task's down/ folder, keeping the structure."));
+	statementLabel->setText(tr("Statement file:"));
+	statementBox->setToolTip(tr("Which file under statement/ goes into the package (the PDF name is set in the "
+	                           "Statement tab)."));
 	encryptBox->setText(tr("Encrypt with a password (ZipCrypto)"));
 	showPasswordBox->setText(tr("Show"));
 	contentsBox->setTitle(tr("Package contents"));
@@ -278,6 +243,8 @@ void ExportWidget::syncOptionWidgets() {
 	perTaskBox->setVisible(testData);
 	structureBox->setVisible(testData);
 	samplesBox->setVisible(testData);
+	statementLabel->setVisible(! testData && ! answers);
+	statementBox->setVisible(! testData && ! answers);
 
 	// 名字与说明都随包类型变。
 	if (answers) {
@@ -296,12 +263,15 @@ void ExportWidget::syncOptionWidgets() {
 		nestedBox->setToolTip(
 		    tr("The outer .zip will hold nothing but the inner zip; all the content lives inside it."));
 		hintLabel->setText(testData
-		                       ? tr("Test data of every task: the whole <b>data/</b> and <b>graders/</b> folders "
-		                            "(plus <b>down/</b> when the sample data is included). The statement PDF is "
-		                            "not packed.")
+		                       ? tr("Test data of every task: the whole <b>data/</b> folder. From <b>graders/</b> "
+		                            "only the files the task really needs are packed (the interactive library, "
+		                            "or the checker source of a special judged task). <b>gen/</b> and "
+		                            "<b>tests/</b> are never packed, and neither is the statement PDF. "
+		                            "<b>down/</b> is added when the sample data is included (only the files "
+		                            "directly inside it; subfolders are skipped).")
 		                       : tr("One subfolder per task (named after the task's folder), containing the files "
 		                            "directly inside that task's <b>down/</b> folder (subfolders are skipped). The "
-		                            "statement PDF is placed in the zip root."));
+		                            "statement file selected below is placed in the zip root."));
 	}
 
 	if (! testData)
@@ -358,6 +328,75 @@ void ExportWidget::setContest(Contest *contest) {
 void ExportWidget::setDayFile(const QString &filePath) {
 	dayFile = filePath;
 	builder->setDayFile(filePath);
+	scheduleRefresh();
+}
+
+// 题面选项卡算出来的默认题面文件名：下拉框里没有就补一项，并选上它。
+void ExportWidget::setDefaultStatementFile(const QString &fileName) {
+	const QString name = QFileInfo(fileName).fileName();
+
+	if (name.isEmpty() || name == defaultStatementFile)
+		return;
+
+	defaultStatementFile = name;
+	reloadStatementFiles();
+	syncOptions();
+	scheduleRefresh();
+}
+
+// 列出 statement/ 下的文件：选中的保持选中，否则选默认题面（即使它还没被导出）。
+void ExportWidget::reloadStatementFiles() {
+	const QString current = statementBox->currentText();
+	const QDir statementDir(QDir(builder->dayRoot()).absoluteFilePath(Settings::statementPath()));
+	QStringList names;
+
+	if (statementDir.exists()) {
+		const QFileInfoList found =
+		    statementDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot, QDir::Name);
+
+		for (const QFileInfo &info : found)
+			names << info.fileName();
+	}
+
+	const QString fallback = defaultStatementFile.isEmpty() ? builder->statementFile() : defaultStatementFile;
+
+	// PDF 排前面（题面通常就是 PDF），同类按名字排。
+	std::sort(names.begin(), names.end(), [](const QString &left, const QString &right) {
+		const bool leftPdf = left.endsWith(QStringLiteral(".pdf"), Qt::CaseInsensitive);
+		const bool rightPdf = right.endsWith(QStringLiteral(".pdf"), Qt::CaseInsensitive);
+
+		if (leftPdf != rightPdf)
+			return leftPdf;
+
+		return QString::compare(left, right, Qt::CaseInsensitive) < 0;
+	});
+
+	// 默认题面可能还没导出：补一项（标上「未找到」）让用户看得见。
+	if (! fallback.isEmpty() && ! names.contains(fallback))
+		names.prepend(fallback + QStringLiteral(" (") + tr("missing") + QStringLiteral(")"));
+
+	QSignalBlocker blocker(statementBox);
+	statementBox->clear();
+	statementBox->addItems(names);
+
+	if (names.contains(current))
+		statementBox->setCurrentText(current);
+	else if (! names.isEmpty())
+		statementBox->setCurrentIndex(0);
+
+	// 建 builder 里存的是真文件名，「(missing)」这种标记不能带进去。
+	builder->setStatementFile(selectedStatementFile());
+}
+
+// 下拉框当前项对应的真文件名（去掉「 (missing)」这种装饰）。
+QString ExportWidget::selectedStatementFile() const {
+	const QString text = statementBox->currentText();
+	const int marker = text.indexOf(QStringLiteral(" ("));
+	return marker < 0 ? text : text.left(marker);
+}
+
+void ExportWidget::statementChanged() {
+	builder->setStatementFile(selectedStatementFile());
 	scheduleRefresh();
 }
 
@@ -423,12 +462,108 @@ void ExportWidget::syncOptions() {
 	builder->setOneFolderPerTask(perTaskBox->isChecked());
 	builder->setKeepStructure(structureBox->isChecked());
 	builder->setIncludeSamples(samplesBox->isChecked());
+	builder->setStatementFile(statementBox->currentText());
 	builder->setPassword(encryptBox->isChecked() ? passwordEdit->text() : QString());
+}
+
+// 取（必要时逐级创建）目录节点；root 为空表示外层。
+auto ExportWidget::folderNode(QTreeWidgetItem *root, const QString &path) -> QTreeWidgetItem * {
+	if (path.isEmpty())
+		return root;
+
+	QHash<QString, QTreeWidgetItem *> &nodes = folderNodes[root];
+
+	if (nodes.contains(path))
+		return nodes.value(path);
+
+	const int slash = path.lastIndexOf(QChar('/'));
+	const QString parentPath = slash < 0 ? QString() : path.left(slash);
+	const QString name = slash < 0 ? path : path.mid(slash + 1);
+
+	QTreeWidgetItem *parent = folderNode(root, parentPath);
+	auto *node = parent ? new PackageItem(parent, {name, QString()})
+	                    : new PackageItem(contentTree, {name, QString()});
+	node->setFolder(true);
+	node->setIcon(0, folderIcon);
+	nodes.insert(path, node);
+	++folderTotal;
+	return node;
+}
+
+// 内层压缩包在外层里的节点，比如 answers.zip 里的 day1/HN.zip 要显示在 day1/ 下面。
+auto ExportWidget::archiveNode(const QString &path) -> QTreeWidgetItem * {
+	const int slash = path.lastIndexOf(QChar('/'));
+	const QString parentPath = slash < 0 ? QString() : path.left(slash);
+	const QString name = slash < 0 ? path : path.mid(slash + 1);
+	QTreeWidgetItem *parent = folderNode(nullptr, parentPath);
+	auto *node = parent ? new PackageItem(parent, {name, QString()})
+	                    : new PackageItem(contentTree, {name, QString()});
+	node->setFolder(false);
+	node->setIcon(0, fileIcon);
+	return node;
+}
+
+// 分批插入：每轮只建一小批节点，建完就返回事件循环，界面始终能响应。
+void ExportWidget::buildTreeStep() {
+	// 一轮的节点数：图标已经缓存好，一下建几百个也就几毫秒，但又不至于让一帧太长。
+	constexpr int perStep = 500;
+	int done = 0;
+
+	while (pendingIndex < pendingNodes.size() && done < perStep) {
+		const PendingNode &pending = pendingNodes.at(pendingIndex);
+		const int slash = pending.path.lastIndexOf(QChar('/'));
+
+		if (pending.folder) {
+			// 目录：逐级建出来（建过的会直接复用）。
+			folderNode(pending.root, pending.path);
+		} else {
+			QTreeWidgetItem *parent = folderNode(pending.root, slash < 0 ? QString() : pending.path.left(slash));
+			const QString name = slash < 0 ? pending.path : pending.path.mid(slash + 1);
+			auto *node = parent ? new PackageItem(parent, {name, QString()})
+			                    : new PackageItem(contentTree, {name, QString()});
+			node->setFolder(false);
+			node->setIcon(0, fileIcon);
+			node->setText(1, QDir::toNativeSeparators(pending.source));
+			++fileTotal;
+		}
+
+		++pendingIndex;
+		++done;
+	}
+
+	if (pendingIndex < pendingNodes.size()) {
+		statusLabel->setText(tr("Listing... %1 file(s)").arg(fileTotal));
+		treeTimer->start();
+		return;
+	}
+
+	finishTree();
+}
+
+// 树建完了：写状态栏、决定能不能点导出、排一次序、默认折起来。
+void ExportWidget::finishTree() {
+	pendingNodes.clear();
+	pendingIndex = 0;
+	statusLabel->setText(tr("%1 file(s), %2 folder(s)").arg(fileTotal).arg(folderTotal));
+	exportButton->setEnabled(fileTotal > 0);
+
+	// 建的时候关着排序（每插一个都重排一次太亏），这里打开就相当于只排一次。
+	contentTree->setSortingEnabled(true);
+
+	// 每次刷新（打开比赛日、改选项）都重新建树：默认全部折叠，由用户自己展开。
+	contentTree->collapseAll();
 }
 
 void ExportWidget::refresh() {
 	refreshTimer->stop();
 	needsRefresh = false;
+	// 上一次的分批建树可能还没建完（比如刚切了包类型）：直接作废。
+	treeTimer->stop();
+	pendingNodes.clear();
+	pendingIndex = 0;
+	folderNodes.clear();
+	fileTotal = 0;
+	folderTotal = 0;
 	contentTree->clear();
 	logView->clear();
 
@@ -440,13 +575,22 @@ void ExportWidget::refresh() {
 		return;
 	}
 
+	// 图标取一次就够：style()->standardIcon() 每次要十几毫秒，几万个节点就完蛋了。
+	fileIcon = contentTree->style()->standardIcon(QStyle::SP_FileIcon);
+	folderIcon = contentTree->style()->standardIcon(QStyle::SP_DirIcon);
+	// 建树期间先关掉排序，插完再打开（finishTree()），省得每插一个节点都去排一次。
+	contentTree->setSortingEnabled(false);
+
 	syncOptions();
 	builder->setContest(curContest);
-	// 「各题文件是否重名」要遍历数据，先算好（builder 内部有缓存，只算一次）。
+	// 「各题文件是否重名」要遍历数据，先算好（builder 内部按输入缓存，同一种输入只算一次）。
 	duplicatesLocked =
 	    builder->kind() == PackageBuilder::TestDataPackage && builder->hasDuplicateTaskFiles();
 	// 选项的显示 / 可用状态、内层压缩包名字、说明文字都要跟着包类型走。
 	syncOptionWidgets();
+	// 重新列一遍 statement/ 下的题面文件（可能在题面选项卡里刚导出过一个新名字）。
+	reloadStatementFiles();
+	syncOptions();
 
 	const QString dayDirectory = builder->dayRoot();
 	builder->setOutputFile(builder->defaultOutputFile());
@@ -454,43 +598,43 @@ void ExportWidget::refresh() {
 
 	const PackageBuilder::Plan plan = builder->collectItems();
 
-	// 像文件资源管理器那样：按包内路径逐级建目录，文件挂在对应目录里。
-	// 外层里的普通条目直接挂在根上；内层压缩包（可能不止一个，比如每个赛区一个）
-	// 各自作为一个 zip 节点，内容挂在它下面。
-	PackageTree tree(contentTree, nullptr);
-	tree.add(plan.items);
-
-	// 内层压缩包（可能不止一个，比如每个赛区一个）按包内路径挂到对应目录下，
-	// 比如 answers.zip 里的 day1/HN.zip 应该显示在 day1/ 下面，而不是当根节点。
-	int archiveFiles = 0;
-	int archiveFolders = 0;
-
-	for (const PackageBuilder::NestedArchive &archive : plan.archives) {
-		const int slash = archive.name.lastIndexOf(QChar('/'));
-		const QString parentPath = slash < 0 ? QString() : archive.name.left(slash);
-		const QString name = slash < 0 ? archive.name : archive.name.mid(slash + 1);
-		QTreeWidgetItem *parent = tree.folderNode(parentPath);
-		auto *root = parent ? new PackageItem(parent, {name, QString()})
-		                    : new PackageItem(contentTree, {name, QString()});
-		root->setFolder(false);
-		root->setIcon(0, contentTree->style()->standardIcon(QStyle::SP_FileIcon));
-		PackageTree inner(contentTree, root);
-		inner.add(archive.items);
-		archiveFiles += inner.files();
-		archiveFolders += inner.folders();
+	// 这里只攒「待插入的节点」，不碰控件：真正建节点放到 buildTreeStep() 里分批做。
+	for (const PackageBuilder::Item &item : plan.items) {
+		PendingNode pending;
+		pending.root = nullptr;
+		pending.path = item.archivePath;
+		pending.source = item.sourcePath;
+		pending.folder = item.isDirectory;
+		pendingNodes.append(pending);
 	}
 
-	statusLabel->setText(
-	    tr("%1 file(s), %2 folder(s)").arg(tree.files() + archiveFiles).arg(tree.folders() + archiveFolders));
-	exportButton->setEnabled(tree.files() + archiveFiles > 0);
+	// 内层压缩包（可能不止一个，比如每个赛区一个）各自作为一棵子树的根。
+	for (const PackageBuilder::NestedArchive &archive : plan.archives) {
+		QTreeWidgetItem *root = archiveNode(archive.name);
 
-	// 每次刷新（打开比赛日、改选项）都重新建树：默认全部折叠，由用户自己展开。
-	contentTree->collapseAll();
+		for (const PackageBuilder::Item &item : archive.items) {
+			PendingNode pending;
+			pending.root = root;
+			pending.path = item.archivePath;
+			pending.source = item.sourcePath;
+			pending.folder = item.isDirectory;
+			pendingNodes.append(pending);
+		}
+	}
+
+	exportButton->setEnabled(! pendingNodes.isEmpty());
+
+	if (pendingNodes.isEmpty()) {
+		finishTree();
+		return;
+	}
+
+	buildTreeStep();
 
 	if (builder->kind() == PackageBuilder::ContestantPackage &&
-	    ! QFileInfo::exists(QDir(dayDirectory).absoluteFilePath(Settings::statementPath() +
-	                                                            QStringLiteral("statement.pdf"))))
-		appendLog(tr("The statement PDF is missing; export it in the Statement tab first if you need it."));
+	    ! QFileInfo::exists(QDir(dayDirectory).absoluteFilePath(
+	        Settings::statementPath() + builder->statementFile())))
+		appendLog(tr("The statement file is missing; export it in the Statement tab first if you need it."));
 }
 
 void ExportWidget::exportClicked() {
@@ -509,12 +653,12 @@ void ExportWidget::exportClicked() {
 
 	const QString target = builder->defaultOutputFile();
 	const QString pdf = QDir(builder->dayRoot()).absoluteFilePath(Settings::statementPath() +
-	                                                              QStringLiteral("statement.pdf"));
+	                                                             builder->statementFile());
 
 	if (builder->kind() == PackageBuilder::ContestantPackage && ! QFileInfo::exists(pdf)) {
 		const auto answer = QMessageBox::question(
 		    this, tr("Export"),
-		    tr("The statement PDF (%1) does not exist yet, so the package will not contain the statement.\n"
+		    tr("The statement file (%1) does not exist yet, so the package will not contain the statement.\n"
 		       "Export anyway?")
 		        .arg(QDir::toNativeSeparators(pdf)),
 		    QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);

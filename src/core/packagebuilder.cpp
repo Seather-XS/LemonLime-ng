@@ -399,91 +399,82 @@ auto PackageBuilder::kindAt(int index) -> Kind {
 	return static_cast<Kind>(index);
 }
 
-void PackageBuilder::setKind(Kind kind) {
-	if (packageKind == kind)
-		return;
+// 下面这些 setter 都不清缓存：缓存是按「输入签名」存的，
+// 改了哪个选项，只是对应不上旧键而已，别的键仍然有效 —— 这正是来回切包类型能秒开的原因。
 
-	packageKind = kind;
-	clearCache();
-}
+void PackageBuilder::setKind(Kind kind) { packageKind = kind; }
 
 void PackageBuilder::setDayFile(const QString &fileName) {
-	if (dayFile == fileName)
-		return;
-
 	dayFile = fileName;
 
 	if (! fileName.isEmpty())
 		dayDir = QFileInfo(fileName).absolutePath();
-
-	clearCache();
 }
 
-void PackageBuilder::setDayDirectory(const QString &directory) {
-	if (dayDir == directory)
-		return;
-
-	dayDir = directory;
-	clearCache();
-}
+void PackageBuilder::setDayDirectory(const QString &directory) { dayDir = directory; }
 
 void PackageBuilder::setContest(Contest *value) {
 	if (contest == value)
 		return;
 
+	// 换了比赛就丢掉旧结果（同一个比赛内的增删题/选手由签名里的数量覆盖）。
 	contest = value;
 	clearCache();
 }
 
 void PackageBuilder::setOutputFile(const QString &fileName) { output = fileName; }
 
-void PackageBuilder::setWrapInFolder(bool value) {
-	if (wrap == value)
-		return;
+void PackageBuilder::setWrapInFolder(bool value) { wrap = value; }
 
-	wrap = value;
-	clearCache();
-}
+void PackageBuilder::setNestedZip(bool value) { nested = value; }
 
-void PackageBuilder::setNestedZip(bool value) {
-	if (nested == value)
-		return;
+void PackageBuilder::setOneFolderPerTask(bool value) { perTask = value; }
 
-	nested = value;
-	clearCache();
-}
-
-void PackageBuilder::setOneFolderPerTask(bool value) {
-	if (perTask == value)
-		return;
-
-	perTask = value;
-	clearCache();
-}
-
-void PackageBuilder::setKeepStructure(bool value) {
-	if (structure == value)
-		return;
-
-	structure = value;
-	clearCache();
-}
+void PackageBuilder::setKeepStructure(bool value) { structure = value; }
 
 void PackageBuilder::setIncludeSamples(bool value) {
-	if (samples == value)
-		return;
-
 	samples = value;
 
 	// 样例数据必须保留结构，否则 data/ 与 down/ 里的同名文件会撞在一起。
-	if (value && ! structure) {
+	if (value && ! structure)
 		structure = true;
-	}
-
-	clearCache();
 }
 
-void PackageBuilder::clearCache() { cache = Cache(); }
+void PackageBuilder::setStatementFile(const QString &value) { statement = value.trimmed(); }
+
+// 选手目录包里的题面：用户没选就用默认的 statement.pdf；
+// 只取文件名部分，免得传进来的路径把题面放到 statement/ 外面去。
+auto PackageBuilder::statementFile() const -> QString {
+	const QString name = QFileInfo(statement.trimmed()).fileName();
+	return name.isEmpty() ? QStringLiteral("statement.pdf") : name;
+}
+
+void PackageBuilder::clearCache() {
+	planCache.clear();
+	duplicatesCache.clear();
+	taskFileCache.clear();
+}
+
+// 输入签名：只要这些没变，算出来的计划就一样。
+// 除了包类型和各个选项，还要带上比赛日目录 / 比赛日名（套层目录名、内层包名都用它），
+// 以及试题 / 选手数量，这样增删了题或选手也会自动换键。
+auto PackageBuilder::inputKey() const -> QString {
+	const QStringList parts{
+	    QString::number(int(packageKind)),
+	    QString::number(wrap ? 1 : 0),
+	    QString::number(nested ? 1 : 0),
+	    QString::number(perTask ? 1 : 0),
+	    QString::number(structure ? 1 : 0),
+	    QString::number(samples ? 1 : 0),
+	    statementFile(),
+	    dayRoot(),
+	    dayName(),
+	    QString::number(contest ? contest->getTaskList().size() : 0),
+	    QString::number(contest ? contest->getContestantList().size() : 0),
+	};
+
+	return parts.join(QChar('|'));
+}
 
 auto PackageBuilder::innerArchiveName() const -> QString {
 	// 选手目录：整包内容全放进一个固定叫 down.zip 的内层包。
@@ -534,8 +525,7 @@ auto PackageBuilder::defaultOutputFile() const -> QString {
 
 	const QString dir = dayFile.isEmpty() ? dayRoot() : QFileInfo(dayFile).absolutePath();
 
-	return QDir(dir).absoluteFilePath(QStringLiteral("export") + QDir::separator() + name +
-	                                  QStringLiteral(".zip"));
+	return QDir(dir).absoluteFilePath(Settings::exportPath() + name + QStringLiteral(".zip"));
 }
 
 // down 目录里的文件：只取本层，不递归子目录。
@@ -581,18 +571,18 @@ auto PackageBuilder::collectContestantPackage(QList<Item> &items) -> bool {
 		items.append(folder);
 	}
 
-	// 题面 PDF：整场只有一份，放压缩包根目录。
-	const QString pdf =
-	    QDir(dayRoot()).absoluteFilePath(Settings::statementPath() + QStringLiteral("statement.pdf"));
+	// 题面：整场只有一份，放压缩包根目录；名字就是 statement/ 下那个文件的名字。
+	const QString statementName = statementFile();
+	const QString pdf = QDir(dayRoot()).absoluteFilePath(Settings::statementPath() + statementName);
 
-	if (QFileInfo::exists(pdf)) {
+	if (QFileInfo(pdf).isFile()) {
 		Item item;
-		item.archivePath = prefix + QStringLiteral("statement.pdf");
+		item.archivePath = prefix + statementName;
 		item.sourcePath = pdf;
 		items.append(item);
 	} else {
 		// 缺题面照样能打包，只是提醒一句（界面会弹窗再确认一次）。
-		emit logMessage(tr("Statement PDF not found: %1").arg(QDir::toNativeSeparators(pdf)));
+		emit logMessage(tr("Statement file not found: %1").arg(QDir::toNativeSeparators(pdf)));
 	}
 
 	const QList<Task *> taskList = contest->getTaskList();
@@ -621,8 +611,91 @@ auto PackageBuilder::collectContestantPackage(QList<Item> &items) -> bool {
 	return true;
 }
 
+// 一道题要带上的 graders/ 文件，与评测时实际拷进工作目录的保持一一对应：
+//   交互题：交互库 + 主交互程序；通信题：通信库；使用 SPJ（Lemon / testlib 校验器）：校验器源码。
+// 传统题 / 提交答案题不需要 graders/ 里的任何东西。
+auto PackageBuilder::graderFilesForTask(const Task *task, bool quiet) -> QList<QPair<QString, QString>> {
+	QList<QPair<QString, QString>> files;
+
+	if (! task)
+		return files;
+
+	const QString taskName = task->getDirectoryName();
+
+	if (taskName.isEmpty())
+		return files;
+
+	QStringList wanted;
+
+	switch (task->getTaskType()) {
+		case Task::Interaction:
+			wanted << task->getInteractor() << task->getGrader();
+			break;
+
+		case Task::Communication:
+		case Task::CommunicationExec:
+			wanted << task->getGraderFilesPath();
+			break;
+
+		default:
+			break;
+	}
+
+	// 用了校验器的题目，把校验器源码一并带上（编译好的可执行文件不导出）。
+	if (task->getComparisonMode() == Task::LemonSpecialJudgeMode ||
+	    task->getComparisonMode() == Task::TestlibSpecialJudgeMode)
+		wanted << task->getSpecialJudge();
+
+	// gradersPath() 是相对 dataPath() 的，和评测时找交互库 / 校验器的方式保持一致。
+	const QDir graders(QDir(dayRoot()).absoluteFilePath(Settings::dataPath() +
+	                                                    Settings::gradersPath(taskName)));
+	QSet<QString> seen;
+
+	for (const QString &path : wanted) {
+		if (path.trimmed().isEmpty())
+			continue;
+
+		// 工程里存的各种写法（可能是 <题>/graders/x、也可能只是 x）都按文件名到 graders/ 下找。
+		const QString name = QFileInfo(path).fileName();
+
+		if (name.isEmpty() || seen.contains(name))
+			continue;
+
+		seen.insert(name);
+
+		const QString diskPath = graders.absoluteFilePath(name);
+
+		if (! QFileInfo::exists(diskPath)) {
+			if (! quiet)
+				emit logMessage(tr("%1 of task %2 was not found in graders/").arg(name, taskName));
+
+			continue;
+		}
+
+		files.append({name, diskPath});
+	}
+
+	return files;
+}
+
+// 与打包范围有关的题目配置：题型、判题方式、交互库 / 通信库 / 校验器的路径。
+// 改了这些，题目要带的文件就变了，缓存键也得跟着变。
+auto PackageBuilder::taskConfigKey(const Task *task) -> QString {
+	if (! task)
+		return {};
+
+	return QStringLiteral("%1|%2|%3|%4|%5|%6")
+	    .arg(int(task->getTaskType()))
+	    .arg(int(task->getComparisonMode()))
+	    .arg(task->getInteractor())
+	    .arg(task->getGrader())
+	    .arg(task->getSpecialJudge())
+	    .arg(task->getGraderFilesPath().join(QChar(',')));
+}
+
 // 测试数据包：一道题要打包的文件（相对题目录的路径, 磁盘路径）。
-// data/ 与 graders/ 总是带上；down/（样例数据）只有勾了才带上，且一定保留结构。
+// data/ 一定有；graders/ 只带评测真正用得上的那几个文件（见 graderFilesForTask）；
+// down/（样例数据）只有勾了才带上；gen/、tests/ 这类中间产物不导出。
 auto PackageBuilder::collectTestDataFiles(const Task *task, bool quiet) -> QList<QPair<QString, QString>> {
 	QList<QPair<QString, QString>> files;
 
@@ -630,41 +703,64 @@ auto PackageBuilder::collectTestDataFiles(const Task *task, bool quiet) -> QList
 		return files;
 
 	const QString taskName = task->getDirectoryName();
+
+	// 缓存键带上「保留结构 / 样例数据」、题目配置和比赛日：重名检查和收集计划共用同一次扫描。
+	const QString cacheKey = taskName + QChar('|') + (structure ? QChar('1') : QChar('0')) +
+	                         (samples ? QChar('1') : QChar('0')) + QChar('|') + taskConfigKey(task) +
+	                         QChar('|') + dayRoot();
+
+	if (taskFileCache.contains(cacheKey))
+		return taskFileCache.value(cacheKey);
+
 	const QString taskRoot =
 	    QDir(dayRoot()).absoluteFilePath(Settings::dataPath() + taskName + QDir::separator());
 
 	// 保留结构时原样搬过去（data/xxx）；不保留时都铺到题目录下（xxx）。
-	QList<QPair<QString, QString>> parts = {
-	    {QStringLiteral("data"), structure ? QStringLiteral("data") : QString()},
-	    {QStringLiteral("graders"), structure ? QStringLiteral("graders") : QString()},
+	// 只有 data/ 是整个目录带上，其它都是按需挑文件。
+	struct Part {
+		QString folder; ///< 题目录下的哪个子目录
+		QString prefix; ///< 包内的目录前缀（空表示铺到题目录下）
+		bool recursive; ///< 是否连子目录一起收
+	};
+
+	QList<Part> parts = {
+	    {QStringLiteral("data"), structure ? QStringLiteral("data") : QString(), true},
 	};
 
 	if (samples)
-		parts.append({QStringLiteral("down"), QStringLiteral("down")});
+		// 样例数据只收 down/ 本层的文件：down/ 里的子目录（例如按测试点分的子目录）
+		// 是出题人自己的中间产物，不往包里带。
+		parts.append({QStringLiteral("down"), QStringLiteral("down"), false});
 
 	for (const auto &part : parts) {
-		const QDir dir(taskRoot + part.first);
+		const QDir dir(taskRoot + part.folder);
 
 		if (! dir.exists()) {
-			// down/ 没有很正常，不打扰；data/、graders/ 缺了提醒一句。
-			if (! quiet && part.first != QLatin1String("down"))
-				emit logMessage(tr("No %1 folder for task %2").arg(part.first, taskName));
+			// down/ 没有很正常，不打扰；data/ 缺了提醒一句。
+			if (! quiet && part.folder != QLatin1String("down"))
+				emit logMessage(tr("No %1 folder for task %2").arg(part.folder, taskName));
 
 			continue;
 		}
 
 		QDirIterator iterator(dir.path(), QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot,
-		                      QDirIterator::Subdirectories);
+		                      part.recursive ? QDirIterator::Subdirectories : QDirIterator::NoIteratorFlags);
 
 		while (iterator.hasNext()) {
 			iterator.next();
 			const QString name = dir.relativeFilePath(iterator.filePath());
 			// 保留结构时连 data/ 里的子目录一起照搬；不保留时只留文件名（撞名会被跳过并记日志）。
-			const QString relative = part.second.isEmpty()
-			                             ? QFileInfo(name).fileName()
-			                             : part.second + QChar('/') + name;
+			const QString relative = part.prefix.isEmpty() ? QFileInfo(name).fileName()
+			                                               : part.prefix + QChar('/') + name;
 			files.append({relative, iterator.filePath()});
 		}
+	}
+
+	// graders/：只要评测用得上的那几个文件（交互库 / 通信库 / 校验器源码）。
+	for (const auto &file : graderFilesForTask(task, quiet)) {
+		const QString relative =
+		    structure ? QStringLiteral("graders") + QChar('/') + file.first : file.first;
+		files.append({relative, file.second});
 	}
 
 	std::sort(files.begin(), files.end(),
@@ -672,13 +768,19 @@ auto PackageBuilder::collectTestDataFiles(const Task *task, bool quiet) -> QList
 		          return a.first < b.first;
 	          });
 
+	if (taskFileCache.size() > 64)
+		taskFileCache.clear();
+
+	taskFileCache.insert(cacheKey, files);
 	return files;
 }
 
 // 各题的文件是否重名：重名的话「各题单独一个目录」就不能关。
 auto PackageBuilder::hasDuplicateTaskFiles() -> bool {
-	if (cache.duplicatesValid)
-		return cache.duplicates;
+	const QString key = inputKey();
+
+	if (duplicatesCache.contains(key))
+		return duplicatesCache.value(key);
 
 	bool duplicated = false;
 
@@ -687,14 +789,14 @@ auto PackageBuilder::hasDuplicateTaskFiles() -> bool {
 
 		for (auto *task : contest->getTaskList()) {
 			for (const auto &file : collectTestDataFiles(task, true)) {
-				const QString key = structure ? file.first : QFileInfo(file.first).fileName();
+				const QString name = structure ? file.first : QFileInfo(file.first).fileName();
 
-				if (seen.contains(key)) {
+				if (seen.contains(name)) {
 					duplicated = true;
 					break;
 				}
 
-				seen.insert(key);
+				seen.insert(name);
 			}
 
 			if (duplicated)
@@ -702,8 +804,7 @@ auto PackageBuilder::hasDuplicateTaskFiles() -> bool {
 		}
 	}
 
-	cache.duplicates = duplicated;
-	cache.duplicatesValid = true;
+	duplicatesCache.insert(key, duplicated);
 	return duplicated;
 }
 
@@ -921,8 +1022,12 @@ auto PackageBuilder::collectAnswersPackage(Plan &plan) -> bool {
 auto PackageBuilder::collectItems() -> Plan {
 	error.clear();
 
-	if (cache.planValid)
-		return cache.plan;
+	// 同样的输入（包类型 + 选项 + 比赛日）直接给上次的结果，
+	// 这样在选项卡里来回切换、把选项改回原样都不会再扫一遍磁盘。
+	const QString key = inputKey();
+
+	if (planCache.contains(key))
+		return planCache.value(key);
 
 	Plan plan;
 	QList<Item> content;
@@ -959,8 +1064,11 @@ auto PackageBuilder::collectItems() -> Plan {
 			break;
 	}
 
-	cache.plan = plan;
-	cache.planValid = true;
+	// 只留最近几份，别无限涨。
+	if (planCache.size() > 8)
+		planCache.clear();
+
+	planCache.insert(key, plan);
 	return plan;
 }
 

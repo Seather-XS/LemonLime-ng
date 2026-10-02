@@ -50,12 +50,18 @@ auto ExportUtil::getContestantHtmlCode(Contest *contest, Contestant *contestant,
 	QList<Task *> taskList = contest->getTaskList();
 
 	// 违规 / 命名不合规：这里只写「测试被取消」，具体原因跟在后面。
+	// 成绩表里这位选手的每一个试题格都指向这一段（#c<num>p<j>），所以除了第一题的锚点
+	// 之外，后面每道题也各放一个空锚点，否则点第一题以外的试题不会有任何反应。
 	if (contestant->isDisqualified()) {
+		for (int i = taskList.size() - 1; i >= 1; i--)
+			htmlCode += QString(R"(<div id="c%1p%2"></div>)").arg(num).arg(i);
+
 		htmlCode += QString(R"(<div id="c%1p0"><p><span>)").arg(num);
 		htmlCode += QString("%1</span><br>").arg(Contestant::disqualifiedText());
 		htmlCode += QString("&nbsp;&nbsp;%1<br>%2</p></div>")
 		                .arg(contestant->getDisqualifyTitle().toHtmlEscaped(),
 		                     contestant->getDisqualifyMessage().toHtmlEscaped());
+		htmlCode += QString("<p><a href=\"#top\">%1</a></p>").arg(tr("Return to top"));
 		return htmlCode;
 	}
 
@@ -454,6 +460,7 @@ auto ExportUtil::getSmallerContestantHtmlCode(Contest *contest, Contestant *cont
 		htmlCode += QString("&nbsp;&nbsp;%1<br>%2</p>")
 		                .arg(contestant->getDisqualifyTitle().toHtmlEscaped(),
 		                     contestant->getDisqualifyMessage().toHtmlEscaped());
+		htmlCode += QString("<p><a href=\"#top\">%1</a></p>").arg(tr("Return to top"));
 		return htmlCode;
 	}
 
@@ -936,8 +943,8 @@ void ExportUtil::exportResult(QWidget *widget, Contest *contest) {
 		return;
 	}
 
-	// 成绩单固定导到当前比赛日的 reports/ 目录（工作目录就是比赛日目录），不给改路径。
-	const QString reportsDir = QDir::currentPath() + QDir::separator() + QStringLiteral("reports");
+	// 成绩单固定导到当前比赛日的 dist/reports/ 目录（工作目录就是比赛日目录），不给改路径。
+	const QString reportsDir = QDir::current().absoluteFilePath(Settings::reportsPath());
 
 	if (! QDir().mkpath(reportsDir)) {
 		QMessageBox::warning(widget, tr("LemonLime"),

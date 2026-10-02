@@ -122,6 +122,9 @@ bool PdfPreviewWidget::eventFilter(QObject *watched, QEvent *event) {
 void PdfPreviewWidget::clearPages() {
 	for (QLabel *label : pageLabels) {
 		pagesLayout->removeWidget(label);
+		// deleteLater() 要等回到事件循环才真的删掉，其间旧图还贴在界面上（
+		// 渲染一次要好几秒，用户就会看到旧页面）：先藏起来，保证立刻消失。
+		label->hide();
 		label->deleteLater();
 	}
 
@@ -142,6 +145,10 @@ void PdfPreviewWidget::setMessage(const QString &text) {
 	messageLabel->setText(text);
 	infoLabel->clear();
 }
+
+void PdfPreviewWidget::setInfoText(const QString &text) { infoLabel->setText(text); }
+
+QString PdfPreviewWidget::currentInfoText() const { return infoLabel ? infoLabel->text() : QString(); }
 
 void PdfPreviewWidget::setPdf(const QString &path) {
 	pdfPath = path;
@@ -189,7 +196,7 @@ void PdfPreviewWidget::render() {
 	}
 
 	if (! QFileInfo::exists(pdfPath)) {
-		setMessage(tr("statement.pdf does not exist yet."));
+		setMessage(tr("%1 does not exist yet.").arg(QFileInfo(pdfPath).fileName()));
 		return;
 	}
 
@@ -235,7 +242,7 @@ void PdfPreviewWidget::render() {
 	});
 
 	if (files.isEmpty()) {
-		setMessage(tr("Nothing could be rendered from statement.pdf."));
+		setMessage(tr("Nothing could be rendered from %1.").arg(QFileInfo(pdfPath).fileName()));
 		return;
 	}
 

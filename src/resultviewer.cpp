@@ -107,6 +107,7 @@ void ResultViewer::setContest(Contest *contest) {
 		disconnect(curContest, &Contest::taskDeletedForViewer, this, &ResultViewer::refreshViewer);
 		disconnect(curContest, &Contest::problemTitleChanged, this, &ResultViewer::refreshViewer);
 		disconnect(curContest, &Contest::taskJudgingFinished, this, &ResultViewer::refreshViewer);
+		disconnect(curContest, &Contest::contestantSkipped, this, &ResultViewer::refreshViewer);
 	}
 
 	curContest = contest;
@@ -118,6 +119,9 @@ void ResultViewer::setContest(Contest *contest) {
 	connect(curContest, &Contest::taskDeletedForViewer, this, &ResultViewer::refreshViewer);
 	connect(curContest, &Contest::problemTitleChanged, this, &ResultViewer::refreshViewer);
 	connect(curContest, &Contest::taskJudgingFinished, this, &ResultViewer::refreshViewer);
+	// 被取消测试的选手不会产生 taskJudgingFinished，只发 contestantSkipped。
+	// 不接这个信号的话，他们的成绩行要等到下一个正常选手的某题测完才变。
+	connect(curContest, &Contest::contestantSkipped, this, &ResultViewer::refreshViewer);
 }
 
 int ResultViewer::taskColumnBase() const {

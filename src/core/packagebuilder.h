@@ -7,6 +7,7 @@
 #pragma once
 //
 
+#include <QHash>
 #include <QList>
 #include <QObject>
 #include <QPair>
@@ -22,12 +23,12 @@ class Contestant;
  *
  * - **选手目录**（ContestantPackage）：每道题一个子目录（子目录名 = 题目目录名），
  *   里面放该题 `problem/<题>/down/` 下的文件（**不含 down 子目录里的文件**）；
- *   整场的题面 PDF（`statement/statement.pdf`）放在压缩包根目录。
+ *   整场的题面文件（`statement/` 下用户选定的那一个）放在压缩包根目录。
  * - **测试数据**（TestDataPackage）：把每题的 `data/`、`graders/`（可选 `down/`）
  *   按开关决定是保留原来的目录结构还是铺平，也可以决定要不要每道题单独一个目录。
  * - **选手代码**（AnswersPackage）：每位选手一个目录，里面是他全部题目的源代码；
  *   启用赛区时按赛区分组（同名文件夹 / 每个赛区一个同名内层压缩包），
- *   固定输出 `<比赛日>/export/answers.zip`。
+ *   固定输出 `<比赛日>/dist/export/answers.zip`。
  *
  * 可选开关（不适用的包会忽略）：
  * - wrapInFolder：多一层分组目录（选手目录/测试数据是 <比赛日>；选手代码是赛区名）；
@@ -99,6 +100,10 @@ class PackageBuilder : public QObject {
 	/// 测试数据包：一并导出样例数据（down/）。开启时强制保留内部结构。
 	void setIncludeSamples(bool);
 	bool includeSamples() const { return samples; }
+	/// 选手目录包：要放进包里的题面文件（`statement/` 下的文件名，如 `statement.pdf`）。
+	/// 空表示用默认的 statement.pdf。
+	void setStatementFile(const QString &);
+	QString statementFile() const;
 	/// 内层压缩包的名字：选手目录固定 down.zip，测试数据与比赛日文件同名。
 	QString innerArchiveName() const;
 	/// 测试数据包：各题的文件是否重名（重名就不能关掉「每道题单独一个目录」）。
@@ -112,7 +117,7 @@ class PackageBuilder : public QObject {
 	/// 比赛日目录（绝对路径）。
 	QString dayRoot() const;
 
-	/// 默认输出文件：`<比赛日>/export/` 下，选手目录叫 `<比赛日>.zip`，
+	/// 默认输出文件：`<比赛日>/dist/export/` 下，选手目录叫 `<比赛日>.zip`，
 	/// 测试数据叫 `evaldata.zip`，选手代码叫 `answers.zip`。
 	QString defaultOutputFile() const;
 
@@ -138,6 +143,10 @@ class PackageBuilder : public QObject {
 	QList<QPair<QString, QString>> collectDownFiles(const QString &taskName);
 	/// 测试数据包：一道题要打包的文件（相对题目录的路径, 磁盘路径）。
 	QList<QPair<QString, QString>> collectTestDataFiles(const class Task *task, bool quiet);
+	/// 一道题要带上的 graders/ 文件（文件名, 磁盘路径）：交互库 / 通信库 / 校验器源码。
+	QList<QPair<QString, QString>> graderFilesForTask(const class Task *task, bool quiet);
+	/// 与打包范围有关的题目配置（题型、判题方式、交互库 / 校验器路径），用作缓存键的一部分。
+	static QString taskConfigKey(const class Task *task);
 
 	Kind packageKind{ContestantPackage};
 	QString dayFile;
@@ -149,17 +158,17 @@ class PackageBuilder : public QObject {
 	bool perTask{true};
 	bool structure{true};
 	bool samples{false};
+	QString statement;
 	QString pass;
 	QString error;
 
-	/// collectItems() / hasDuplicateTaskFiles() 都要遍历整份数据，缓存起来，
-	/// 避免改一个选项就把几万个文件重新走一遍。
-	struct Cache {
-		bool planValid{false};
-		Plan plan;
-		bool duplicatesValid{false};
-		bool duplicates{false};
-	};
+	/// collectItems() / hasDuplicateTaskFiles() 都要遍历磁盘，按「输入签名」缓存起来：
+	/// 来回切包类型、把选项改回原样，都不用重新扫一遍。
+	QHash<QString, Plan> planCache;
+	QHash<QString, bool> duplicatesCache;
+	/// 测试数据包：一道题的文件列表（键里带上结构 / 样例开关、题目配置、比赛日）。
+	QHash<QString, QList<QPair<QString, QString>>> taskFileCache;
 
-	Cache cache;
+	/// 当前输入的签名：包类型 + 各选项 + 比赛日。
+	QString inputKey() const;
 };

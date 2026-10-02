@@ -488,8 +488,8 @@ void StatisticsBrowser::exportStatistics(QWidget *widget, Contest *curContest) {
 		return;
 	}
 
-	// 统计图固定导到当前比赛日的 reports/ 目录（工作目录就是比赛日目录），不给改路径。
-	const QString reportsDir = QDir::currentPath() + QDir::separator() + QStringLiteral("reports");
+	// 统计图固定导到当前比赛日的 dist/reports/ 目录（工作目录就是比赛日目录），不给改路径。
+	const QString reportsDir = QDir::current().absoluteFilePath(Settings::reportsPath());
 
 	if (! QDir().mkpath(reportsDir)) {
 		if (widget)

@@ -31,6 +31,7 @@ ZH_CN = {
     "Source on disk": "磁盘来源",
     "No contest": "尚未打开比赛",
     "%1 file(s), %2 folder(s)": "%1 个文件，%2 个目录",
+    "Listing... %1 file(s)": "正在列出...%1 个文件",
     "The statement PDF is missing; export it in the Statement tab first if you need it.":
         "题面 PDF 不存在；如果需要，请先在「题面」选项卡里导出。",
     "The statement PDF (%1) does not exist yet, so the package will not contain the statement. Export anyway?":
@@ -72,6 +73,9 @@ ZH_CN = {
         "样例数据取自每道题的 down/ 目录，并保留目录结构。",
     "Test data of every task: the whole <b>data/</b> and <b>graders/</b> folders (plus <b>down/</b> when the sample data is included). The statement PDF is not packed.":
         "每道题的测试数据：完整的 <b>data/</b> 与 <b>graders/</b> 目录（勾选样例数据时再加 <b>down/</b>）。不含题面 PDF。",
+    "Test data of every task: the whole <b>data/</b> folder. From <b>graders/</b> only the files the task really needs are packed (the interactive library, or the checker source of a special judged task). <b>gen/</b> and <b>tests/</b> are never packed, and neither is the statement PDF. <b>down/</b> is added when the sample data is included (only the files directly inside it; subfolders are skipped).":
+        "每道题的测试数据：完整的 <b>data/</b> 目录；<b>graders/</b> 只带这道题真正用得上的文件（交互题的交互库，或使用校验器的题目的校验器源码）。<b>gen/</b>、<b>tests/</b> 与题面 PDF 都不会打包；勾选样例数据时再加 <b>down/</b> 本层的文件（不递归子目录）。",
+    "%1 of task %2 was not found in graders/": "题目 %2 的 %1 不在 graders/ 里",
     "Each task gets its own folder inside the package.": "每道题在压缩包里单独一个目录。",
     "Some tasks use the same data file names, so every task must keep its own folder.":
         "有试题的数据文件重名，因此每道题必须单独一个目录。",
@@ -103,6 +107,30 @@ ZH_CN = {
         "answers.zip 里还会为每个赛区放一个 <region>.zip。",
     "Answers of every contestant: one folder per contestant with all of their source files. With regions enabled you can group them into region folders and/or one inner zip per region.":
         "每位选手一个目录，里面是他全部题目的源代码。启用赛区时可按赛区分组：赛区同名文件夹、或每个赛区一个内层压缩包（可同时开）。",
+    "Answers of every contestant: one folder per contestant with all of their source files. With regions enabled every region always gets its own folder (and can additionally be packed into a <region>.zip). The <day>/ wrapper is optional.":
+        "每位选手一个目录，里面是他全部题目的源代码。启用赛区时每个赛区固定占一个目录（另外可选再打包成 <region>.zip）；<day>/ 那层可选。",
+    "Judged By LemonLime": "使用 LemonLime 评测",
+    "Export and Open PDF": "导出并打开 PDF",
+    "Compile the statement PDF with pandoc + xelatex, then open it.":
+        "用 pandoc + xelatex 编译题面 PDF，编译好后直接打开。",
+    "PDF file name:": "PDF 文件名：",
+    "File name of the exported PDF (no extension). Placeholders: <day> = contest day file name, <title-day> = contest day title, <title> = contest title.":
+        "导出的 PDF 文件名（不带扩展名）。可以用占位符：<day> = 比赛日文件名，<title-day> = 比赛日标题，<title> = 比赛标题。",
+    "-> %1": "-> %1",
+    "Building %1 ...": "正在编译 %1 ...",
+    "Building %1 failed.": "编译 %1 失败。",
+    "Statement file:": "题面文件：",
+    "Which file under statement/ goes into the package (the PDF name is set in the Statement tab).":
+        "打包用 statement/ 下的哪个文件（PDF 的文件名在「题面」选项卡里设置）。",
+    "missing": "未找到",
+    "Statement file not found: %1": "找不到题面文件：%1",
+    "The statement file is missing; export it in the Statement tab first if you need it.":
+        "题面文件不存在；如果需要，请先在「题面」选项卡里导出。",
+    "The statement file (%1) does not exist yet, so the package will not contain the statement. Export anyway?":
+        "题面文件（%1）还不存在，压缩包里将不含题面。仍要导出吗？",
+    "One subfolder per task (named after the task's folder), containing the files directly inside that task's <b>down/</b> folder (subfolders are skipped). The statement file selected below is placed in the zip root.":
+        "每道题一个子目录（用题目目录名），放入该题 <b>down/</b> 目录下的文件（不包含子目录里的文件）；下面选中的题面文件放在压缩包根目录。",
+    "Nothing could be rendered from %1.": "无法从 %1 渲染出任何页面。",
 }
 
 ZH_TW = {
@@ -119,6 +147,7 @@ ZH_TW = {
     "Source on disk": "磁碟來源",
     "No contest": "尚未開啟比賽",
     "%1 file(s), %2 folder(s)": "%1 個檔案，%2 個目錄",
+    "Listing... %1 file(s)": "正在列出...%1 個檔案",
     "The statement PDF is missing; export it in the Statement tab first if you need it.":
         "題面 PDF 不存在；若需要，請先在「題面」分頁匯出。",
     "The statement PDF (%1) does not exist yet, so the package will not contain the statement. Export anyway?":
@@ -160,6 +189,9 @@ ZH_TW = {
         "樣例資料取自每題的 down/ 目錄，並保留目錄結構。",
     "Test data of every task: the whole <b>data/</b> and <b>graders/</b> folders (plus <b>down/</b> when the sample data is included). The statement PDF is not packed.":
         "每題的測試資料：完整的 <b>data/</b> 與 <b>graders/</b> 目錄（勾選樣例資料時再加上 <b>down/</b>）。不含題面 PDF。",
+    "Test data of every task: the whole <b>data/</b> folder. From <b>graders/</b> only the files the task really needs are packed (the interactive library, or the checker source of a special judged task). <b>gen/</b> and <b>tests/</b> are never packed, and neither is the statement PDF. <b>down/</b> is added when the sample data is included (only the files directly inside it; subfolders are skipped).":
+        "每題的測試資料：完整的 <b>data/</b> 目錄；<b>graders/</b> 只帶這題真正用得上的檔案（互動題的互動庫，或使用檢查器的題目的檢查器原始碼）。<b>gen/</b>、<b>tests/</b> 與題面 PDF 都不會打包；勾選樣例資料時再加上 <b>down/</b> 本層的檔案（不遞迴子目錄）。",
+    "%1 of task %2 was not found in graders/": "題目 %2 的 %1 不在 graders/ 裡",
     "Each task gets its own folder inside the package.": "每題在壓縮檔裡單獨一個目錄。",
     "Some tasks use the same data file names, so every task must keep its own folder.":
         "有試題的資料檔案重名，因此每題必須單獨一個目錄。",
@@ -191,6 +223,30 @@ ZH_TW = {
         "answers.zip 裡還會為每個賽區放一個 <region>.zip。",
     "Answers of every contestant: one folder per contestant with all of their source files. With regions enabled you can group them into region folders and/or one inner zip per region.":
         "每位選手一個目錄，裡面是他全部題目的原始碼。啟用賽區時可按賽區分組：賽區同名目錄、或每個賽區一個內層壓縮檔（可同時開）。",
+    "Answers of every contestant: one folder per contestant with all of their source files. With regions enabled every region always gets its own folder (and can additionally be packed into a <region>.zip). The <day>/ wrapper is optional.":
+        "每位選手一個目錄，裡面是他全部題目的原始碼。啟用賽區時每個賽區固定佔一個目錄（另外可選再打包成 <region>.zip）；<day>/ 那層可選。",
+    "Judged By LemonLime": "使用 LemonLime 評測",
+    "Export and Open PDF": "導出並開啟 PDF",
+    "Compile the statement PDF with pandoc + xelatex, then open it.":
+        "用 pandoc + xelatex 編譯題面 PDF，編譯好後直接開啟。",
+    "PDF file name:": "PDF 檔名：",
+    "File name of the exported PDF (no extension). Placeholders: <day> = contest day file name, <title-day> = contest day title, <title> = contest title.":
+        "導出的 PDF 檔名（不含副檔名）。可以用佔位符：<day> = 比賽日檔名，<title-day> = 比賽日標題，<title> = 比賽標題。",
+    "-> %1": "-> %1",
+    "Building %1 ...": "正在編譯 %1 ...",
+    "Building %1 failed.": "編譯 %1 失敗。",
+    "Statement file:": "題面檔案：",
+    "Which file under statement/ goes into the package (the PDF name is set in the Statement tab).":
+        "打包用 statement/ 下的哪個檔案（PDF 檔名在「題面」索引標籤裡設定）。",
+    "missing": "找不到",
+    "Statement file not found: %1": "找不到題面檔案：%1",
+    "The statement file is missing; export it in the Statement tab first if you need it.":
+        "題面檔案不存在；如果需要，請先在「題面」索引標籤裡導出。",
+    "The statement file (%1) does not exist yet, so the package will not contain the statement. Export anyway?":
+        "題面檔案（%1）還不存在，壓縮檔裡將不含題面。仍要導出嗎？",
+    "One subfolder per task (named after the task's folder), containing the files directly inside that task's <b>down/</b> folder (subfolders are skipped). The statement file selected below is placed in the zip root.":
+        "每道題一個子目錄（用題目目錄名），放入該題 <b>down/</b> 目錄下的檔案（不含子目錄裡的檔案）；下面選中的題面檔案放在壓縮檔根目錄。",
+    "Nothing could be rendered from %1.": "無法從 %1 繪製出任何頁面。",
 }
 
 TRANSLATIONS = {"zh_CN": ZH_CN, "zh_TW": ZH_TW}
@@ -198,6 +254,8 @@ TRANSLATIONS = {"zh_CN": ZH_CN, "zh_TW": ZH_TW}
 # 已经作废的字符串（语义变了），从 .ts 里直接删掉
 OBSOLETE = {
     "Pack each task's down files into down.zip",
+    "Test data of every task: the whole <b>data/</b> and <b>graders/</b> folders (plus <b>down/</b> when the sample data is included). The statement PDF is not packed.",
+    "Test data of every task: the whole <b>data/</b> folder. From <b>graders/</b> only the files the task really needs are packed (the interactive library, or the checker source of a special judged task). <b>gen/</b> and <b>tests/</b> are never packed, and neither is the statement PDF. <b>down/</b> is added when the sample data is included.",
     "Inside each task folder the down files are packed into down.zip instead.",
     "%1 file(s) from the down folder",
     "Pack everything into an inner zip named down.zip",
@@ -207,6 +265,17 @@ OBSOLETE = {
     "Give every region its own folder (named after the region)",
     "Contestants of one region go into a folder named after it.",
     "Answers of every contestant: one folder per contestant with all of their source files. With regions enabled you can group them into region folders and/or one inner zip per region.",
+    "Export PDF",
+    "Open PDF",
+    "Compile statement/statement.pdf with pandoc + xelatex.",
+    "Building statement.pdf ...",
+    "Building statement.pdf failed.",
+    "statement.pdf does not exist yet.",
+    "Statement PDF not found: %1",
+    "The statement PDF is missing; export it in the Statement tab first if you need it.",
+    "The statement PDF (%1) does not exist yet, so the package will not contain the statement. Export anyway?",
+    "One subfolder per task (named after the task's folder), containing the files directly inside that task's <b>down/</b> folder (subfolders are skipped). The statement PDF is placed in the zip root.",
+    "Nothing could be rendered from statement.pdf.",
 }
 
 

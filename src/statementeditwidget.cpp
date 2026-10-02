@@ -6,7 +6,9 @@
 
 #include "statementeditwidget.h"
 //
+#include "base/LemonUtils.hpp"
 #include "base/settings.h"
+#include "core/contest.h"
 #include "core/statementbuilder.h"
 #include "findreplacebar.h"
 #include "markdownhighlighter.h"
@@ -156,7 +158,33 @@ QString StatementEditWidget::markdownPath() {
 	return Settings::statementPath() + QStringLiteral("statement.md");
 }
 
-QString StatementEditWidget::pdfPath() { return Settings::statementPath() + QStringLiteral("statement.pdf"); }
+// 当前要导出的 PDF 名字：模板存在比赛日里，占位符用比赛日上下文替换。
+QString StatementEditWidget::pdfFileName() const {
+	return Lemon::common::ResolveStatementPdfName(
+	           curContest ? curContest->getStatementPdfName() : QString(), dayFileName, dayTitle,
+	           contestTitle) +
+	       QStringLiteral(".pdf");
+}
+
+QString StatementEditWidget::pdfPath() const { return Settings::statementPath() + pdfFileName(); }
+
+void StatementEditWidget::setDayContext(Contest *contest, const QString &dayFileName,
+                                        const QString &dayTitle, const QString &contestTitle) {
+	curContest = contest;
+	this->dayFileName = dayFileName;
+	this->dayTitle = dayTitle;
+	this->contestTitle = contestTitle;
+
+	if (pdfNameEdit) {
+		// 刷新时不要把输入的模板改成替换后的名字：模板才存在比赛日里。
+		QSignalBlocker blocker(pdfNameEdit);
+		pdfNameEdit->setText(curContest ? curContest->getStatementPdfName() : QString());
+		pdfNameEdit->setPlaceholderText(QStringLiteral("statement"));
+	}
+
+	refreshPdfNamePreview();
+	emit pdfFileNameChanged(pdfFileName());
+}
 
 StatementEditWidget::StatementEditWidget(QWidget *parent) : QWidget(parent) {
 	builder = new StatementBuilder();
@@ -178,10 +206,19 @@ StatementEditWidget::StatementEditWidget(QWidget *parent) : QWidget(parent) {
 	// 会在程序的工作目录下凭空建出 statement/statement.md。题面在 loadDay() 里用 reload() 载入。
 }
 
+// 改 PDF 文件名时预览换文件的去抖（见 refreshPdfNamePreview()）。
+void StatementEditWidget::setupPdfPreviewTimer() {
+	pdfPreviewTimer = new QTimer(this);
+	pdfPreviewTimer->setSingleShot(true);
+	pdfPreviewTimer->setInterval(200);
+	connect(pdfPreviewTimer, &QTimer::timeout, this, &StatementEditWidget::applyPdfNameToPreview);
+}
+
 StatementEditWidget::~StatementEditWidget() { delete builder; }
 
 void StatementEditWidget::changeEvent(QEvent *event) {
 	if (event->type() == QEvent::LanguageChange) {
+		retranslate();
 		refreshTree();
 		refreshEditor();
 	}
@@ -201,14 +238,27 @@ void StatementEditWidget::buildUi() {
 	importButton = new QPushButton(tr("Import"), this);
 	importButton->setToolTip(tr("Load statement/statement.md into the editor."));
 	saveButton = new QPushButton(tr("Save"), this);
-	exportButton = new QPushButton(tr("Export PDF"), this);
-	exportButton->setToolTip(tr("Compile statement/statement.pdf with pandoc + xelatex."));
-	openPdfButton = new QPushButton(tr("Open PDF"), this);
+	// 编译与打开合并成一个按钮：编译成功后直接用系统默认程序打开。
+	exportButton = new QPushButton(tr("Export and Open PDF"), this);
+	exportButton->setToolTip(tr("Compile the statement PDF with pandoc + xelatex, then open it."));
 	toolBar->addWidget(importButton);
 	toolBar->addWidget(saveButton);
 	toolBar->addWidget(exportButton);
-	toolBar->addWidget(openPdfButton);
 	layout->addLayout(toolBar);
+
+	// ---- PDF 文件名 ----
+	auto *nameBar = new QHBoxLayout();
+	nameBar->addWidget(new QLabel(tr("PDF file name:"), this));
+	pdfNameEdit = new QLineEdit(this);
+	pdfNameEdit->setPlaceholderText(QStringLiteral("statement"));
+	pdfNameEdit->setToolTip(tr("File name of the exported PDF (no extension). Placeholders: <day> = contest day file "
+	                          "name, <title-day> = contest day title, <title> = contest title."));
+	nameBar->addWidget(pdfNameEdit, 1);
+	pdfNamePreview = new QLabel(this);
+	pdfNamePreview->setStyleSheet(QStringLiteral("color: gray;"));
+	pdfNamePreview->setTextInteractionFlags(Qt::TextSelectableByMouse);
+	nameBar->addWidget(pdfNamePreview, 1);
+	layout->addLayout(nameBar);
 
 	// ---- 左树 + 编辑区 ----
 	auto *splitter = new QSplitter(Qt::Horizontal, this);
@@ -321,7 +371,7 @@ void StatementEditWidget::buildUi() {
 	connect(importButton, &QPushButton::clicked, this, &StatementEditWidget::importClicked);
 	connect(saveButton, &QPushButton::clicked, this, &StatementEditWidget::saveClicked);
 	connect(exportButton, &QPushButton::clicked, this, &StatementEditWidget::exportClicked);
-	connect(openPdfButton, &QPushButton::clicked, this, &StatementEditWidget::openPdfClicked);
+	connect(pdfNameEdit, &QLineEdit::textChanged, this, &StatementEditWidget::pdfNameChanged);
 	connect(addButton, &QToolButton::clicked, this, &StatementEditWidget::addProblem);
 	connect(removeButton, &QToolButton::clicked, this, &StatementEditWidget::removeProblem);
 	connect(upButton, &QToolButton::clicked, this, &StatementEditWidget::moveProblemUp);
@@ -334,6 +384,22 @@ void StatementEditWidget::buildUi() {
 	connect(findShortcut, &QShortcut::activated, this, [this] { findBar->activate(false); });
 	const auto replaceShortcut = new QShortcut(QKeySequence::Replace, this);
 	connect(replaceShortcut, &QShortcut::activated, this, [this] { findBar->activate(true); });
+
+	setupPdfPreviewTimer();
+	retranslate();
+}
+
+// 可以随界面语言变化的文字集中在这里，切语言时重设一遍。
+void StatementEditWidget::retranslate() {
+	if (! pdfNameEdit)
+		return;
+
+	importButton->setToolTip(tr("Load statement/statement.md into the editor."));
+	exportButton->setText(tr("Export and Open PDF"));
+	exportButton->setToolTip(tr("Compile the statement PDF with pandoc + xelatex, then open it."));
+	pdfNameEdit->setToolTip(tr("File name of the exported PDF (no extension). Placeholders: <day> = contest day file "
+	                           "name, <title-day> = contest day title, <title> = contest title."));
+	refreshPdfNamePreview();
 }
 
 void StatementEditWidget::loadDocument() {
@@ -368,11 +434,8 @@ void StatementEditWidget::loadDocument() {
 	setDirty(false);
 	loading = false;
 
-	// 已有编译结果时直接给出预览
-	if (QFileInfo::exists(pdfPath()))
-		preview->setPdf(pdfPath());
-	else
-		preview->setMessage(tr("Compile the statement to see the preview here."));
+	// 已有编译结果时直接给出预览（名字对不上就写清楚在等哪个文件）。
+	applyPdfNameToPreview();
 }
 
 void StatementEditWidget::reload() { loadDocument(); }
@@ -697,17 +760,18 @@ void StatementEditWidget::exportClicked() {
 	if (! saveToDisk())
 		return;
 
+	const QString target = QFileInfo(pdfPath()).absoluteFilePath();
 	logView->clear();
 	importButton->setEnabled(false);
 	saveButton->setEnabled(false);
 	exportButton->setEnabled(false);
-	setStatus(tr("Building statement.pdf ..."));
-	preview->setMessage(tr("Building statement.pdf ..."));
+	setStatus(tr("Building %1 ...").arg(QFileInfo(target).fileName()));
+	preview->setMessage(tr("Building %1 ...").arg(QFileInfo(target).fileName()));
 	QCoreApplication::processEvents();
 
 	builder->setTemplate(templateBox->currentText());
 	builder->setSourceFile(markdownPath());
-	builder->setOutputBase(QFileInfo(pdfPath()).absolutePath() + QChar('/') + QFileInfo(pdfPath()).completeBaseName());
+	builder->setOutputBase(QFileInfo(target).absolutePath() + QChar('/') + QFileInfo(target).completeBaseName());
 
 	const bool ok = builder->build();
 
@@ -715,28 +779,62 @@ void StatementEditWidget::exportClicked() {
 	saveButton->setEnabled(true);
 	exportButton->setEnabled(true);
 
-	if (ok) {
-		setStatus(tr("Exported %1").arg(pdfPath()));
-		preview->setPdf(pdfPath());
-
-		if (! logView->toPlainText().isEmpty())
-			appendLog(tr("Done."));
-	} else {
+	if (! ok) {
 		appendLog(tr("Failed: %1").arg(builder->lastError()));
-		setStatus(tr("Building statement.pdf failed."));
-		preview->setMessage(tr("Building statement.pdf failed."));
-	}
-}
-
-void StatementEditWidget::openPdfClicked() {
-	const QString path = QFileInfo(pdfPath()).absoluteFilePath();
-
-	if (! QFileInfo::exists(path)) {
-		QMessageBox::information(this, tr("Statement"), tr("%1 does not exist yet.").arg(pdfPath()));
+		setStatus(tr("Building %1 failed.").arg(QFileInfo(target).fileName()));
+		preview->setMessage(tr("Building %1 failed.").arg(QFileInfo(target).fileName()));
 		return;
 	}
 
-	QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+	setStatus(tr("Exported %1").arg(pdfPath()));
+	preview->setPdf(pdfPath());
+
+	if (! logView->toPlainText().isEmpty())
+		appendLog(tr("Done."));
+
+	// 按钮只有这一个：编译完直接打开（系统默认的 PDF 阅读器）。
+	QDesktopServices::openUrl(QUrl::fromLocalFile(target));
+}
+
+void StatementEditWidget::pdfNameChanged() {
+	if (loading || ! curContest)
+		return;
+
+	// 模板存在比赛日里，随自动保存（30s）与关闭比赛日一起落盘；
+	// 这里不算「题面被改过」，免得把没动过的 statement.md 重写一遍。
+	curContest->setStatementPdfName(pdfNameEdit->text());
+	refreshPdfNamePreview();
+	emit pdfFileNameChanged(pdfFileName());
+}
+
+// 输入框旁边显示「真正会写出的文件名」，省得用户对着占位符猜。
+// 预览换文件要读盘（甚至起 pdftocairo 渲染好几秒），敲字时每一下都换会卡，
+// 所以这里只立刻更新文字，预览本身攒 200ms 再换（结果还是「改完就能看到」）。
+void StatementEditWidget::refreshPdfNamePreview() {
+	if (! pdfNamePreview)
+		return;
+
+	pdfNamePreview->setText(
+	    tr("-> %1").arg(QDir::toNativeSeparators(Settings::statementPath() + pdfFileName())));
+
+	if (pdfPreviewTimer)
+		pdfPreviewTimer->start();
+	else
+		applyPdfNameToPreview();
+}
+
+void StatementEditWidget::applyPdfNameToPreview() {
+	const QString path = pdfPath();
+
+	if (QFileInfo::exists(path)) {
+		preview->setPdf(path);
+		return;
+	}
+
+	// 名字对应的 PDF 还没有：预览清空，但底下写清楚现在等的是哪个文件，
+	// 免得用户以为「改了名字预览没反应」。
+	preview->setMessage(tr("Compile the statement to see the preview here."));
+	preview->setInfoText(QDir::toNativeSeparators(path));
 }
 
 void StatementEditWidget::addProblem() {

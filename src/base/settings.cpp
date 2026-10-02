@@ -646,16 +646,57 @@ void Settings::ensureTaskDirs(const QString &taskName) {
 	if (taskName.isEmpty())
 		return;
 
-	// gengen-tuack 的试题目录：正式数据 / 下发样例 / 校验器与交互库 / 数据生成器 / 标程
+	// gengen-tuack 的试题目录：正式数据 / 下发样例 / 校验器与交互库 / 数据生成器
 	const QString base = dataPath() + taskName;
 	const QStringList subDirs = {QStringLiteral("data"), QStringLiteral("down"), QStringLiteral("graders"),
-	                             QStringLiteral("gen"), QStringLiteral("tests")};
+	                             QStringLiteral("gen")};
 
 	for (const QString &subDir : subDirs)
 		QDir().mkpath(base + QDir::separator() + subDir);
+
+	// 早期版本会顺手建一个空的 tests/ 目录（没人用），现在不再创建；
+	// 老工程里残留下来的那些一并清掉（里面有东西的话记一条日志，方便对照）。
+	QDir legacy(base + QDir::separator() + QStringLiteral("tests"));
+
+	if (legacy.exists()) {
+		const int entries = legacy.entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden).size();
+		legacy.removeRecursively();
+
+		if (entries > 0)
+			LOG("Removed the leftover tests/ folder of task", taskName, "with", entries, "entries");
+	}
 }
 
 auto Settings::selfTestPath() -> QString { return QString("selftest") + QDir::separator(); }
 
 // 每个比赛日一个 statement/ 目录：题面 markdown 与导出的 PDF 都固定放在这里。
 auto Settings::statementPath() -> QString { return QString("statement") + QDir::separator(); }
+
+// 导出物统一放 dist/ 下：成绩单与统计在 dist/reports/，导出的压缩包在 dist/export/。
+auto Settings::reportsPath() -> QString {
+	return QString("dist") + QDir::separator() + QStringLiteral("reports") + QDir::separator();
+}
+
+auto Settings::exportPath() -> QString {
+	return QString("dist") + QDir::separator() + QStringLiteral("export") + QDir::separator();
+}
+
+void Settings::ensureDistDirs() {
+	QDir().mkpath(reportsPath());
+	QDir().mkpath(exportPath());
+
+	// 早期版本把导出物直接放在比赛日根目录下（reports/、export/）：老工程里残留的这两个
+	// 目录清掉（里面是上一次的导出结果，重新导出会在 dist/ 下生成）。有东西的话记一条日志。
+	for (const QString &legacy : {QStringLiteral("reports"), QStringLiteral("export")}) {
+		QDir dir(legacy);
+
+		if (! dir.exists())
+			continue;
+
+		const int entries = dir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden).size();
+		dir.removeRecursively();
+
+		if (entries > 0)
+			LOG("Removed the legacy", legacy + QDir::separator(), "folder with", entries, "entries");
+	}
+}

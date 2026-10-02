@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     构建（并可打包）LemonLime。Windows + MinGW + Qt6。

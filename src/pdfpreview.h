@@ -35,8 +35,17 @@ class PdfPreviewWidget : public QWidget {
 	void setMessage(const QString &message);
 	/// 渲染并显示指定的 PDF。
 	void setPdf(const QString &path);
+	/// 底部信息行（渲染出页面时是「N 页 · 缩放 …」，没有页面时用来写「期望的文件路径」）。
+	void setInfoText(const QString &text);
 	/// 清空预览。
 	void clear();
+
+	/// 当前预览指向的文件（测试用）。
+	QString currentPdf() const { return pdfPath; }
+	/// 当前已渲染出来的页数（测试用）。
+	int renderedPages() const { return pageLabels.size(); }
+	/// 底部信息行的内容（测试用）。
+	QString currentInfoText() const;
 
   protected:
 	/// 在预览区里 Ctrl+滚轮 = 缩放。

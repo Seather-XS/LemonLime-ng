@@ -402,7 +402,8 @@ void JudgingDialog::contestantJudgedDisplay(const QString &contestantName, const
 		bar->setValue(bar->maximum());
 }
 
-void JudgingDialog::contestantSkipped(const QString &contestantName, const QString &, const QString &) {
+void JudgingDialog::contestantSkipped(const QString &contestantName, const QString &, const QString &,
+                                      int progress) {
 	bool isOnMaxValue =
 	    ui->logViewer->verticalScrollBar()->value() == ui->logViewer->verticalScrollBar()->maximum();
 	QTextBlockFormat blockFormat;
@@ -410,6 +411,8 @@ void JudgingDialog::contestantSkipped(const QString &contestantName, const QStri
 	cursor->insertBlock(blockFormat);
 	cursor->insertText(QStringLiteral("%1 ").arg(contestantName), plainLogFormat(ui->logViewer));
 	cursor->insertText(Contestant::disqualifiedText(), plainLogFormat(ui->logViewer));
+	// 这位选手一题都没跑，进度条要把他的那份工时跳过，否则最后走不满。
+	ui->progressBar->setValue(ui->progressBar->value() + progress);
 	QScrollBar *bar = ui->logViewer->verticalScrollBar();
 
 	if (isOnMaxValue)

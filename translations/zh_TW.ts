@@ -3068,11 +3068,6 @@ No: remove it from the contest only.</source>
         <translation>編譯題面後，這裡會顯示 statement.pdf 的分頁預覽。</translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="175"/>
-        <source>statement.pdf does not exist yet.</source>
-        <translation>statement.pdf 還不存在。</translation>
-    </message>
-    <message>
         <location filename="../src/pdfpreview.cpp" line="188"/>
         <source>pdftocairo / pdftoppm not found in PATH, so the PDF cannot be previewed.</source>
         <translation>在 PATH 中找不到 pdftocairo / pdftoppm，無法預覽 PDF。</translation>
@@ -3088,14 +3083,19 @@ No: remove it from the contest only.</source>
         <translation>算圖 PDF 預覽失敗。</translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="221"/>
-        <source>Nothing could be rendered from statement.pdf.</source>
-        <translation>沒能從 statement.pdf 算圖出任何頁面。</translation>
-    </message>
-    <message>
         <location filename="../src/pdfpreview.cpp" line="240"/>
         <source>%1 page(s) · zoom %2</source>
         <translation>共 %1 頁 · 縮放 %2</translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="238"/>
+        <source>Nothing could be rendered from %1.</source>
+        <translation>無法從 %1 繪製出任何頁面。</translation>
+    </message>
+    <message>
+        <location filename="../src/pdfpreview.cpp" line="192"/>
+        <source>%1 does not exist yet.</source>
+        <translation>%1 還不存在。</translation>
     </message>
 </context>
 <context>
@@ -3411,21 +3411,6 @@ No: remove it from the contest only.</source>
         <translation>儲存</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="204"/>
-        <source>Export PDF</source>
-        <translation>匯出 PDF</translation>
-    </message>
-    <message>
-        <location filename="../src/statementeditwidget.cpp" line="205"/>
-        <source>Compile statement/statement.pdf with pandoc + xelatex.</source>
-        <translation>用 pandoc + xelatex 編譯出 statement/statement.pdf。</translation>
-    </message>
-    <message>
-        <location filename="../src/statementeditwidget.cpp" line="206"/>
-        <source>Open PDF</source>
-        <translation>開啟 PDF</translation>
-    </message>
-    <message>
         <location filename="../src/statementeditwidget.cpp" line="235"/>
         <source>Title / subtitle / day / date of the statement.</source>
         <translation>題面的標題、副標題、比賽日與日期。</translation>
@@ -3539,12 +3524,6 @@ No: remove it from the contest only.</source>
         <translation>無法寫入 %1</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="704"/>
-        <location filename="../src/statementeditwidget.cpp" line="705"/>
-        <source>Building statement.pdf ...</source>
-        <translation>正在產生 statement.pdf …</translation>
-    </message>
-    <message>
         <location filename="../src/statementeditwidget.cpp" line="719"/>
         <source>Exported %1</source>
         <translation>已匯出 %1</translation>
@@ -3560,12 +3539,6 @@ No: remove it from the contest only.</source>
         <translation>失敗：%1</translation>
     </message>
     <message>
-        <location filename="../src/statementeditwidget.cpp" line="726"/>
-        <location filename="../src/statementeditwidget.cpp" line="727"/>
-        <source>Building statement.pdf failed.</source>
-        <translation>產生 statement.pdf 失敗。</translation>
-    </message>
-    <message>
         <location filename="../src/statementeditwidget.cpp" line="735"/>
         <source>%1 does not exist yet.</source>
         <translation>%1 還不存在。</translation>
@@ -3579,6 +3552,46 @@ No: remove it from the contest only.</source>
         <location filename="../src/statementeditwidget.cpp" line="811"/>
         <source>(unsaved changes)</source>
         <translation>（有未儲存的變更）</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="762"/>
+        <location filename="../src/statementeditwidget.cpp" line="763"/>
+        <source>Building %1 ...</source>
+        <translation>正在編譯 %1 ...</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="778"/>
+        <location filename="../src/statementeditwidget.cpp" line="779"/>
+        <source>Building %1 failed.</source>
+        <translation>編譯 %1 失敗。</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="809"/>
+        <source>-&gt; %1</source>
+        <translation>-&gt; %1</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="234"/>
+        <location filename="../src/statementeditwidget.cpp" line="389"/>
+        <source>Export and Open PDF</source>
+        <translation>導出並開啟 PDF</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="235"/>
+        <location filename="../src/statementeditwidget.cpp" line="390"/>
+        <source>Compile the statement PDF with pandoc + xelatex, then open it.</source>
+        <translation>用 pandoc + xelatex 編譯題面 PDF，編譯好後直接開啟。</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="243"/>
+        <source>PDF file name:</source>
+        <translation>PDF 檔名：</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp" line="246"/>
+        <location filename="../src/statementeditwidget.cpp" line="391"/>
+        <source>File name of the exported PDF (no extension). Placeholders: &lt;day&gt; = contest day file name, &lt;title-day&gt; = contest day title, &lt;title&gt; = contest title.</source>
+        <translation>導出的 PDF 檔名（不含副檔名）。可以用佔位符：&lt;day&gt; = 比賽日檔名，&lt;title-day&gt; = 比賽日標題，&lt;title&gt; = 比賽標題。</translation>
     </message>
 </context>
 <context>
@@ -4299,11 +4312,6 @@ p, li { white-space: pre-wrap; }
         <translation>匯出記錄</translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="115"/>
-        <source>One subfolder per task (named after the task&apos;s folder), containing the files directly inside that task&apos;s &lt;b&gt;down/&lt;/b&gt; folder (subfolders are skipped). The statement PDF is placed in the zip root.</source>
-        <translation>每題一個子目錄（使用題目目錄名），放入該題 &lt;b&gt;down/&lt;/b&gt; 目錄下的檔案（不含子目錄裡的檔案）；題面 PDF 放在壓縮檔根目錄。</translation>
-    </message>
-    <message>
         <location filename="../src/exportwidget.cpp" line="118"/>
         <source>Path in package</source>
         <translation>壓縮檔內路徑</translation>
@@ -4324,23 +4332,11 @@ p, li { white-space: pre-wrap; }
         <translation>%1 個檔案，%2 個目錄</translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="199"/>
-        <source>The statement PDF is missing; export it in the Statement tab first if you need it.</source>
-        <translation>題面 PDF 不存在；若需要，請先在「題面」分頁匯出。</translation>
-    </message>
-    <message>
         <location filename="../src/exportwidget.cpp" line="216"/>
         <location filename="../src/exportwidget.cpp" line="231"/>
         <location filename="../src/exportwidget.cpp" line="237"/>
         <source>Export</source>
         <translation>匯出</translation>
-    </message>
-    <message>
-        <location filename="../src/exportwidget.cpp" line="217"/>
-        <source>The statement PDF (%1) does not exist yet, so the package will not contain the statement.
-Export anyway?</source>
-        <translation>題面 PDF（%1）還不存在，壓縮檔將不含題面。
-仍要匯出嗎？</translation>
     </message>
     <message>
         <location filename="../src/exportwidget.cpp" line="231"/>
@@ -4427,11 +4423,6 @@ Export anyway?</source>
         <translation>樣例資料取自每題的 down/ 目錄，並保留目錄結構。</translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="284"/>
-        <source>Test data of every task: the whole &lt;b&gt;data/&lt;/b&gt; and &lt;b&gt;graders/&lt;/b&gt; folders (plus &lt;b&gt;down/&lt;/b&gt; when the sample data is included). The statement PDF is not packed.</source>
-        <translation>每題的測試資料：完整的 &lt;b&gt;data/&lt;/b&gt; 與 &lt;b&gt;graders/&lt;/b&gt; 目錄（勾選樣例資料時再加上 &lt;b&gt;down/&lt;/b&gt;）。不含題面 PDF。</translation>
-    </message>
-    <message>
         <location filename="../src/exportwidget.cpp" line="303"/>
         <source>Some tasks use the same data file names, so every task must keep its own folder.</source>
         <translation>有試題的資料檔案重名，因此每題必須單獨一個目錄。</translation>
@@ -4481,6 +4472,53 @@ Export anyway?</source>
         <source>Answers of every contestant: one folder per contestant with all of their source files. With regions enabled you can group them into region folders and/or one inner zip per region. The &lt;day&gt;/ wrapper is optional.</source>
         <translation>每位選手一個目錄，裡面是他全部題目的原始碼。啟用賽區時可按賽區分組：賽區同名目錄、或每個賽區一個內層壓縮檔（可同時開）；&lt;day&gt;/ 那層可選。</translation>
     </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="445"/>
+        <source>Listing... %1 file(s)</source>
+        <translation>正在列出...%1 個檔案</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="238"/>
+        <source>Answers of every contestant: one folder per contestant with all of their source files. With regions enabled every region always gets its own folder (and can additionally be packed into a &lt;region&gt;.zip). The &lt;day&gt;/ wrapper is optional.</source>
+        <translation>每位選手一個目錄，裡面是他全部題目的原始碼。啟用賽區時每個賽區固定佔一個目錄（另外可選再打包成 &lt;region&gt;.zip）；&lt;day&gt;/ 那層可選。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="249"/>
+        <source>Test data of every task: the whole &lt;b&gt;data/&lt;/b&gt; folder. From &lt;b&gt;graders/&lt;/b&gt; only the files the task really needs are packed (the interactive library, or the checker source of a special judged task). &lt;b&gt;gen/&lt;/b&gt; and &lt;b&gt;tests/&lt;/b&gt; are never packed, and neither is the statement PDF. &lt;b&gt;down/&lt;/b&gt; is added when the sample data is included (only the files directly inside it; subfolders are skipped).</source>
+        <translation>每題的測試資料：完整的 &lt;b&gt;data/&lt;/b&gt; 目錄；&lt;b&gt;graders/&lt;/b&gt; 只帶這題真正用得上的檔案（互動題的互動庫，或使用檢查器的題目的檢查器原始碼）。&lt;b&gt;gen/&lt;/b&gt;、&lt;b&gt;tests/&lt;/b&gt; 與題面 PDF 都不會打包；勾選樣例資料時再加上 &lt;b&gt;down/&lt;/b&gt; 本層的檔案（不遞迴子目錄）。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="637"/>
+        <source>The statement file is missing; export it in the Statement tab first if you need it.</source>
+        <translation>題面檔案不存在；如果需要，請先在「題面」索引標籤裡導出。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="134"/>
+        <location filename="../src/exportwidget.cpp" line="223"/>
+        <source>Statement file:</source>
+        <translation>題面檔案：</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="224"/>
+        <source>Which file under statement/ goes into the package (the PDF name is set in the Statement tab).</source>
+        <translation>打包用 statement/ 下的哪個檔案（PDF 檔名在「題面」索引標籤裡設定）。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="272"/>
+        <source>One subfolder per task (named after the task&apos;s folder), containing the files directly inside that task&apos;s &lt;b&gt;down/&lt;/b&gt; folder (subfolders are skipped). The statement file selected below is placed in the zip root.</source>
+        <translation>每道題一個子目錄（用題目目錄名），放入該題 &lt;b&gt;down/&lt;/b&gt; 目錄下的檔案（不含子目錄裡的檔案）；下面選中的題面檔案放在壓縮檔根目錄。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="376"/>
+        <source>missing</source>
+        <translation>找不到</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="661"/>
+        <source>The statement file (%1) does not exist yet, so the package will not contain the statement.
+Export anyway?</source>
+        <translation>題面檔案（%1）還不存在，壓縮檔裡將不含題面。仍要導出嗎？</translation>
+    </message>
 </context>
 <context>
     <name>PackageBuilder</name>
@@ -4493,11 +4531,6 @@ Export anyway?</source>
         <location filename="../src/core/packagebuilder.cpp" line="53"/>
         <source>No contest</source>
         <translation>尚未開啟比賽</translation>
-    </message>
-    <message>
-        <location filename="../src/core/packagebuilder.cpp" line="66"/>
-        <source>Statement PDF not found: %1</source>
-        <translation>找不到題面 PDF：%1</translation>
     </message>
     <message>
         <location filename="../src/core/packagebuilder.cpp" line="83"/>
@@ -4579,6 +4612,16 @@ Export anyway?</source>
         <location filename="../src/core/packagebuilder.cpp" line="806"/>
         <source>No contestant in current contest</source>
         <translation>目前比賽還沒有選手</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="661"/>
+        <source>%1 of task %2 was not found in graders/</source>
+        <translation>題目 %2 的 %1 不在 graders/ 裡</translation>
+    </message>
+    <message>
+        <location filename="../src/core/packagebuilder.cpp" line="585"/>
+        <source>Statement file not found: %1</source>
+        <translation>找不到題面檔案：%1</translation>
     </message>
 </context>
 </TS>

@@ -45,6 +45,10 @@ class Contest : public QObject {
 	void setViolationRules(const QVector<ViolationRule> &);
 	void setNamingCheck(bool);
 	void setNamingPattern(const QString &);
+	/// 导出的题面 PDF 文件名（不带扩展名，可含 `<day>` / `<title-day>` / `<title>` 占位符），
+	/// 保存在比赛日文件里。空表示用默认的 statement。
+	const QString &getStatementPdfName() const;
+	void setStatementPdfName(const QString &);
 	/// 按当前比赛日设置重算每位选手的违规 / 命名判定（改了设置不用重测）。
 	void evaluateContestantRules();
 
@@ -70,6 +74,7 @@ class Contest : public QObject {
 	QVector<ViolationRule> violationRules;
 	bool namingCheck{false};
 	QString namingPattern;
+	QString statementPdfName;
 	Settings *settings{};
 	QList<Task *> taskList;
 	QMap<QString, Contestant *> contestantList;
@@ -102,7 +107,9 @@ class Contest : public QObject {
 	void contestantJudgingFinished();
 	void contestantJudgedDisplay(const QString &, const int, const int);
 	/// 选手因违规 / 命名不合规被跳过测试（标题 + 详情）。
-	void contestantSkipped(const QString &name, const QString &title, const QString &message);
+	/// 选手被取消测试（违规 / 命名不合规）：progress 是这位选手本轮被跳过的工时，
+	/// 用来让进度条跳过对应的量。
+	void contestantSkipped(const QString &name, const QString &title, const QString &message, int progress);
 	void compileError(int, int);
 	void stopJudgingSignal();
 };

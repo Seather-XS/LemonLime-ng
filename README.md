@@ -1,138 +1,88 @@
 <a href="https://project-lemonlime.github.io/Project_LemonLime/"><img src="assets/icons/lemon-lime.png" align=right /></a>
 
-# Project LemonLime (Beta)
+# gengen-tuack
 
-为了 OI 比赛而生的基于 Lemon + LemonPlus 的轻量评测系统
+[Project LemonLime](https://github.com/Project-LemonLime/Project_LemonLime) 的一个分支，面向 gengen 风格的比赛：
+在原有评测能力之上，补齐了**赛区**、**题面**与**一键打包**这几件事。
 
-A tiny judging environment for OI contest based on Lemon + LemonPlus
+需要 Qt 6.8 或更高版本。主要在 Windows + MinGW 上开发与验证，其它平台沿用上游的构建方式。
 
-需要 Qt 6.8 或更高版本。
+## 与原版的区别
 
-现已支持 Linux，Windows 以及 macOS
+评测本身与上游一致，这个分支主要在比赛的组织方式上做了补齐：
 
-[![Linux Static Qt6](https://github.com/Project-LemonLime/Project_LemonLime/actions/workflows/linux-static-qt6.yml/badge.svg)](https://github.com/Project-LemonLime/Project_LemonLime/actions/workflows/linux-static-qt6.yml)
-[![CPack - DEB - Debian](https://github.com/Project-LemonLime/Project_LemonLime/actions/workflows/cpack-deb-debian.yml/badge.svg)](https://github.com/Project-LemonLime/Project_LemonLime/actions/workflows/cpack-deb-debian.yml)
-[![Windows Qt6](https://github.com/Project-LemonLime/Project_LemonLime/actions/workflows/windows-qt6.yml/badge.svg)](https://github.com/Project-LemonLime/Project_LemonLime/actions/workflows/windows-qt6.yml)
-[![MacOS Qt6](https://github.com/Project-LemonLime/Project_LemonLime/actions/workflows/macos-qt6.yml/badge.svg)](https://github.com/Project-LemonLime/Project_LemonLime/actions/workflows/macos-qt6.yml)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ea760fd4674f44eaa6ca8273abc0669d)](https://www.codacy.com/gh/Project-LemonLime/Project_LemonLime/dashboard?utm_source=github.com&utm_medium=referral&utm_content=Project-LemonLime/Project_LemonLime&utm_campaign=Badge_Grade)
-
-[![AUR version](https://img.shields.io/aur/version/lemon-lime?style=flat-square)](https://aur.archlinux.org/packages/lemon-lime/)
-[![AUR votes](https://img.shields.io/aur/votes/lemon-lime?label=lemon-lime%20vote&style=flat-square)](https://aur.archlinux.org/packages/lemon-lime/)
-
-[![Packaging status](https://repology.org/badge/vertical-allrepos/lemon-lime.svg)](https://repology.org/metapackage/lemon-lime/versions)
-
-曾在这些系统测试：
-
-|      系统名称       |   版本号   |    架构    |    DE / WM     |
-|:-------------------:|:----------:|:----------:|:--------------:|
-|       Windows       |     10     |   amd64    |    Untitled    |
-|       Windows       |     11     |   amd64    |    Untitled    |
-|       Manjaro       |   20.0.1   |   amd64    | KDE-Xorg; i3WM |
-|        Arch         | 2021-07-11 |   amd64    |    KDE-Xorg    |
-|        Arch         | 2020-10-31 |   amd64    |  KDE-Wayland   |
-|       Ubuntu        |   20.04    |   amd64    |    GNOME 3     |
-|       Ubuntu        |  18.04.4   |   amd64    |    GNOME 3     |
-| NOI Linux 2(Ubuntu) |   20.04    |   amd64    |    GNOME 3     |
-|     Linux Mint      |    19.3    |   amd64    |    Cinnamon    |
-|       Deepin        |   15.11    |   amd64    |      DDE       |
-|       Deepin        | 20 (1000)  |   amd64    |      DDE       |
-|       Debian        |   10.3.0   |   amd64    | LXQt; KDE-Xorg |
-|       Fedora        |   31-1.9   |   amd64    |      XFCE      |
-|      openSUSE       | Leap 15.1  |   amd64    |     iceWM      |
-|      openSUSE       | Tumbleweed |   amd64    |    KDE-Xorg    |
-|        macOS        |  15.2 Beta |   arm64    |      Aqua      |
-
-如果您在您的系统上做了测试，请前往
-[#49](https://github.com/Project-LemonLime/Project_LemonLime/issues/49)
-告知。
-
-## 特色
-
-以下是一些非常重要的改动：
-
--   **Lemon 绿了！**
--   LemonLime 现在支持 4 种题目类型：传统题、提交答案题、交互题，以及通信题（2 种：一种是选手只完成部分函数，一种是选手要写多个完整程序）。不过交互题和通信题暂时只确保 C++ 的支持。
--   现在在选手栏中，每个选手的每个题目都可以单独选择，而不是只能一行一行地选。现在你可以方便地重测某道题，还支持一键测试未测试/未找到源文件/编译错误等操作。
--   原先的 Lemon 的重测制度因为过于耗时而被废弃。现在，你可以自定义最大的重新评测次数。
--   自带的实数比较模式现在将同时比较绝对误差和相对误差，并且对 `nan` 和 `inf` 做出了判断。
--   在 Linux 下，默认的栈空间设置为和内存限制相同。
--   自定义测试被移除。
-
-这里是一些值得称道的新功能：
-
--   现在你可以给每个测试点设置子任务依赖，而不是像以前把同一个数据加到一个又一个测试点中。
--   在题目概要栏右键题目，可以进入增强测试点调整器。CCR 的出色功能，现在 LemonLime 也支持了。（这个功能还在测试阶段，小心使用！）
--   增加统计栏目，对比赛分数数据进行简要的分析。还需要很多的更新。
--   新增的整理文件功能，可以使所有的选手的子文件夹内外都有答案文件，并且删除大部分无用文件。支持在这之前备份文件。
--   你也可以对每一个题目，选择是在子文件夹内寻找源文件还是子文件夹外。
--   多线程评测（实验中）
-
-还有一些令人舒适的小变化：
-
--   支持高 DPI。
--   颜色主题：选手名单上的成绩将会有背景颜色，随着分数变化而变化。导出的 HTML 文件也有颜色。默认 2 种主题来自 IOI 和 JOI。主题支持自定义。
--   各种评测结果在评测时界面、结果查看界面和导出的 HTML 文件有了易于区分的不同的颜色。
--   支持重新排列题目顺序。在有些时候它很重要。
--   支持重命名比赛。
--   手动保存比赛、打开比赛目录（在 `文件` 菜单栏中）。
--   窗口下方新增提示栏。
-
-以及，一点小细节：
-
--   如果你在某个点得分了，那么在测试时的窗口会显示获得的分数、使用的时间和空间。
--   逐行比较模式现在可以显示出错位置的行号了。
--   减小了导出 HTM 的体积，并且给 HTML 添加了更多跳转。
--   自动添加试题的时候每个点的分数不再是下取整 (总分 / 数据点个数)。
--   改动了图标和启动横幅。
--   无处不在的界面优化。
+-   **比赛日布局**：试题数据放在 `problem/<题>/{data,down,graders,gen}`，选手代码放在 `answers/<赛区>/<选手>/`；打开旧布局的比赛日时会自动迁移。
+-   **赛区**：可以按赛区组织选手，成绩表、统计和导出都会带上赛区，也能按赛区拆开。
+-   **题面**：内置题面编辑器，写 Markdown，用 pandoc + LaTeX 编译成 PDF，自带 ccpc / noi / noi new 模板，右侧即时预览；导出的 PDF 名字可以自己写模板。
+-   **导出**：新增「导出」选项卡，把比赛日一键打成 zip —— 选手目录、测试数据、选手代码三类包；选手目录里可以自选 `statement/` 下的题面文件，还能额外套一层目录、压缩包内再套压缩包、密码加密。
+-   **成绩与统计**：固定导出到 `<比赛日>/dist/reports/`；启用赛区时每个赛区各出一份。
 
 ## 安装
 
-### Windows
+Windows 上可以直接用仓库里的 `build.cmd` 构建（需要 Qt 6、MinGW、CMake、Ninja）：
 
-可以在 Release 或者 GitHub Actions 处自行取用预构建包。
-
-### macOS
-
-可以在 Release 或者 GitHub Actions 处自行取用预构建包，也可以从 Homebrew Cask 安装。
-
-**对于 Apple Silicon 用户，不保证其使用或评测稳定性**
-
-```bash
-brew install lemonlime --cask
+```powershell
+.\build.cmd            # 构建到 build\，产物是 build\lemon.exe
+.\build.cmd -NoLto     # 关掉 LTO，链接快很多
+.\build.cmd -Package   # 顺便打包成带 Qt 运行库的 zip（放到 dist\）
 ```
 
-### Debian && Ubuntu
+`build.cmd` / `package.cmd` 只是把 `build.ps1` / `package.ps1` 换成
+`powershell -ExecutionPolicy Bypass -File ...` 调用：Windows 客户端默认的执行策略是 `Restricted`，
+直接 `.\build.ps1` 会报「因为在此系统上禁止运行脚本」。
+不想用包装脚本的话，二选一：
 
-我们提供预编译的 deb 包，但是因为依赖问题有时无法提供，此时可使用[静态链接版本](#静态链接版本)。
+```powershell
+# A. 只对当前窗口生效
+powershell -NoProfile -ExecutionPolicy Bypass -File .\package.ps1
 
-### Arch Linux
+# B. 只对本用户放开（不需要管理员）
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
 
-请从 [Arch Linux CN 非官方仓库](https://www.archlinuxcn.org/archlinux-cn-repo-and-mirror/)安装或从 AUR 自行编译。
+其它平台的依赖与构建方式见 [BUILD.md](BUILD.md)。
 
-注意包含一个名为 `lemon-lime-debug` 的调试信息包，报告崩溃等错误时请务必安装。
+### 打包成能直接运行的完整软件
 
-### Nix
+`package.ps1` 会在构建之后把 Qt 运行库铺到 `lemon.exe` 旁边，并删掉用不到的文件，
+让 `build\` 拷到别的机器上也能直接跑：
 
-已经进入 Nix Unstable 仓库
+```powershell
+.\package.cmd                 # 构建 + 就地部署到 build\（含题面模板），最后自检
+.\package.cmd -NoBuild        # 不重新构建，只部署 / 精简
+.\package.cmd -OutDir .\out   # 生成一个干干净净的发布目录（不含任何构建中间产物）
+.\package.cmd -PruneBuildJunk # 就地部署时顺便清掉 *.obj / CMakeFiles\ 等（下次构建会完整重编）
+```
 
-使用 `nix-env -iA nixpkgs.project-lemonlime` 安装
+（用 `package.ps1` 时要先解决执行策略的问题，两种办法见上一节。）
 
-### 静态链接版本（即无后缀名的单独的可执行文件）
+它会删掉这些用不到的东西：`opengl32sw.dll`、`D3Dcompiler_47.dll`、Qt 自带的几十种语言翻译
+（只留 `zh_CN` / `zh_TW`，界面文字用的是程序内嵌的翻译）、多余的图片格式插件（只留 SVG）、
+调试符号，以及 `tls` / `networkinformation` / `generic` 这些插件目录。
 
-可以在 Release 或者 GitHub Actions 处自行取用。
+每次部署完都会跑一遍 `lemon.exe --self-test`（把 PATH 里的 Qt / MinGW 全部去掉），
+确认平台插件、SVG 图标、题面模板、内嵌翻译和主窗口都正常；要发布前能放心。
 
-`chmod +x <filename>` 后直接执行
+## 快速使用
+
+新建比赛 → 新建比赛日 → 添加试题 → 评测，与上游相同。这个分支多出来的部分集中在三个选项卡：
+
+-   **题面**：编辑 Markdown，点「导出并打开 PDF」编译题面（编译完直接打开），PDF 放在 `<比赛日>/statement/` 下。文件名可以在「PDF 文件名」里自定义，支持占位符：`<day>` 比赛日文件名、`<title-day>` 比赛日标题、`<title>` 比赛标题（默认 `statement.pdf`）。
+-   **导出**：选择包类型与选项，导出到 `<比赛日>/dist/export/`；选手目录包里可以在「题面文件」下拉框里挑 `statement/` 下的哪个文件进包。
+-   **统计**：查看整场统计，导出到 `<比赛日>/dist/reports/`。
+
+比赛的导出物统一放在 `<比赛日>/dist/` 下；早期版本遗留在根目录的 `export/`、`reports/` 会在打开比赛日时自动清掉。
+
+题面 Markdown 的写法、各选项的含义等细节，见用户手册与界面内的提示。
 
 ## 用户手册
 
-请访问 [在线用户手册](https://project-lemonlime.github.io/Project_LemonLime/)。
-
-## 构建
-
-请看 [LemonLime 构建指南](BUILD.md)。
+[在线用户手册](https://project-lemonlime.github.io/Project_LemonLime/)（上游版本；本分支新增的功能以上一节的说明与界面提示为准）。
 
 ## Credit
+
+本项目按 GPL-3.0-or-later 授权，见 [LICENSE](LICENSE)。
+
 ```
 Copyright (c) 2019-2022 Project LemonLime.
 

@@ -116,6 +116,10 @@ void Contest::setNamingCheck(bool enabled) { namingCheck = enabled; }
 
 void Contest::setNamingPattern(const QString &pattern) { namingPattern = pattern.trimmed(); }
 
+auto Contest::getStatementPdfName() const -> const QString & { return statementPdfName; }
+
+void Contest::setStatementPdfName(const QString &name) { statementPdfName = name.trimmed(); }
+
 void Contest::evaluateContestantRules() {
 	const bool namingActive = namingCheck && ! namingPattern.isEmpty();
 	const QVector<ViolationRule> rules = violationCheck ? Violation::normalizeRules(violationRules)
@@ -340,7 +344,15 @@ void Contest::judge(const QVector<std::pair<Contestant *, int>> &judgingTasks, b
 
 	// 被判定为违规 / 命名不合规的选手可以直接跳过：这里的信号让测试界面（日志）
 	// 能写出「测试被取消 (...）」并提供详情入口。
+	// 进度条的最大值是「本轮所有（选手，试题）的时限之和」，跳过的那些也要把这份工时
+	// 补给测试界面，否则进度条永远走不满。
 	QSet<QString> skipped;
+	QHash<QString, int> skippedProgress;
+
+	for (auto [contestant, i] : judgingTasks) {
+		if (contestant->isDisqualified())
+			skippedProgress[contestant->getContestantName()] += taskList[i]->getTotalTimeLimit();
+	}
 
 	// connect(controller, &JudgingController::judgeFinished, this, &Contest::judgeFinished);
 	for (auto [contestant, i] : judgingTasks) {
@@ -352,7 +364,7 @@ void Contest::judge(const QVector<std::pair<Contestant *, int>> &judgingTasks, b
 				contestant->setJudgingTime(QDateTime::currentDateTime());
 				emit contestantJudgingStart(contestantName);
 				emit contestantSkipped(contestantName, contestant->getDisqualifyTitle(),
-				                       contestant->getDisqualifyMessage());
+				                       contestant->getDisqualifyMessage(), skippedProgress.value(contestantName));
 			}
 
 			continue;
@@ -439,6 +451,7 @@ void Contest::writeToJson(QJsonObject &out) {
 	out.insert(QStringLiteral("violationRules"), violationRulesJson);
 	WRITE_JSON(out, namingCheck);
 	WRITE_JSON(out, namingPattern);
+	WRITE_JSON(out, statementPdfName);
 
 	QJsonArray tasks;
 
@@ -480,6 +493,8 @@ int Contest::readFromJson(const QJsonObject &in) {
 
 	READ_JSON(in, namingCheck);
 	READ_JSON(in, namingPattern);
+	// 老比赛文件里没有这一项：读不到就保持空，用默认的 statement。
+	READ_JSON(in, statementPdfName);
 
 	QJsonArray tasks;
 	READ_JSON(in, tasks);

@@ -52,7 +52,7 @@ class JudgingDialog : public QDialog {
 	void contestantJudgingStart(const QString &);
 	void contestantJudgingFinished();
 	void contestantJudgedDisplay(const QString &, const int, const int);
-	void contestantSkipped(const QString &, const QString &, const QString &);
+	void contestantSkipped(const QString &, const QString &, const QString &, int);
 	void compileError(int, int);
 
   signals:

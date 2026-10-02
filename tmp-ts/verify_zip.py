@@ -10,7 +10,7 @@ import zipfile
 
 DAY = pathlib.Path(r"d:\gengen-tuack\build\export-test\TestDay")
 LEMON = pathlib.Path(r"d:\gengen-tuack\build\lemon.exe")
-ZIP = DAY / "export" / "TestDay.zip"
+ZIP = DAY / "dist" / "export" / "TestDay.zip"
 LOGFILE = DAY / "export-log.txt"
 
 PASSWORD = "pwd123"
@@ -18,7 +18,7 @@ PASSWORD = "pwd123"
 
 def run(flags=(), password=None, zip_name="TestDay.zip"):
     global ZIP
-    ZIP = DAY / "export" / zip_name
+    ZIP = DAY / "dist" / "export" / zip_name
 
     if ZIP.exists():
         ZIP.unlink()
@@ -82,6 +82,8 @@ def check(title, flags, password=None, expect_prefix=False, expect_nested=False)
         assert f"{base}statement.pdf" in names, names
         assert f"{base}plus/plus1.in" in names, names
         assert f"{base}plus/samples/ignored.txt" not in names, "down 子目录里的文件不该被打包"
+        assert f"{base}plus/nested/ignored.txt" not in names, "down 子目录里的文件不该被打包"
+        assert f"{base}tree/nested/ignored.txt" not in names, "down 子目录里的文件不该被打包"
         assert f"{base}C. Graph/" in names, names
 
         if password:
@@ -152,28 +154,46 @@ def check_testdata(title, flags, password=None, expect_nested=False, expect=(), 
     return names
 
 
-# 默认：每道题一个目录，保留结构（data/、graders/）
+# 默认：每道题一个目录、保留结构；只有该题型真正用得上的东西才会被打包
 check_testdata("6) 测试数据 · 默认（分题目录 + 保留结构）", (),
                expect=["plus/", "plus/data/plus1.in", "plus/data/plus1.ans",
-                       "plus/graders/plus_grader.cpp", "tree/data/sub/nested.txt", "C. Graph/"])
+                       "tree/data/tree1.in", "tree/data/sub/nested.txt",
+                       "tree/graders/tree_spj.cpp",
+                       "C. Graph/data/plus1.in", "C. Graph/graders/graph.h",
+                       "C. Graph/graders/graph_grader.cpp",
+                       "D. Answer/data/ans1.in"],
+               not_expect=["plus/graders/plus_grader.cpp", "tree/graders/tree_grader.cpp",
+                           "C. Graph/graders/unused.cpp", "D. Answer/graders/d_grader.cpp",
+                           "plus/gen/g.cpp", "plus/tests/leftover.tmp",
+                           "tree/gen/g.cpp", "tree/tests/leftover.tmp",
+                           "C. Graph/tests/leftover.tmp", "D. Answer/tests/leftover.tmp",
+                           "statement.pdf"])
 
 # 不保留结构：文件铺到题目录下
 check_testdata("7) 测试数据 · 不保留结构", ("--no-structure",),
-               expect=["plus/plus1.in", "plus/plus1.ans", "plus/plus_grader.cpp",
-                       "tree/tree1.in", "tree/nested.txt", "tree/tree_grader.cpp"],
-               not_expect=["plus/data/plus1.in", "plus/graders/plus_grader.cpp"])
+               expect=["plus/plus1.in", "plus/plus1.ans", "tree/tree1.in", "tree/nested.txt",
+                       "tree/tree_spj.cpp", "C. Graph/graph.h", "C. Graph/graph_grader.cpp",
+                       "D. Answer/ans1.in"],
+               not_expect=["plus/data/plus1.in", "plus/plus_grader.cpp", "tree/tree_grader.cpp",
+                           "tree/graders/tree_spj.cpp", "C. Graph/graders/graph.h",
+                           "C. Graph/unused.cpp", "plus/g.cpp", "plus/leftover.tmp"])
 
-# 样例数据：一定保留结构，多出 down/
+# 样例数据：一定保留结构，多出 down/（只收 down 本层的文件，子目录内容不许被读）
 check_testdata("8) 测试数据 · 带样例数据（down/）", ("--samples",),
                expect=["plus/data/plus1.in", "plus/down/plus1.in", "plus/down/plus1.ans",
-                       "plus/graders/plus_grader.cpp"],
-               not_expect=["plus/plus1.in"])
+                       "plus/down/sample1.in", "tree/down/sample1.in",
+                       "tree/graders/tree_spj.cpp"],
+               not_expect=["plus/plus1.in", "plus/graders/plus_grader.cpp",
+                           "plus/down/samples/ignored.txt", "plus/down/nested/ignored.txt",
+                           "tree/down/samples/ignored.txt", "tree/down/nested/ignored.txt"])
 
 # 不分题目录 + 平铺：重名文件被跳过并记日志
 names = check_testdata("9) 测试数据 · 不分题目录 + 平铺", ("--no-per-task", "--no-structure"),
-                       expect=["plus1.in", "plus1.ans", "plus_grader.cpp", "tree1.in",
-                               "tree1.ans", "tree_grader.cpp", "nested.txt"],
-                       not_expect=["plus/", "tree/", "C. Graph/"])
+                       expect=["plus1.in", "plus1.ans", "tree1.in", "tree1.ans", "nested.txt",
+                               "tree_spj.cpp", "graph.h", "graph_grader.cpp", "ans1.in"],
+                       not_expect=["plus/", "tree/", "C. Graph/", "D. Answer/",
+                                   "plus_grader.cpp", "tree_grader.cpp", "unused.cpp",
+                                   "d_grader.cpp", "g.cpp", "leftover.tmp"])
 assert "Duplicate file name skipped" in open(LOGFILE, encoding="utf-8").read()
 assert "duplicate task files: yes" in open(LOGFILE, encoding="utf-8").read()
 print("  重名文件被跳过并记了日志 ✓")

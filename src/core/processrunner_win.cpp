@@ -289,7 +289,10 @@ ProcessRunnerResult WinProcessRunner::run() {
 	timer.start();
 
 	while (timer.elapsed() <= config.timeLimit + extraTime) {
-		if (WaitForSingleObject(pi.hProcess, 0) == WAIT_OBJECT_0) {
+		// 直接等进程本身（10ms 超时就回来看看内存），而不是「查询 + msleep(10)」：
+		// Windows 默认定时器精度是 15.6ms，msleep(10) 实际会睡 15.6ms，每个测试点都要
+		// 白等这么久；进程退出也能立刻发现。
+		if (WaitForSingleObject(pi.hProcess, 10) == WAIT_OBJECT_0) {
 			isProgramFinishedInExtraTimeLimit = true;
 			break;
 		}
@@ -314,8 +317,6 @@ ProcessRunnerResult WinProcessRunner::run() {
 
 			return res;
 		}
-
-		QThread::msleep(10);
 	}
 
 	if (! isProgramFinishedInExtraTimeLimit) {

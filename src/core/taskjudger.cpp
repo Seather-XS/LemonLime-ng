@@ -18,6 +18,7 @@
 #include "core/testcase.h"
 
 #include <QFile>
+#include <QElapsedTimer>
 #include <QSysInfo>
 #include <QTimer>
 #include <QtMath>
@@ -475,8 +476,14 @@ int TaskJudger::judge() {
 		if (! dependenceSubtask.empty())
 			score[i].push_back(overallStatus[i]);
 
-		if (isSkipped)
+		if (isSkipped) {
+			// 依赖的子任务没过：这组测试点整组跳过。进度要照常走（进度条的上限把这组
+			// 的时限也算进去了），日志里也把每个测试点标成 Skipped，免得看起来像卡住。
+			for (int j = 0; j < task->getTestCase(i)->getInputFiles().size(); j++)
+				taskSkipped(std::make_pair(i, j));
+
 			continue;
+		}
 
 		for (int j = 0; j < task->getTestCase(i)->getInputFiles().size(); j++) {
 			inputFiles[i][j] = QFileInfo(curTestCase->getInputFiles().at(j)).fileName();
@@ -492,23 +499,17 @@ int TaskJudger::judge() {
 
 			auto *thread = new JudgingThread();
 			thread->setExtraTimeRatio(settings->getDefaultExtraTimeRatio());
-			QString workingDirectory =
-			    QDir::toNativeSeparators(QDir(QDir::toNativeSeparators(temporaryDir.path()) +
-			                                  QDir::separator() + QString("_%1.%2").arg(i).arg(j))
-			                                 .absolutePath()) +
-			    QDir::separator();
+			// 全部测试点共用同一个工作目录（就是准备阶段放选手程序的那个目录）：
+			// 以前每个测试点都新开一个 _i.j 目录、把可执行文件再拷一份，而 Windows 会对
+			// 每次新出现的 .exe 做一遍实时扫描，实测一个测试点要白等 ~120ms。
+			// 现在只有输入文件（在 JudgingThread 里）按测试点拷，程序本体只拷一次。
+			// 每个测试点跑完都会把输入/输出/_tmpout/_tmperr 删掉，所以不会互相干扰。
+			QString workingDirectory = QDir::toNativeSeparators(
+			                               QDir(QDir::toNativeSeparators(temporaryDir.path()) +
+			                                    QDir::separator() + contestantName)
+			                                   .absolutePath()) +
+			                           QDir::separator();
 			thread->setWorkingDirectory(workingDirectory);
-			QDir(QDir::toNativeSeparators(temporaryDir.path()) + QDir::separator())
-			    .mkdir(QString("_%1.%2").arg(i).arg(j));
-			QStringList entryList =
-			    QDir(QDir::toNativeSeparators(temporaryDir.path()) + QDir::separator() + contestantName)
-			        .entryList(QDir::Files);
-
-			for (int fileIdx = 0; fileIdx < entryList.size(); fileIdx++) {
-				QFile::copy(QDir::toNativeSeparators(temporaryDir.path()) + QDir::separator() +
-				                contestantName + QDir::separator() + entryList[fileIdx],
-				            workingDirectory + entryList[fileIdx]);
-			}
 
 			thread->setSpecialJudgeTimeLimit(settings->getSpecialJudgeTimeLimit());
 			thread->setSpecialJudgeExecutable(specialJudgeExecutable);

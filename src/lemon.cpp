@@ -30,6 +30,7 @@
 #include "opencontestdialog.h"
 #include "optionsdialog.h"
 #include "statisticsbrowser.h"
+#include "statementeditwidget.h"
 #include "welcomedialog.h"
 //
 #include <QByteArrayView>
@@ -91,6 +92,9 @@ LemonLime::LemonLime(QWidget *parent) : QMainWindow(parent), ui(new Ui::LemonLim
 	connect(ui->moveDownButton, &QToolButton::clicked, this, &LemonLime::moveDownTask);
 	connect(ui->resultViewer, &ResultViewer::itemSelectionChanged, this, &LemonLime::viewerSelectionChanged);
 	connect(ui->resultViewer, &ResultViewer::contestantDeleted, this, &LemonLime::contestantDeleted);
+	// 题面 PDF 改了名字：导出选项卡里的题面下拉框跟着换默认项。
+	connect(ui->statementEdit, &StatementEditWidget::pdfFileNameChanged, ui->exportWidget,
+	        &ExportWidget::setDefaultStatementFile);
 	connect(ui->newAction, &QAction::triggered, this, &LemonLime::newAction);
 	connect(ui->openAction, &QAction::triggered, this, &LemonLime::loadAction);
 	connect(ui->saveAction, &QAction::triggered, this, &LemonLime::saveAction);
@@ -949,8 +953,11 @@ void LemonLime::loadDay(const QString &filePath) {
 	QDir().mkdir(Settings::importPath());
 	// 每个比赛日一个 statement/ 目录：题面 markdown 与导出的 PDF 都放这里。
 	QDir().mkpath(Settings::statementPath());
+	// 导出物统一放 dist/ 下（dist/reports 成绩单与统计、dist/export 压缩包）；
+	// 顺便清掉老工程根目录里残留的 reports/、export/。
+	Settings::ensureDistDirs();
 
-	// 补齐每个试题的标准子目录（data / down / graders / gen / tests）
+	// 补齐每个试题的标准子目录（data / down / graders / gen），顺便清掉老的 tests/
 	for (auto *task : curContest->getTaskList()) {
 		// 目录跟着（固定的）文件名走，与 addTask / import 流程一致。
 		const QString base = task->getSourceFileName().isEmpty() ? task->getProblemTitle()
@@ -991,11 +998,21 @@ void LemonLime::loadDay(const QString &filePath) {
 		setWindowTitle(tr("LemonLime - %1 / %2").arg(curProject.title, curContest->getContestTitle()));
 
 	ui->tabWidget->setCurrentIndex(0);
-	// 题面：加载当前比赛日的 statement/statement.md
+	// 题面：加载当前比赛日的 statement/statement.md，并把占位符要用的上下文交给它
+	// （比赛日文件名 / 比赛日标题 / 比赛标题）。
+	const QString dayTitle =
+	    (projectFile.isEmpty() || curDayIndex < 0 || curDayIndex >= curProject.days.size())
+	        ? QString()
+	        : curProject.days[curDayIndex].title;
+	const QString projectTitle =
+	    projectFile.isEmpty() ? curContest->getContestTitle() : curProject.title;
+	ui->statementEdit->setDayContext(curContest, QFileInfo(curFile).completeBaseName(), dayTitle,
+	                                 projectTitle);
 	ui->statementEdit->reload();
-	// 导出：重新列出当前比赛日能打包的内容
+	// 导出：重新列出当前比赛日能打包的内容（默认题面取题面选项卡算出来的名字）
 	ui->exportWidget->setDayFile(curFile);
 	ui->exportWidget->setContest(curContest);
+	ui->exportWidget->setDefaultStatementFile(ui->statementEdit->pdfFileName());
 	QApplication::restoreOverrideCursor();
 	LOG("Contest -", curContest->getContestTitle(), "loaded successfully");
 }
