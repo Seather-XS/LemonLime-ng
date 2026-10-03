@@ -364,6 +364,28 @@ namespace {
 		return result;
 	}
 
+	/// `::cute-table` / `::cute-table{tuack}` 是 tuack 那边包表格用的标记，pandoc 不认，
+	/// 不处理就会原样渲染成一行正文。这里把「后面紧跟着表格」（下一行就是表格行）的
+	/// 标记行直接删掉；标记后面不是表格时保留原样，免得误伤正文。
+	QString stripCuteTableDirectives(const QString &text) {
+		static const QRegularExpression directive(
+		    QStringLiteral(R"(^[ \t]*::cute-table[ \t]*(?:\{[^{}]*\})?[ \t]*$)"));
+		static const QRegularExpression tableLine(QStringLiteral(R"(^[ \t]*\|)"));
+
+		const QStringList lines = text.split(QChar('\n'));
+		QStringList kept;
+
+		for (int i = 0; i < lines.size(); i++) {
+			if (directive.match(lines.at(i)).hasMatch() && i + 1 < lines.size() &&
+			    tableLine.match(lines.at(i + 1)).hasMatch())
+				continue;
+
+			kept.append(lines.at(i));
+		}
+
+		return kept.join(QChar('\n'));
+	}
+
 	// ==================================================================================
 	// LaTeX 收尾处理（sanitize_latex）
 	// ==================================================================================
@@ -1128,6 +1150,7 @@ namespace {
 		if (text.isEmpty())
 			return {};
 
+		text = stripCuteTableDirectives(text);
 		text = normalizeBlockSeparation(text);
 		text = normalizeInlineMath(text);
 		text = maskTildes(text);
@@ -1162,6 +1185,7 @@ namespace {
 		namedSections = extractNamedSections(body, body);
 		bool hasProblemMarkers = false;
 		body = replaceProblemMarkers(body, hasProblemMarkers);
+		body = stripCuteTableDirectives(body);
 		body = normalizeBlockSeparation(body);
 		body = normalizeInlineMath(body);
 		body = maskTildes(body);

@@ -380,6 +380,56 @@
         <source>Time Limit</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../src/addtaskdialog.cpp" line="77"/>
+        <source>Traditional</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/addtaskdialog.cpp" line="78"/>
+        <source>Answers Only</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/addtaskdialog.cpp" line="79"/>
+        <source>Interaction</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/forms/addtaskdialog.ui" line="227"/>
+        <source>Task Type</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/forms/addtaskdialog.ui" line="250"/>
+        <source>Interactor Path</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/forms/addtaskdialog.ui" line="273"/>
+        <source>Grader Path</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/addtaskdialog.cpp" line="90"/>
+        <source>Line-by-line mode (ignore extra spaces and tabs)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/addtaskdialog.cpp" line="92"/>
+        <source>Special judge mode (testlib)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/forms/addtaskdialog.ui" line="296"/>
+        <source>Comparison Mode</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/forms/addtaskdialog.ui" line="319"/>
+        <source>Checker Path:</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>AddTestCasesWizard</name>
@@ -3868,7 +3918,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/forms/taskeditwidget.ui" line="307"/>
-        <source>Exec File Path:</source>
+        <source>Checker Path:</source>
         <translation></translation>
     </message>
     <message>

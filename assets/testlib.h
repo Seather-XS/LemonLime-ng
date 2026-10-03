@@ -1696,6 +1696,14 @@ const std::string outcomes[] = {
 
 class InputStreamReader {
 public:
+    /*
+     * Whether anything has actually been consumed from this stream yet.
+     * Used by the "extra information in the output file" check in InStream::quit():
+     * checkers that read the output file with their own std::ifstream never touch
+     * testlib's `ouf`, and for them that check would report a correct answer as _dirt.
+     */
+    bool readOccurred = false;
+
     virtual void setTestCase(int testCase) = 0;
 
     virtual std::vector<int> getReadChars() = 0;
@@ -1749,6 +1757,8 @@ public:
     }
 
     int nextChar() {
+        readOccurred = true;
+
         if (pos >= s.length()) {
             pos++;
             return EOFC;
@@ -1757,6 +1767,7 @@ public:
     }
 
     void skipChar() {
+        readOccurred = true;
         pos++;
     }
 
@@ -1858,6 +1869,8 @@ public:
     }
 
     int nextChar() {
+        readOccurred = true;
+
         if (feof(file))
             return EOFC;
         else
@@ -1865,6 +1878,7 @@ public:
     }
 
     void skipChar() {
+        readOccurred = true;
         getc(file);
     }
 
@@ -1981,6 +1995,8 @@ public:
     }
 
     int nextChar() {
+        readOccurred = true;
+
         if (!refill())
             return EOFC;
 
@@ -1988,6 +2004,7 @@ public:
     }
 
     void skipChar() {
+        readOccurred = true;
         increment();
     }
 
@@ -3129,7 +3146,16 @@ NORETURN void InStream::quit(TResult result, const char *msg) {
     std::string errorName;
 
     if (__testlib_shouldCheckDirt(result)) {
-        if (testlibMode != _interactor && !ouf.seekEof())
+        // Only complain about extra data if the checker actually read the output stream.
+        //
+        // Legacy custom checkers (the `e_<task>.cpp` kind) often open argv[2] with their own
+        // std::ifstream and never touch testlib's `ouf`. In that case ouf.seekEof() can never
+        // return true, so a perfectly correct answer would be reported as
+        // "wrong output format Extra information in the output file".
+        // When ouf was not read at all, testlib has no idea what the checker consumed, so the
+        // check is skipped (this matches the behaviour of testlib before this check existed).
+        if (testlibMode != _interactor && ouf.reader != NULL && ouf.reader->readOccurred &&
+            !ouf.seekEof())
             quit(_dirt, "Extra information in the output file");
     }
 

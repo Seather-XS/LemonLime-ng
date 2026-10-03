@@ -79,6 +79,15 @@ namespace {
 
 		return result;
 	}
+
+	// 题目的磁盘目录名是否可以直接拼进 problem/ 下用：空、带分隔符、`.` 与 `..` 都得挡掉，
+	// 否则 removeRecursively() 会把整个 problem/ 甚至更上层的东西删掉。
+	bool isSafeTaskDirectoryName(const QString &name) {
+		if (name.isEmpty() || name == QStringLiteral(".") || name == QStringLiteral(".."))
+			return false;
+
+		return ! name.contains(QLatin1Char('/')) && ! name.contains(QLatin1Char('\\'));
+	}
 } // namespace
 
 Contest::Contest(QObject *parent) : QObject(parent) {
@@ -226,6 +235,25 @@ void Contest::addTask(Task *task) {
 
 void Contest::deleteTask(int index) {
 	if (0 <= index && index < taskList.size()) {
+		// 题目在磁盘上的目录跟着一起删：problem/<题>/ 下的测试数据、校验器、交互库、
+		// 数据生成器都只属于这一道题，留着只会变成垃圾。
+		const QString taskName = taskList[index]->getDirectoryName();
+
+		if (isSafeTaskDirectoryName(taskName)) {
+			QDir taskDir(Settings::dataPath() + taskName);
+
+			if (taskDir.exists()) {
+				// 删不掉就是有句柄占着（QFileSystemWatcher、还开着的子进程、
+				// 资源管理器里的预览等），记一条日志方便排查，别默默地失败。
+				if (! taskDir.removeRecursively())
+					WARN("Failed to remove the data folder of task", taskName);
+				else
+					LOG("Removed the data folder of task", taskName);
+			}
+		} else {
+			LOG("Skip removing the data folder of task with unsafe name", taskName);
+		}
+
 		delete taskList[index];
 		taskList.removeAt(index);
 	}

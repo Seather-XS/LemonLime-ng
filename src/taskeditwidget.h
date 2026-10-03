@@ -41,6 +41,7 @@ class TaskEditWidget : public QWidget {
 	void rmGraderFilesAt(int);
 	void multiFilesRefresh();
 	void refreshComparisonMode(int);
+	void refreshComparisonSettingPage();
 	void refreshGraderRoots();
 	QString currentTaskName() const;
 	QList<int> comparisonModes;
@@ -57,7 +58,7 @@ class TaskEditWidget : public QWidget {
 	void standardInputCheckChanged();
 	void standardOutputCheckChanged();
 	void comparisonModeChanged();
-	void specialJudgeChanged(const QString &);
+	void specialJudgeChanged();
 	void interactorChanged(const QString &);
 	void graderPathEditingFinished();
 	void interactorNameChanged(const QString &);

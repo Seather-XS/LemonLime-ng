@@ -73,6 +73,9 @@ LemonLime::LemonLime(QWidget *parent) : QMainWindow(parent), ui(new Ui::LemonLim
 	connect(this, &LemonLime::dataPathChanged, ui->taskEdit, &TaskEditWidget::dataPathChanged);
 	connect(this, &LemonLime::dataPathChanged, ui->testCaseEdit, &TestCaseEditWidget::dataPathChanged);
 	connect(ui->summary, &SummaryTree::currentItemChanged, this, &LemonLime::summarySelectionChanged);
+	// 删试题会让 problem/<题>/ 整个目录消失，删完得重新挂监听。
+	connect(ui->summary, &SummaryTree::taskAboutToBeDeleted, this, &LemonLime::releaseDataWatcher);
+	connect(ui->summary, &SummaryTree::taskChanged, this, &LemonLime::resetDataWatcher);
 	connect(ui->optionsAction, &QAction::triggered, this, &LemonLime::showOptionsDialog);
 	connect(ui->actionContestSettings, &QAction::triggered, this, &LemonLime::showContestSettingsDialog);
 	connect(ui->cleanupButton, &QPushButton::clicked, this, &LemonLime::cleanupButtonClicked);
@@ -204,8 +207,16 @@ void LemonLime::resetDataWatcher() {
 		dataWatcherTimer->start();
 }
 
-void LemonLime::rebuildDataWatcher() {
+void LemonLime::releaseDataWatcher() {
+	// QFileSystemWatcher 在 Windows 上是用 FindFirstChangeNotification() 实现的，
+	// 每个被监视的目录都会挂一个句柄，占住目录不放：目录被监视着就删不掉（连父目录
+	// 一起删也会失败）。删试题 / 删比赛日之前必须先把它拆掉。
 	delete dataDirWatcher;
+	dataDirWatcher = nullptr;
+}
+
+void LemonLime::rebuildDataWatcher() {
+	releaseDataWatcher();
 	dataDirWatcher = new QFileSystemWatcher(this);
 	insertWatchPath(Settings::dataPath(), dataDirWatcher);
 	// 只挂到去抖入口，避免每个文件的变动都全量重扫一遍。
@@ -1058,6 +1069,8 @@ void LemonLime::closeAction() {
 	// 还处于当前比赛日的工作目录，先把题面写回去。
 	ui->statementEdit->saveIfNeeded();
 	saveContest(curFile);
+	// 关掉比赛日后可能整个比赛日目录都要被删（deleteDayAt），先把监听器拆掉。
+	releaseDataWatcher();
 	ui->summary->setContest(nullptr);
 	ui->taskEdit->setEditTask(nullptr);
 	ui->resultViewer->setContest(nullptr);
@@ -1151,7 +1164,10 @@ void LemonLime::addTask(const QString &title, const QList<std::pair<QString, QSt
 
 void LemonLime::addTaskWithScoreScale(const QString &title,
                                       const QList<std::pair<QString, QString>> &testCases, int sumScore,
-                                      int timeLimit, int memoryLimit) {
+                                      int timeLimit, int memoryLimit, Task::TaskType taskType,
+                                      Task::ComparisonMode comparisonMode,
+                                      const QString &interactorSource, const QString &graderSource,
+                                      const QString &checkerSource) {
 	Task *newTask = new Task;
 	newTask->setProblemTitle(title);
 	newTask->setSourceFileName(title);
@@ -1161,6 +1177,32 @@ void LemonLime::addTaskWithScoreScale(const QString &title,
 	newTask->setAnswerFileExtension(settings->getDefaultOutputFileExtension());
 	curContest->addTask(newTask);
 	Settings::ensureTaskDirs(title);
+
+	// 题型 / 判题方式就是导入时选的那个；交互题与自定义校验器顺带把选好的文件路径填上。
+	newTask->setComparisonMode(comparisonMode);
+
+	if (comparisonMode == Task::TestlibSpecialJudgeMode && ! checkerSource.isEmpty())
+		newTask->setSpecialJudge(Settings::graderFilePath(title, QFileInfo(checkerSource).fileName()));
+
+	if (taskType == Task::AnswersOnly) {
+		newTask->setTaskType(Task::AnswersOnly);
+	} else if (taskType == Task::Interaction) {
+		newTask->setTaskType(Task::Interaction);
+
+		if (! interactorSource.isEmpty()) {
+			const QString name = QFileInfo(interactorSource).fileName();
+			newTask->setInteractor(Settings::graderFilePath(title, name));
+			newTask->setInteractorName(name);
+		}
+
+		if (! graderSource.isEmpty())
+			newTask->setGrader(Settings::graderFilePath(title, QFileInfo(graderSource).fileName()));
+
+		// 没配全（或一个都没指定）的按原来的默认补上：生成 <题>.h 与 <题>_grader.cpp。
+		if (interactorSource.isEmpty() || graderSource.isEmpty())
+			newTask->prepareInteraction();
+	}
+
 	int scorePer = sumScore / testCases.size();
 	int scoreLos = sumScore - scorePer * testCases.size();
 
@@ -1242,9 +1284,8 @@ void LemonLime::addTasksAction() {
 	}
 
 	auto *dialog = new AddTaskDialog(this);
+	dialog->setSourceRoot(Settings::importPath());
 	dialog->resize(dialog->sizeHint());
-	dialog->setMaximumSize(dialog->sizeHint());
-	dialog->setMinimumSize(dialog->sizeHint());
 
 	for (int i = 0; i < nameList.size(); i++) {
 		dialog->addTask(nameList[i], qMax(100, testCases[i].size()), settings->getDefaultTimeLimit(),
@@ -1280,8 +1321,51 @@ void LemonLime::addTasksAction() {
 				}
 			}
 
+			// 交互题带上交互库与接口，自定义校验器带上校验器文件：都要从 import/ 搬进
+			// problem/<题>/graders/。
+			const Task::TaskType taskType = dialog->getTaskType(i);
+			const Task::ComparisonMode comparisonMode = dialog->getComparisonMode(i);
+			const QString interactorSource = dialog->getInteractorSource(i);
+			const QString graderSource = dialog->getGraderSource(i);
+			const QString checkerSource = dialog->getCheckerSource(i);
+
+			QStringList gradersFiles;
+
+			if (taskType == Task::Interaction)
+				gradersFiles << interactorSource << graderSource;
+
+			if (comparisonMode == Task::TestlibSpecialJudgeMode)
+				gradersFiles << checkerSource;
+
+			if (! gradersFiles.isEmpty()) {
+				const QString gradersDir = Settings::dataPath() + Settings::gradersPath(taskName);
+				QDir().mkpath(gradersDir);
+
+				for (const QString &source : gradersFiles) {
+					if (source.isEmpty() || ! QFile::exists(source))
+						continue;
+
+					const QString target = gradersDir + QFileInfo(source).fileName();
+
+					if (QFileInfo(source).absoluteFilePath() == QFileInfo(target).absoluteFilePath())
+						continue;
+
+					if (QFile::exists(target))
+						QFile::remove(target);
+
+					if (! QFile::rename(source, target)) {
+						QFile::copy(source, target);
+						QFile::remove(source);
+					}
+				}
+			}
+
 			addTaskWithScoreScale(taskName, testCases[i], dialog->getFullScore(i), dialog->getTimeLimit(i),
-			                      dialog->getMemoryLimit(i));
+			                      dialog->getMemoryLimit(i), taskType, comparisonMode, interactorSource,
+			                      graderSource, checkerSource);
+
+			// 导入完就把 import/ 下这道题的整个目录清掉（不管还剩什么文件）。
+			QDir(Settings::importPath() + taskName).removeRecursively();
 		}
 	}
 

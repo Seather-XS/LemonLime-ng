@@ -386,6 +386,56 @@
         <source>MiB</source>
         <translation>MiB</translation>
     </message>
+    <message>
+        <location filename="../src/addtaskdialog.cpp" line="77"/>
+        <source>Traditional</source>
+        <translation>传统题</translation>
+    </message>
+    <message>
+        <location filename="../src/addtaskdialog.cpp" line="78"/>
+        <source>Answers Only</source>
+        <translation>提交答案题</translation>
+    </message>
+    <message>
+        <location filename="../src/addtaskdialog.cpp" line="79"/>
+        <source>Interaction</source>
+        <translation>交互题</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/addtaskdialog.ui" line="227"/>
+        <source>Task Type</source>
+        <translation>试题类型</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/addtaskdialog.ui" line="250"/>
+        <source>Interactor Path</source>
+        <translation>交互库路径</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/addtaskdialog.ui" line="273"/>
+        <source>Grader Path</source>
+        <translation>接口实现路径</translation>
+    </message>
+    <message>
+        <location filename="../src/addtaskdialog.cpp" line="90"/>
+        <source>Line-by-line mode (ignore extra spaces and tabs)</source>
+        <translation>逐行比较模式（忽略多余空格和制表符）</translation>
+    </message>
+    <message>
+        <location filename="../src/addtaskdialog.cpp" line="92"/>
+        <source>Special judge mode (testlib)</source>
+        <translation>自定义校验器模式（testlib）</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/addtaskdialog.ui" line="296"/>
+        <source>Comparison Mode</source>
+        <translation>比较模式</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/addtaskdialog.ui" line="319"/>
+        <source>Checker Path:</source>
+        <translation>校验器路径：</translation>
+    </message>
 </context>
 <context>
     <name>AddTestCasesWizard</name>
@@ -3927,8 +3977,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/forms/taskeditwidget.ui" line="307"/>
-        <source>Exec File Path:</source>
-        <translation>可执行文件路径：</translation>
+        <source>Checker Path:</source>
+        <translation>校验器路径：</translation>
     </message>
     <message>
         <location filename="../src/forms/taskeditwidget.ui" line="79"/>

@@ -754,6 +754,25 @@ void JudgingThread::judgeOutput() {
 	}
 }
 
+namespace {
+	/// 删除临时文件；Windows 上文件可能还被刚被杀掉的进程占着一小会儿，删不掉就
+	/// 稍等再试几次。返回 false 表示最终仍然没删掉。
+	bool removeTemporaryFile(const QString &path) {
+		if (path.isEmpty())
+			return true;
+
+		for (int attempt = 0; attempt < 20; ++attempt) {
+			if (! QFile::exists(path) || QFile::remove(path))
+				return true;
+
+			QThread::msleep(10);
+		}
+
+		WARN("Failed to remove", path);
+		return ! QFile::exists(path);
+	}
+} // namespace
+
 void JudgingThread::judgeTraditionalTask() {
 	if (! QFileInfo::exists(inputFile)) {
 		score = 0;
@@ -762,27 +781,35 @@ void JudgingThread::judgeTraditionalTask() {
 		return;
 	}
 
+	const QString copiedInput = workingDirectory + task->getInputFileName();
+	const QString producedOutput = workingDirectory + task->getOutputFileName();
+
+	// 清理必须比复制先挂上：复制失败（比如残留文件占着位置）时会直接 return，
+	// 不先清掉残留的话，残留会一直在，后面每个测试点都会跟着失败。
+	auto cleanupTempFiles = qScopeGuard([&] {
+		if (! task->getStandardInputCheck())
+			removeTemporaryFile(copiedInput);
+
+		if (! task->getStandardOutputCheck())
+			removeTemporaryFile(producedOutput);
+		else
+			removeTemporaryFile(workingDirectory + "_tmpout");
+
+		removeTemporaryFile(workingDirectory + "_tmperr");
+	});
+
 	if (! task->getStandardInputCheck()) {
-		if (! QFile::copy(inputFile, workingDirectory + task->getInputFileName())) {
+		// QFile::copy() 碰到已存在的目标会直接失败，所以先把上一轮的残留清掉。
+		// 超时被杀的程序可能还没来得及放手，removeTemporaryFile() 会等它一下。
+		removeTemporaryFile(copiedInput);
+
+		if (! QFile::copy(inputFile, copiedInput)) {
 			score = 0;
 			result = FileError;
 			message = tr("Cannot copy standard input file");
 			return;
 		}
 	}
-
-	auto cleanupTempFiles = qScopeGuard([&] {
-		if (! task->getStandardInputCheck()) {
-			QFile::remove(workingDirectory + task->getInputFileName());
-		}
-
-		if (! task->getStandardOutputCheck()) {
-			QFile::remove(workingDirectory + task->getOutputFileName());
-		} else {
-			QFile::remove(workingDirectory + "_tmpout");
-		}
-		QFile::remove(workingDirectory + "_tmperr");
-	});
 
 	ProcessRunnerConfig cfg;
 	cfg.executableFile = executableFile;

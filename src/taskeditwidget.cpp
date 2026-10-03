@@ -17,16 +17,15 @@
 TaskEditWidget::TaskEditWidget(QWidget *parent) : QWidget(parent), ui(new Ui::TaskEditWidget) {
 	ui->setupUi(this);
 	editTask = nullptr;
-	ui->testlibSpecialJudge->setFilters(QDir::Files | QDir::Executable);
-	ui->testlibSpecialJudge->setFileExtensions(QStringList{"exe"});
 	ui->interactorPath->setFilters(QDir::Files);
 	ui->interactorPath->setFileExtensions(QStringList{"h", "hpp"});
 	ui->graderPath->setFilters(QDir::Files);
 	ui->graderPath->setFileExtensions(QStringList{"cpp", "cc", "cxx"});
 	comparisonModes << int(Task::IgnoreSpacesMode) << int(Task::TestlibSpecialJudgeMode);
-	connect(this, &TaskEditWidget::dataPathChanged, ui->testlibSpecialJudge, &FileLineEdit::refreshFileList);
 	connect(this, &TaskEditWidget::dataPathChanged, ui->interactorPath, &FileLineEdit::refreshFileList);
 	connect(this, &TaskEditWidget::dataPathChanged, ui->graderPath, &FileLineEdit::refreshFileList);
+	// 换比赛日后，校验器（testlib）的候选 .exe 也要跟着换。
+	connect(this, &TaskEditWidget::dataPathChanged, this, &TaskEditWidget::refreshGraderRoots);
 	ui->sourceFileName->setValidator(new QRegularExpressionValidator(QRegularExpression("\\w+"), this));
 	// 试题创建后文件名不再允许更改（只读），但保留正常外观以便查看/复制。
 	ui->sourceFileName->setReadOnly(true);
@@ -54,7 +53,8 @@ TaskEditWidget::TaskEditWidget(QWidget *parent) : QWidget(parent), ui(new Ui::Ta
 	        &TaskEditWidget::standardOutputCheckChanged);
 	connect(ui->comparisonMode, qOverload<int>(&QComboBox::currentIndexChanged), this,
 	        &TaskEditWidget::comparisonModeChanged);
-	connect(ui->testlibSpecialJudge, &QLineEdit::textChanged, this, &TaskEditWidget::specialJudgeChanged);
+	connect(ui->testlibSpecialJudge, qOverload<int>(&QComboBox::currentIndexChanged), this,
+	        &TaskEditWidget::specialJudgeChanged);
 	connect(ui->interactorPath, &QLineEdit::textChanged, this, &TaskEditWidget::interactorChanged);
 	connect(ui->interactorPath, &QLineEdit::editingFinished, this,
 	        &TaskEditWidget::graderPathEditingFinished);
@@ -112,7 +112,7 @@ void TaskEditWidget::setEditTask(Task *task) {
 	ui->inputFileName->setText(editTask->getInputFileName());
 	ui->outputFileName->setText(editTask->getOutputFileName());
 	refreshComparisonMode(int(editTask->getComparisonMode()));
-	ui->testlibSpecialJudge->setText(editTask->getSpecialJudge());
+	// 校验器的可执行文件由 refreshGraderRoots() 列成下拉框并选中。
 	ui->interactorPath->setText(editTask->getInteractor());
 	ui->interactorName->setText(editTask->getInteractorName());
 	ui->graderPath->setText(editTask->getGrader());
@@ -198,9 +198,7 @@ void TaskEditWidget::refreshWidgetState() {
 	// ui->comparisonMode->setEnabled(types == Task::Traditional || types == Task::AnswersOnly);
 	ui->answerFileExtension->setVisible(types == Task::AnswersOnly);
 	ui->answerFileExtensionLabel->setVisible(types == Task::AnswersOnly);
-	ui->comparisonSetting->setCurrentIndex(editTask->getComparisonMode() == Task::TestlibSpecialJudgeMode
-	                                           ? 1
-	                                           : 0);
+	refreshComparisonSettingPage();
 	ui->sourceFilesLabel->setVisible(types == Task::Communication || types == Task::CommunicationExec);
 	ui->sourceFilesTable->setVisible(types == Task::Communication || types == Task::CommunicationExec);
 	ui->graderFilesLabel->setVisible(types == Task::Communication || types == Task::CommunicationExec);
@@ -328,6 +326,17 @@ void TaskEditWidget::comparisonModeChanged() {
 		return;
 
 	editTask->setComparisonMode(Task::ComparisonMode(comparisonModes.at(index)));
+	// 立刻切换「比较设置」那一行：选自定义校验器时要马上出现可执行文件的选择框。
+	refreshComparisonSettingPage();
+}
+
+// 只有自定义校验器（testlib）模式才需要选校验器可执行文件。
+void TaskEditWidget::refreshComparisonSettingPage() {
+	if (! editTask)
+		return;
+
+	ui->comparisonSetting->setCurrentIndex(
+	    editTask->getComparisonMode() == Task::TestlibSpecialJudgeMode ? 1 : 0);
 }
 
 void TaskEditWidget::refreshComparisonMode(int mode) {
@@ -343,11 +352,11 @@ void TaskEditWidget::refreshComparisonMode(int mode) {
 	ui->comparisonMode->setCurrentIndex(index);
 }
 
-void TaskEditWidget::specialJudgeChanged(const QString &text) {
+void TaskEditWidget::specialJudgeChanged() {
 	if (! editTask)
 		return;
 
-	editTask->setSpecialJudge(text);
+	editTask->setSpecialJudge(ui->testlibSpecialJudge->currentData().toString());
 }
 
 void TaskEditWidget::interactorChanged(const QString &text) {
@@ -397,6 +406,52 @@ void TaskEditWidget::refreshGraderRoots() {
 
 	adopt(editTask->getInteractor(), ui->interactorPath);
 	adopt(editTask->getGrader(), ui->graderPath);
+
+	// 自定义校验器（testlib）的可执行文件同样只从 <题>/graders/ 里取，而且只认 .exe：
+	// 把候选直接列成下拉框，不再让人手填路径。
+	{
+		const QString stored = editTask->getSpecialJudge();
+		QString normalized = stored;
+
+		if (! stored.isEmpty()) {
+			const QString candidate = toGradersPath(stored, taskName);
+
+			if (candidate != stored && QFileInfo::exists(Settings::dataPath() + candidate))
+				normalized = candidate;
+		}
+
+		QSignalBlocker blocker(ui->testlibSpecialJudge);
+		ui->testlibSpecialJudge->clear();
+
+		const QDir graders(Settings::dataPath() + Settings::gradersPath(taskName));
+
+		// 可以直接选编译好的 .exe，也可以选校验器源码：评测前会先编译一次，
+		// 之后（包括后续选手）都复用这个可执行文件。
+		QStringList candidates =
+		    graders.entryList({QStringLiteral("*.exe")}, QDir::Files, QDir::Name);
+		candidates += graders.entryList(
+		    {QStringLiteral("*.cpp"), QStringLiteral("*.cc"), QStringLiteral("*.cxx"), QStringLiteral("*.c")},
+		    QDir::Files, QDir::Name);
+
+		for (const QString &name : candidates)
+			ui->testlibSpecialJudge->addItem(name, Settings::graderFilePath(taskName, name));
+
+		const int target = ui->testlibSpecialJudge->findData(normalized);
+
+		if (target >= 0) {
+			ui->testlibSpecialJudge->setCurrentIndex(target);
+
+			if (normalized != stored)
+				editTask->setSpecialJudge(normalized);
+		} else {
+			// 候选里没有它就说明这个文件已经不存在了（或不在 graders/ 下）：不留这种
+			// 点不出来的「幽灵」选项，直接把设置清掉，让用户重新选一个真实的 .exe。
+			ui->testlibSpecialJudge->setCurrentIndex(-1);
+
+			if (! stored.isEmpty())
+				editTask->setSpecialJudge(QString());
+		}
+	}
 }
 
 // 手填的路径也只会去 <题>/graders/ 找，这里把控件内容一并纠正过去。

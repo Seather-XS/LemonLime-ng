@@ -293,9 +293,9 @@ void StatementDocument::splitProblemArea(const QString &text, QStringList &head,
 	head.clear();
 	problems.clear();
 
-	// `<!-- PROBLEM -->` 只是试题块之间的分隔符，本而重写时又会在每题前面再补一个 —— 于是每存一次
-	// 就多留一个标记，statement.md 里的 `<!-- PROBLEM -->` 就这样越攒越多身不属于任何一段正文：解析时直接吞掉。
-	// 否则它会被当成上一题正文的一部分，。
+	// `<!-- PROBLEM -->` 只是试题块之间的分隔符，本身不属于任何一段正文：解析时直接吞掉。
+	// 否则它会被当成上一题正文的一部分，而重写时又会在每题前面再补一个 —— 于是每存一次
+	// 就多留一个标记，statement.md 里的 `<!-- PROBLEM -->` 就这样越攒越多。
 	bool inProblem = false;
 	StatementProblem current;
 

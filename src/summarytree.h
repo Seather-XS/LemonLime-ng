@@ -56,4 +56,7 @@ class SummaryTree : public QTreeWidget {
 
   signals:
 	void taskChanged();
+	/// 删试题之前先发这个信号，让外面的数据目录监听器松手：Windows 上
+	/// QFileSystemWatcher 会给每个被监视目录开一个句柄，不释放就删不掉 problem/<题>/。
+	void taskAboutToBeDeleted();
 };

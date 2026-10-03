@@ -283,6 +283,8 @@ void SummaryTree::deleteTask() {
 	}
 
 	delete curItem;
+	// 先让数据目录监听器松手，curContest->deleteTask() 才能把磁盘上的题目录删掉。
+	emit taskAboutToBeDeleted();
 	curContest->deleteTask(index);
 	emit taskChanged();
 }

@@ -83,6 +83,14 @@ namespace {
 		return status == ERROR_SUCCESS;
 	}
 
+	/// TerminateProcess() 只是「发起」终止，进程还会存活一小会儿；不等它真的退出就
+	/// 返回的话，它占着的输入 / 输出文件删不掉，会一直留在工作目录里，把后面每个
+	/// 测试点都弄成「文件错误」（复制标准输入文件失败）。
+	void terminateProcessAndWait(HANDLE process, DWORD timeoutMs = 5000) {
+		TerminateProcess(process, 0);
+		WaitForSingleObject(process, timeoutMs);
+	}
+
 } // namespace
 
 ProcessRunnerResult WinProcessRunner::run() {
@@ -275,7 +283,7 @@ ProcessRunnerResult WinProcessRunner::run() {
 
 		if (qMax(memoryInfo.PrivateUsage, memoryInfo.PeakWorkingSetSize) >
 		    1ll * config.memoryLimit * 1024 * 1024) {
-			TerminateProcess(pi.hProcess, 0);
+			terminateProcessAndWait(pi.hProcess);
 
 			res.score = 0;
 			res.result = MemoryLimitExceeded;
@@ -302,7 +310,7 @@ ProcessRunnerResult WinProcessRunner::run() {
 
 			if (qMax(memoryInfo.PrivateUsage, memoryInfo.PeakWorkingSetSize) >
 			    1ll * config.memoryLimit * 1024 * 1024) {
-				TerminateProcess(pi.hProcess, 0);
+				terminateProcessAndWait(pi.hProcess);
 				res.score = 0;
 				res.result = MemoryLimitExceeded;
 				res.memoryUsed = res.timeUsed = -1;
@@ -313,14 +321,14 @@ ProcessRunnerResult WinProcessRunner::run() {
 		QCoreApplication::processEvents();
 
 		if (stopFlag) {
-			TerminateProcess(pi.hProcess, 0);
+			terminateProcessAndWait(pi.hProcess);
 
 			return res;
 		}
 	}
 
 	if (! isProgramFinishedInExtraTimeLimit) {
-		TerminateProcess(pi.hProcess, 0);
+		terminateProcessAndWait(pi.hProcess);
 
 		res.score = 0;
 		res.result = TimeLimitExceeded;

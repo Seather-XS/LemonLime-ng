@@ -14,6 +14,7 @@
 #include <QtCore>
 
 #include "core/dayproject.h"
+#include "core/task.h"
 
 namespace Ui {
 	class LemonLime;
@@ -76,13 +77,17 @@ class LemonLime : public QMainWindow {
 	void openDay(int index);
 	static void getFiles(const QString &, const QStringList &, QMap<QString, QString> &);
 	void addTask(const QString &, const QList<std::pair<QString, QString>> &, int, int, int);
-	void addTaskWithScoreScale(const QString &, const QList<std::pair<QString, QString>> &, int, int, int);
+	void addTaskWithScoreScale(const QString &, const QList<std::pair<QString, QString>> &, int, int, int,
+	                           Task::TaskType, Task::ComparisonMode, const QString &, const QString &,
+	                           const QString &);
 	static bool compareFileName(const std::pair<QString, QString> &, const std::pair<QString, QString> &);
 
   private slots:
 	void summarySelectionChanged();
 	void refreshSummary();
 	void resetDataWatcher();
+	/// 释放数据目录监听：删试题 / 删比赛日前必须调，否则目录被句柄占着删不掉。
+	void releaseDataWatcher();
 	void showOptionsDialog();
 	void showContestSettingsDialog();
 	void newDayAction();

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>284</width>
-    <height>193</height>
+    <width>340</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -66,7 +66,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="4">
+   <item row="9" column="0" colspan="4">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -214,6 +214,121 @@
      </property>
     </widget>
    </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="taskTypeLabel">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Task Type</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="3">
+    <widget class="QComboBox" name="taskTypeBox">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="interactorLabel">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Interactor Path</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1" colspan="3">
+    <widget class="QComboBox" name="interactorBox">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="graderLabel">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Grader Path</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1" colspan="3">
+    <widget class="QComboBox" name="graderBox">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="comparisonModeLabel">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Comparison Mode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1" colspan="3">
+    <widget class="QComboBox" name="comparisonModeBox">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="checkerPathLabel">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Checker Path:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1" colspan="3">
+    <widget class="QComboBox" name="checkerBox">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <tabstops>
@@ -221,6 +336,11 @@
   <tabstop>fullScore</tabstop>
   <tabstop>timeLimit</tabstop>
   <tabstop>memoryLimit</tabstop>
+  <tabstop>taskTypeBox</tabstop>
+  <tabstop>interactorBox</tabstop>
+  <tabstop>graderBox</tabstop>
+  <tabstop>comparisonModeBox</tabstop>
+  <tabstop>checkerBox</tabstop>
  </tabstops>
  <resources/>
  <connections>
