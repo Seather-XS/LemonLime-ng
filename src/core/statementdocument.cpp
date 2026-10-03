@@ -292,34 +292,58 @@ void StatementDocument::splitProblemArea(const QString &text, QStringList &head,
 	const QStringList lines = splitLines(text);
 	head.clear();
 	problems.clear();
-	int index = 0;
-	QString title;
-	QString english;
 
-	while (index < lines.size() && ! matchProblemHeading(lines.at(index), title, english)) {
-		head.append(lines.at(index));
-		index++;
-	}
+	// `<!-- PROBLEM -->` 只是试题块之间的分隔符，本而重写时又会在每题前面再补一个 —— 于是每存一次
+	// 就多留一个标记，statement.md 里的 `<!-- PROBLEM -->` 就这样越攒越多身不属于任何一段正文：解析时直接吞掉。
+	// 否则它会被当成上一题正文的一部分，。
+	bool inProblem = false;
+	StatementProblem current;
 
-	while (index < lines.size()) {
-		if (! matchProblemHeading(lines.at(index), title, english)) {
-			head.append(lines.at(index));
-			index++;
+	auto flush = [&] {
+		if (inProblem) {
+			// 既没有标题也没有正文的空段是旧文件里攒下的标记残渣，丢掉。
+			const bool blank = current.title.trimmed().isEmpty() && current.english.trimmed().isEmpty() &&
+			                   current.body.join(QChar('\n')).trimmed().isEmpty();
+
+			if (! blank)
+				problems.append(current);
+		}
+
+		inProblem = false;
+		current = StatementProblem();
+	};
+
+	for (const QString &line : lines) {
+		if (isProblemMarker(line)) {
+			flush();
+			inProblem = true;
 			continue;
 		}
 
-		StatementProblem problem;
-		problem.title = title;
-		problem.english = english;
-		index++;
+		QString title;
+		QString english;
 
-		while (index < lines.size() && ! matchProblemHeading(lines.at(index), title, english)) {
-			problem.body.append(lines.at(index));
-			index++;
+		if (matchProblemHeading(line, title, english)) {
+			// 兼容旧写法（没有分隔符、直接按 `# 标题` 分块）：当前这段已经有内容时，
+			// 这个标题就是下一题的开头；紧跟分隔符的空段则直接补上标题。
+			const bool empty = current.title.isEmpty() && current.english.isEmpty() && current.body.isEmpty();
+
+			if (! inProblem || ! empty)
+				flush();
+
+			inProblem = true;
+			current.title = title;
+			current.english = english;
+			continue;
 		}
 
-		problems.append(problem);
+		if (inProblem)
+			current.body.append(line);
+		else
+			head.append(line);
 	}
+
+	flush();
 }
 
 QString StatementDocument::serializeProblemArea(const QStringList &head, const QList<StatementProblem> &problems) {
