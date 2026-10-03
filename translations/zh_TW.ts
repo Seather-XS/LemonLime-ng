@@ -357,6 +357,16 @@
         <translation>新增試題</translation>
     </message>
     <message>
+        <location filename="../src/addtaskdialog.cpp" line="89"/>
+        <source>Only .cpp files can be the checker; it is compiled once before judging.</source>
+        <translation>校驗器只支援 .cpp 原始碼；評測前會先編譯一次。</translation>
+    </message>
+    <message>
+        <location filename="../src/addtaskdialog.cpp" line="165"/>
+        <source>No .cpp checker found</source>
+        <translation>沒有找到 .cpp 校驗器</translation>
+    </message>
+    <message>
         <location filename="../src/forms/addtaskdialog.ui" line="190"/>
         <source>Task</source>
         <translation>試題</translation>
@@ -433,8 +443,8 @@
     </message>
     <message>
         <location filename="../src/forms/addtaskdialog.ui" line="319"/>
-        <source>Checker Path:</source>
-        <translation>校驗器路徑：</translation>
+        <source>Checker Path (.cpp):</source>
+        <translation>校驗器路徑（.cpp）：</translation>
     </message>
 </context>
 <context>
@@ -3196,6 +3206,11 @@ No: remove it from the contest only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/core/specialjudge.cpp" line="197"/>
+        <source>The special judge must be a .cpp source file.</source>
+        <translation>校驗器必須是 .cpp 原始碼檔案。</translation>
+    </message>
+    <message>
         <location filename="../src/core/specialjudge.cpp" line="207"/>
         <source>No compiler is available to build the special judge.</source>
         <translation type="unfinished"></translation>
@@ -3890,6 +3905,16 @@ p, li { white-space: pre-wrap; }
         <translation>Form</translation>
     </message>
     <message>
+        <location filename="../src/taskeditwidget.cpp" line="31"/>
+        <source>Only .cpp files can be the checker; it is compiled once before judging.</source>
+        <translation>校驗器只支援 .cpp 原始碼；評測前會先編譯一次。</translation>
+    </message>
+    <message>
+        <location filename="../src/taskeditwidget.cpp" line="442"/>
+        <source>No .cpp checker found</source>
+        <translation>沒有找到 .cpp 校驗器</translation>
+    </message>
+    <message>
         <location filename="../src/forms/taskeditwidget.ui" line="187"/>
         <source>Problem Title</source>
         <translation>試題標題</translation>
@@ -3967,8 +3992,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/forms/taskeditwidget.ui" line="307"/>
-        <source>Checker Path:</source>
-        <translation>校驗器路徑：</translation>
+        <source>Checker Path (.cpp):</source>
+        <translation>校驗器路徑（.cpp）：</translation>
     </message>
     <message>
         <location filename="../src/forms/taskeditwidget.ui" line="79"/>

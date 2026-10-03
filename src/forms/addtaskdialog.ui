@@ -316,7 +316,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Checker Path:</string>
+      <string>Checker Path (.cpp):</string>
      </property>
     </widget>
    </item>

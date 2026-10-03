@@ -351,6 +351,16 @@
         <translation></translation>
     </message>
     <message>
+        <location filename="../src/addtaskdialog.cpp" line="89"/>
+        <source>Only .cpp files can be the checker; it is compiled once before judging.</source>
+        <translation>Only .cpp files can be the checker; it is compiled once before judging.</translation>
+    </message>
+    <message>
+        <location filename="../src/addtaskdialog.cpp" line="165"/>
+        <source>No .cpp checker found</source>
+        <translation>No .cpp checker found</translation>
+    </message>
+    <message>
         <location filename="../src/forms/addtaskdialog.ui" line="39"/>
         <source>Full Score</source>
         <translation></translation>
@@ -427,8 +437,8 @@
     </message>
     <message>
         <location filename="../src/forms/addtaskdialog.ui" line="319"/>
-        <source>Checker Path:</source>
-        <translation></translation>
+        <source>Checker Path (.cpp):</source>
+        <translation>Checker Path (.cpp):</translation>
     </message>
 </context>
 <context>
@@ -3171,6 +3181,11 @@ No: remove it from the contest only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/core/specialjudge.cpp" line="197"/>
+        <source>The special judge must be a .cpp source file.</source>
+        <translation>The special judge must be a .cpp source file.</translation>
+    </message>
+    <message>
         <location filename="../src/core/specialjudge.cpp" line="207"/>
         <source>No compiler is available to build the special judge.</source>
         <translation type="unfinished"></translation>
@@ -3858,6 +3873,16 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
+        <location filename="../src/taskeditwidget.cpp" line="31"/>
+        <source>Only .cpp files can be the checker; it is compiled once before judging.</source>
+        <translation>Only .cpp files can be the checker; it is compiled once before judging.</translation>
+    </message>
+    <message>
+        <location filename="../src/taskeditwidget.cpp" line="442"/>
+        <source>No .cpp checker found</source>
+        <translation>No .cpp checker found</translation>
+    </message>
+    <message>
         <location filename="../src/forms/taskeditwidget.ui" line="67"/>
         <source>Output File Name</source>
         <translation></translation>
@@ -3918,8 +3943,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/forms/taskeditwidget.ui" line="307"/>
-        <source>Checker Path:</source>
-        <translation></translation>
+        <source>Checker Path (.cpp):</source>
+        <translation>Checker Path (.cpp):</translation>
     </message>
     <message>
         <location filename="../src/forms/taskeditwidget.ui" line="206"/>

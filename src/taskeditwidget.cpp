@@ -24,8 +24,11 @@ TaskEditWidget::TaskEditWidget(QWidget *parent) : QWidget(parent), ui(new Ui::Ta
 	comparisonModes << int(Task::IgnoreSpacesMode) << int(Task::TestlibSpecialJudgeMode);
 	connect(this, &TaskEditWidget::dataPathChanged, ui->interactorPath, &FileLineEdit::refreshFileList);
 	connect(this, &TaskEditWidget::dataPathChanged, ui->graderPath, &FileLineEdit::refreshFileList);
-	// 换比赛日后，校验器（testlib）的候选 .exe 也要跟着换。
+	// 换比赛日后，校验器（testlib）的候选 .cpp 也要跟着换。
 	connect(this, &TaskEditWidget::dataPathChanged, this, &TaskEditWidget::refreshGraderRoots);
+	// 校验器只支持 .cpp：把限制写在悬浮提示里，免得用户找不到选项时摸不着头。
+	ui->testlibSpecialJudge->setToolTip(
+	    tr("Only .cpp files can be the checker; it is compiled once before judging."));
 	ui->sourceFileName->setValidator(new QRegularExpressionValidator(QRegularExpression("\\w+"), this));
 	// 试题创建后文件名不再允许更改（只读），但保留正常外观以便查看/复制。
 	ui->sourceFileName->setReadOnly(true);
@@ -80,6 +83,8 @@ void TaskEditWidget::changeEvent(QEvent *event) {
 		Task *bak = editTask;
 		setEditTask(nullptr);
 		ui->retranslateUi(this);
+		ui->testlibSpecialJudge->setToolTip(
+		    tr("Only .cpp files can be the checker; it is compiled once before judging."));
 		setEditTask(bak);
 	}
 }
@@ -407,8 +412,8 @@ void TaskEditWidget::refreshGraderRoots() {
 	adopt(editTask->getInteractor(), ui->interactorPath);
 	adopt(editTask->getGrader(), ui->graderPath);
 
-	// 自定义校验器（testlib）的可执行文件同样只从 <题>/graders/ 里取，而且只认 .exe：
-	// 把候选直接列成下拉框，不再让人手填路径。
+	// 自定义校验器（testlib）只认 <题>/graders/ 下的 .cpp 源码：把候选直接列成下拉框，
+	// 不再让人手填路径，也不接受现成的可执行文件。
 	{
 		const QString stored = editTask->getSpecialJudge();
 		QString normalized = stored;
@@ -425,16 +430,16 @@ void TaskEditWidget::refreshGraderRoots() {
 
 		const QDir graders(Settings::dataPath() + Settings::gradersPath(taskName));
 
-		// 可以直接选编译好的 .exe，也可以选校验器源码：评测前会先编译一次，
-		// 之后（包括后续选手）都复用这个可执行文件。
-		QStringList candidates =
-		    graders.entryList({QStringLiteral("*.exe")}, QDir::Files, QDir::Name);
-		candidates += graders.entryList(
-		    {QStringLiteral("*.cpp"), QStringLiteral("*.cc"), QStringLiteral("*.cxx"), QStringLiteral("*.c")},
-		    QDir::Files, QDir::Name);
+		// 校验器只能是 .cpp 源码：评测前先编译一次，之后（包括后续选手）复用这个可执行文件。
+		const QStringList candidates =
+		    graders.entryList({QStringLiteral("*.cpp")}, QDir::Files, QDir::Name);
 
 		for (const QString &name : candidates)
 			ui->testlibSpecialJudge->addItem(name, Settings::graderFilePath(taskName, name));
+
+		// graders/ 里一个 .cpp 都没有时给个提示项：空下拉框看起来像是界面坏了。
+		if (ui->testlibSpecialJudge->count() == 0)
+			ui->testlibSpecialJudge->addItem(tr("No .cpp checker found"), QString());
 
 		const int target = ui->testlibSpecialJudge->findData(normalized);
 
@@ -445,7 +450,7 @@ void TaskEditWidget::refreshGraderRoots() {
 				editTask->setSpecialJudge(normalized);
 		} else {
 			// 候选里没有它就说明这个文件已经不存在了（或不在 graders/ 下）：不留这种
-			// 点不出来的「幽灵」选项，直接把设置清掉，让用户重新选一个真实的 .exe。
+			// 点不出来的「幽灵」选项，直接把设置清掉，让用户重新选一个真实的 .cpp。
 			ui->testlibSpecialJudge->setCurrentIndex(-1);
 
 			if (! stored.isEmpty())

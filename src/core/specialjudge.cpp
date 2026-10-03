@@ -23,7 +23,9 @@
 
 namespace {
 
-const QStringList SOURCE_EXTENSIONS{"cpp", "cc", "cxx", "c", "c++"};
+// 自定义校验器只支持 C++ 源码（.cpp）：评测前编译一次，之后复用编译结果。
+// 现成的可执行文件、其它后缀的源码都不再接受。
+const QString CHECKER_SUFFIX("cpp");
 const QString TESTLIB_RESOURCE(":/testlib/testlib.h");
 const QString TESTLIB_HEADER("testlib.h");
 
@@ -32,8 +34,8 @@ QHash<QString, QString> cache;
 QString workDir;
 bool postRoutineAdded = false;
 
-bool hasSourceExtension(const QString &path) {
-	return SOURCE_EXTENSIONS.contains(QFileInfo(path).suffix().toLower());
+bool isCppChecker(const QString &path) {
+	return QFileInfo(path).suffix().compare(CHECKER_SUFFIX, Qt::CaseInsensitive) == 0;
 }
 
 bool includesTestlib(const QString &path) {
@@ -193,9 +195,9 @@ auto SpecialJudge::resolve(const QString &checkerPath, const QString &compilerLo
 		return QString();
 	}
 
-	if (! hasSourceExtension(checkerPath)) {
-		addPostRoutine();
-		return QDir::toNativeSeparators(info.absoluteFilePath());
+	if (! isCppChecker(checkerPath)) {
+		error = QObject::tr("The special judge must be a .cpp source file.");
+		return QString();
 	}
 
 	if (! includesTestlib(checkerPath)) {

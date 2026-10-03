@@ -85,6 +85,8 @@ AddTaskDialog::AddTaskDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AddT
 	        &AddTaskDialog::sourceSelectionChanged);
 	connect(ui->checkerBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
 	        &AddTaskDialog::sourceSelectionChanged);
+	ui->checkerBox->setToolTip(
+	    tr("Only .cpp files can be the checker; it is compiled once before judging."));
 
 	// 判题方式：与「试题」选项卡里的两项一致。
 	ui->comparisonModeBox->addItem(tr("Line-by-line mode (ignore extra spaces and tabs)"),
@@ -150,15 +152,17 @@ void AddTaskDialog::refreshCandidates() {
 	for (const auto &file : candidateFiles(taskDir, {QStringLiteral("*.cpp")}))
 		ui->graderBox->addItem(file.first, file.second);
 
-	// 校验器：.exe 可直接用；源码在评测前编译一次并复用编译结果。
+	// 校验器：只能是 .cpp 源码，评测前会编译一次并复用编译结果。
 	ui->checkerBox->clear();
 
-	for (const auto &file : candidateFiles(taskDir, {QStringLiteral("*.exe")}))
+	for (const auto &file : candidateFiles(taskDir, {QStringLiteral("*.cpp")}))
 		ui->checkerBox->addItem(file.first, file.second);
 
-	for (const auto &file : candidateFiles(taskDir, {QStringLiteral("*.cpp"), QStringLiteral("*.cc"),
-	                                                  QStringLiteral("*.cxx"), QStringLiteral("*.c")}))
-		ui->checkerBox->addItem(file.first, file.second);
+	// 一个 .cpp 都没有时给个提示项，免得导入完才发现校验器没选上。
+	ui->checkerBox->setEnabled(ui->checkerBox->count() > 0);
+
+	if (ui->checkerBox->count() == 0)
+		ui->checkerBox->addItem(tr("No .cpp checker found"), QString());
 
 	applySelection(ui->interactorBox, interactorSources[index]);
 	applySelection(ui->graderBox, graderSources[index]);
