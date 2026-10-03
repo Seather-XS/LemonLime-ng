@@ -130,7 +130,7 @@ date: ""
 	}
 
 	QString problemSkeleton() {
-		return QStringLiteral("# 新题目（problem）\n\n"
+		return QStringLiteral("# 题目（problem）\n\n"
 		                      "## 题目描述\n\n"
 		                      "## 输入格式\n\n"
 		                      "## 输出格式\n\n"
@@ -432,6 +432,9 @@ void StatementEditWidget::loadDocument() {
 
 	loading = true;
 	document = StatementDocument::parse(text);
+	// 文档整个换掉了，编辑框里原来的内容不属于新文档的任何一格，
+	// 先标记成「不一致」，避免 refreshTree() 重选旧槽位时把旧内容写进新文档。
+	editorSlot.clear();
 
 	if (isNoiTemplateName(templateBox->currentText()))
 		applyNoiSectionDefaults();
@@ -518,6 +521,8 @@ void StatementEditWidget::refreshEditor() {
 	const bool isProblem = currentSlot.startsWith(QStringLiteral("problem:"));
 	problemTitleRow->setVisible(isProblem);
 	stack->setCurrentIndex(isMeta ? 0 : 1);
+	// 下面把内容装进编辑框，装完这两者才算一致；槽位无效时会重新清掉。
+	editorSlot = currentSlot;
 
 	if (isMeta) {
 		const QStringList keys = StatementDocument::editableMetaKeys();
@@ -535,8 +540,19 @@ void StatementEditWidget::refreshEditor() {
 			problemTitleEdit->setText(problemTitleText(problem));
 			editor->setPlainText(problem.body.join(QChar('\n')).trimmed());
 		} else {
+			// 选中的题目在文档里已经不存在了（比如它被清空后退化成空块而被丢弃，
+			// 或者左树没跟上文档的变化）。此时编辑框里是空的，绝不能当成
+			// 「用户把这些内容删了」写回去；顺便退回「基础信息」，别让用户
+			// 对着一页空白以为题面整篇丢了。
 			problemTitleEdit->clear();
 			editor->clear();
+			editorSlot.clear();
+			QTimer::singleShot(0, this, [this] {
+				if (currentSlot.startsWith(QStringLiteral("problem:")) &&
+				    currentSlot.mid(QStringLiteral("problem:").length()).toInt() >=
+				        document.problems().size())
+					selectSlot(QStringLiteral("meta"));
+			});
 		}
 	}
 
@@ -552,6 +568,11 @@ void StatementEditWidget::storeEditor() {
 	// 有挂起的写回就一起做掉（后面会重新开始计时）
 	if (storeTimer)
 		storeTimer->stop();
+
+	// 编辑框里的内容不一定属于 currentSlot：切槽位、重新载入文档、删题 / 移题之后都可能对不上。
+	// 对不上就不写回，免得把别的内容写进这一题，甚至把题目标题与正文清空。
+	if (currentSlot != editorSlot)
+		return;
 
 	if (currentSlot == QStringLiteral("meta"))
 		return;
@@ -859,6 +880,7 @@ void StatementEditWidget::applyPdfNameToPreview() {
 }
 
 void StatementEditWidget::addProblem() {
+	storeEditor();
 	QList<StatementProblem> problems = document.problems();
 	StatementProblem problem;
 	problem.title = tr("New Problem");
@@ -868,6 +890,8 @@ void StatementEditWidget::addProblem() {
 	document.setProblems(problems);
 	setDirty(true);
 	const QString slot = QStringLiteral("problem:") + QString::number(problems.size() - 1);
+	// 文档变了，编辑框里的旧内容不再对应任何一格。
+	editorSlot.clear();
 	refreshTree();
 	selectSlot(slot);
 }
@@ -876,6 +900,7 @@ void StatementEditWidget::removeProblem() {
 	if (! currentSlot.startsWith(QStringLiteral("problem:")))
 		return;
 
+	storeEditor();
 	const int index = currentSlot.mid(QStringLiteral("problem:").length()).toInt();
 	QList<StatementProblem> problems = document.problems();
 
@@ -886,6 +911,7 @@ void StatementEditWidget::removeProblem() {
 	document.setProblems(problems);
 	setDirty(true);
 	currentSlot = QStringLiteral("meta");
+	editorSlot.clear();
 	refreshTree();
 }
 
@@ -893,6 +919,7 @@ void StatementEditWidget::moveProblemUp() {
 	if (! currentSlot.startsWith(QStringLiteral("problem:")))
 		return;
 
+	storeEditor();
 	const int index = currentSlot.mid(QStringLiteral("problem:").length()).toInt();
 	QList<StatementProblem> problems = document.problems();
 
@@ -902,6 +929,8 @@ void StatementEditWidget::moveProblemUp() {
 	problems.swapItemsAt(index, index - 1);
 	document.setProblems(problems);
 	setDirty(true);
+	// 换位后编辑框里的内容已经属于另一格了，先撇清关系再重建树。
+	editorSlot.clear();
 	refreshTree();
 	selectSlot(QStringLiteral("problem:") + QString::number(index - 1));
 }
@@ -910,6 +939,7 @@ void StatementEditWidget::moveProblemDown() {
 	if (! currentSlot.startsWith(QStringLiteral("problem:")))
 		return;
 
+	storeEditor();
 	const int index = currentSlot.mid(QStringLiteral("problem:").length()).toInt();
 	QList<StatementProblem> problems = document.problems();
 
@@ -919,6 +949,7 @@ void StatementEditWidget::moveProblemDown() {
 	problems.swapItemsAt(index, index + 1);
 	document.setProblems(problems);
 	setDirty(true);
+	editorSlot.clear();
 	refreshTree();
 	selectSlot(QStringLiteral("problem:") + QString::number(index + 1));
 }

@@ -143,6 +143,10 @@ class StatementEditWidget : public QWidget {
 	QString dayTitle;
 	QString contestTitle;
 	QString currentSlot{QStringLiteral("meta")};
+	/// 编辑框里当前装的到底是哪一格的内容。只有 currentSlot == editorSlot 时才允许写回，
+	/// 否则（刚重新载入文档、选中的题目已经不存在、题目刚被移动过……）会把别的内容
+	/// 写进这一题，甚至把整题清空。
+	QString editorSlot{QStringLiteral("meta")};
 	bool loading{false};
 	bool dirty{false};
 };

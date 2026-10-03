@@ -297,19 +297,28 @@ void StatementDocument::splitProblemArea(const QString &text, QStringList &head,
 	// 否则它会被当成上一题正文的一部分，而重写时又会在每题前面再补一个 —— 于是每存一次
 	// 就多留一个标记，statement.md 里的 `<!-- PROBLEM -->` 就这样越攒越多。
 	bool inProblem = false;
+	// 这一段里有没有出现过标题行（`# ...` / 空的 `#`）。见下面 flush() 的说明。
+	bool sawHeading = false;
 	StatementProblem current;
 
 	auto flush = [&] {
 		if (inProblem) {
-			// 既没有标题也没有正文的空段是旧文件里攒下的标记残渣，丢掉。
+			// 既没有标题也没有正文的空段，是旧文件里攒下的标记残渣（连着两个
+			// `<!-- PROBLEM -->`），丢掉。
+			//
+			// 但「分隔符 + 标题行」哪怕标题是空的也要留着：`#` 这一行是用户真的
+			// 留了一个空题目（编辑器写出来的就是这个形状）。如果顺手把它丢了，
+			// 文档里的题目数就会悄悄少一个 —— 左树还是按旧的数量建的，点最后一题
+			// 就会「找不到这一题」，界面看起来就像题面整篇不见了。
 			const bool blank = current.title.trimmed().isEmpty() && current.english.trimmed().isEmpty() &&
 			                   current.body.join(QChar('\n')).trimmed().isEmpty();
 
-			if (! blank)
+			if (! blank || sawHeading)
 				problems.append(current);
 		}
 
 		inProblem = false;
+		sawHeading = false;
 		current = StatementProblem();
 	};
 
@@ -332,6 +341,7 @@ void StatementDocument::splitProblemArea(const QString &text, QStringList &head,
 				flush();
 
 			inProblem = true;
+			sawHeading = true;
 			current.title = title;
 			current.english = english;
 			continue;
