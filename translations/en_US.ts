@@ -4575,6 +4575,11 @@ Export anyway?</source>
         <translation></translation>
     </message>
     <message>
+        <location filename="../src/core/packagebuilder.cpp"/>
+        <source>The encrypted archive failed its self-check. Please export again.</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../src/core/packagebuilder.cpp" line="387"/>
         <source>Test Data</source>
         <translation></translation>

@@ -204,6 +204,12 @@ namespace {
 			QByteArray encrypted = crypto.encrypt(header);
 			encrypted.append(crypto.encrypt(payload));
 
+			// 自检：拿同一个密码把刚写出的 12 字节头解回来，最后一字节必须等于 CRC 高位。
+			// 这里曾经出过「头与正文用错密钥流」的 bug：包能正常生成，解压时却一律报
+			// 「密码错误」。就地验一下，宁可报错，也不要悄悄给出一个打不开的包。
+			if (ZipCrypto(password).decrypt(encrypted.left(12)).at(11) != char((crc >> 24) & 0xFFu))
+				headerCheckFailed = true;
+
 			writeLocalHeader(name, crc, quint32(encrypted.size()), quint32(data.size()), encrypted, method,
 			                 entryFlags());
 
@@ -219,6 +225,12 @@ namespace {
 		}
 
 		bool finish(QString *error) override {
+			if (headerCheckFailed) {
+				*error = QCoreApplication::translate(
+				    "PackageBuilder", "The encrypted archive failed its self-check. Please export again.");
+				return false;
+			}
+
 			const quint32 centralStart = quint32(out->pos());
 
 			for (const Entry &entry : entries) {
@@ -326,6 +338,20 @@ namespace {
 				return out;
 			}
 
+			/// 解密：密文 ^ 同一个密钥流 = 明文，密钥同样用明文字节推进。
+			/// （自检用；写出来的包是给外面的工具解的，这里只验自己写对没有。）
+			QByteArray decrypt(const QByteArray &data) {
+				QByteArray out = data;
+
+				for (int i = 0; i < out.size(); i++) {
+					const unsigned char plain = static_cast<unsigned char>(out[i]) ^ decryptByte();
+					out[i] = char(plain);
+					update(plain);
+				}
+
+				return out;
+			}
+
 		  private:
 			void update(unsigned char value) {
 				key0 = crc32Step(key0, value);
@@ -349,6 +375,8 @@ namespace {
 		quint16 dosDate;
 		quint32 lastOffset{};
 		QList<Entry> entries;
+		/// 加密头自检没过（见 addFile()），finish() 会直接报错。
+		bool headerCheckFailed{false};
 	};
 
 	std::unique_ptr<ArchiveWriter> makeWriter(QIODevice *device, const QByteArray &password) {

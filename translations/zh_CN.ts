@@ -4619,6 +4619,11 @@ Export anyway?</source>
         <translation>无法写入压缩包</translation>
     </message>
     <message>
+        <location filename="../src/core/packagebuilder.cpp"/>
+        <source>The encrypted archive failed its self-check. Please export again.</source>
+        <translation>加密压缩包自检未通过，请重新导出。</translation>
+    </message>
+    <message>
         <location filename="../src/core/packagebuilder.cpp" line="387"/>
         <source>Test Data</source>
         <translation>测试数据</translation>
