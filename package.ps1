@@ -1,16 +1,20 @@
 ﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
-    把编译好的 lemon.exe 变成「拷到别的机器上就能双击运行」的完整软件，顺手删掉用不到的文件。
+    把编译好的 lemon.exe 变成「拷到别的机器上就能双击运行」的完整软件。
+    默认按原版发布包的形态部署（windeployqt 全量输出），可加 -TrimQt 做最小体积。
 
 .DESCRIPTION
     默认就地部署到 .\build（也就是 lemon.exe 所在目录）：
       1. （可选）先构建 —— 直接调 build.ps1，沿用同一个 build 目录与配置；
-      2. windeployqt 拉齐 Qt 运行库 + platforms / styles / iconengines / imageformats 插件
-         与 MinGW 运行库（libgcc / libstdc++ / libwinpthread）；
+      2. windeployqt 拉齐 Qt 运行库、插件（platforms / styles / iconengines / imageformats /
+         generic / tls / networkinformation / translations）与 MinGW 运行库
+         （libgcc / libstdc++ / libwinpthread）——与原版发布包一致；
       3. 复制题面模板 assets\statement-templates（PDF 导出要用）与 LICENSE；
-      4. 删掉用不到的文件：Qt 自带的几十种语言翻译（只留 zh_CN / zh_TW）、
-         opengl32sw.dll、D3Dcompiler_47.dll、多余图片插件（只留 SVG）、调试符号等；
+      4. 清掉调试 / 打包残留（*.pdb、*.ilk、*.prl、vc_redist 等）；
+         默认保留 windeployqt 的全部输出（插件目录、Qt 自带的 qt_*.qm 翻译、
+         opengl32sw.dll / D3Dcompiler 全铺），发布目录的形态与原版一致；
+         加 -TrimQt 才会删掉用不到的 Qt 组件与翻译，做成最小体积；
       5. 跑一次 lemon.exe --self-test 自检：把 PATH 里的 Qt / MinGW 全部去掉，
          确认它真的能独立跑（平台插件、SVG 图标、题面模板、内嵌翻译、主窗口都过一遍）。
 
@@ -29,6 +33,12 @@
 
 .PARAMETER NoBuild
     不重新构建，只对现成的 lemon.exe 做部署 + 精简。
+
+.PARAMETER TrimQt
+    只保留真正用得到的 Qt 组件：删掉 tls / networkinformation / generic 等插件、
+    除 SVG 外的图片插件、除 zh_CN / zh_TW 外的 Qt 自带翻译、opengl32sw.dll /
+    D3Dcompiler_47.dll 等大块头。
+    不加时按 windeployqt 的完整输出铺，发布目录的形态与原版发布包一致。
 
 .PARAMETER KeepEverything
     不删任何文件（排查「是不是删多了」时用）。
@@ -54,6 +64,10 @@
 .EXAMPLE
     .\package.ps1 -OutDir .\build\release
     生成一个干净的发布目录（不含任何构建中间产物）。
+
+.EXAMPLE
+    .\package.ps1 -NoBuild -TrimQt
+    最小体积：把用不到的 Qt 插件与自带翻译一并删掉。
 #>
 [CmdletBinding()]
 param(
@@ -68,6 +82,10 @@ param(
     [string]$CmakeBin = 'C:\mingw64\bin\cmake.exe',
 
     [switch]$NoBuild,
+
+    # 只保留真正用得到的 Qt 组件（最小体积）。不加就是 windeployqt 的完整输出，
+    # 与原版发布包的形态一致。
+    [switch]$TrimQt,
 
     [switch]$KeepEverything,
 
@@ -177,10 +195,10 @@ $windeployqt = Join-Path $QtDir 'bin\windeployqt.exe'
 
 if (-not (Test-Path -LiteralPath $windeployqt)) { throw "找不到 windeployqt：$windeployqt" }
 
-# --no-opengl-sw / --no-system-d3d-compiler：不铺 opengl32sw.dll 与 D3Dcompiler_47.dll
-# --no-translations：不铺 Qt 自带翻译（界面文字用的是程序内嵌的 translation/*.qm）
-$deployArgs = @('--release', '--compiler-runtime', '--no-quick-import', '--no-opengl-sw',
-    '--no-system-d3d-compiler', '--no-translations')
+# 默认按 windeployqt 的完整输出铺（原版发布包就是这个样子：所有插件 + Qt 自带的
+# qt_*.qm 翻译 + opengl32sw / D3Dcompiler），这样发布目录的形态跟原版一致。
+# 想只要最小体积就加 -TrimQt，那时会统一删掉用不到的插件与大块头。
+$deployArgs = @('--release', '--compiler-runtime', '--no-quick-import')
 
 if ($buildType -eq 'Debug') {
     $deployArgs[0] = '--debug'
@@ -233,46 +251,57 @@ if ($KeepEverything) {
 } else {
     Write-Step '删掉用不到的文件'
 
-    # 5.1 用不上的大块头 / 调试文件
-    foreach ($pattern in 'opengl32sw.dll', 'D3Dcompiler_*.dll', 'd3dcompiler_*.dll', 'libEGL.dll',
-        'libGLESv2.dll', 'vc_redist*.exe', 'qtdiag*.exe', '*.pdb', '*.ilk', '*.exp', '*.lib', '*.prl') {
+    # 5.1 调试 / 打包残留：Release 发布包里本来就不该有这些（原版也没有）
+    foreach ($pattern in 'vc_redist*.exe', 'qtdiag*.exe', '*.pdb', '*.ilk', '*.exp', '*.lib', '*.prl') {
         Get-ChildItem -Path $OutDir -Filter $pattern -File -ErrorAction SilentlyContinue |
             ForEach-Object { Remove-Junk $_.FullName }
     }
 
-    # 5.2 Qt 插件目录：只留真正用到的几个
-    $allowedPluginDirs = @('platforms', 'styles', 'iconengines', 'imageformats', 'translations')
-    $pluginDirs = @('tls', 'networkinformation', 'generic', 'scenegraph', 'qmltooling', 'qml',
-        'assetimporters', 'virtualkeyboard', 'texttospeech', 'geometryloaders', 'renderers',
-        'designer', 'sqldrivers', 'multimedia', 'position', 'sensors', 'webview', 'canbus')
-
-    foreach ($dir in $pluginDirs) {
-        if ($allowedPluginDirs -contains $dir) { continue }
-
-        Remove-Junk (Join-Path $OutDir $dir)
-    }
-
-    # 5.3 图片插件：程序只画自己资源里的 SVG（PNG 是 QtGui 内置的），
-    #     不读用户的 gif / jpeg / ico。
-    $imageDir = Join-Path $OutDir 'imageformats'
-
-    if (Test-Path -LiteralPath $imageDir) {
-        Get-ChildItem -Path $imageDir -File | Where-Object { $_.Name -ne 'qsvg.dll' } |
-            ForEach-Object { Remove-Junk $_.FullName }
-    }
-
-    # 5.4 Qt 自带翻译：界面语言用的是程序内嵌的 zh_CN / zh_TW / en_US，
-    #     其余几十种语言的 qt_*.qm 全都没用。
-    $translationDir = Join-Path $OutDir 'translations'
-
-    if (Test-Path -LiteralPath $translationDir) {
-        Get-ChildItem -Path $translationDir -File |
-            Where-Object { $_.Name -notin @('qt_zh_CN.qm', 'qt_zh_TW.qm') } |
-            ForEach-Object { Remove-Junk $_.FullName }
-
-        if (-not (Get-ChildItem -Path $translationDir -File -ErrorAction SilentlyContinue)) {
-            Remove-Junk $translationDir
+    # 5.2 用不到的大块头与 Qt 组件：默认保留（发布目录的形态与原版一致），
+    #     只有 -TrimQt 时才删成最小体积。
+    if ($TrimQt) {
+        foreach ($pattern in 'opengl32sw.dll', 'D3Dcompiler_*.dll', 'd3dcompiler_*.dll', 'libEGL.dll',
+            'libGLESv2.dll') {
+            Get-ChildItem -Path $OutDir -Filter $pattern -File -ErrorAction SilentlyContinue |
+                ForEach-Object { Remove-Junk $_.FullName }
         }
+
+        # Qt 插件目录：只留真正用到的几个
+        $allowedPluginDirs = @('platforms', 'styles', 'iconengines', 'imageformats', 'translations')
+        $pluginDirs = @('tls', 'networkinformation', 'generic', 'scenegraph', 'qmltooling', 'qml',
+            'assetimporters', 'virtualkeyboard', 'texttospeech', 'geometryloaders', 'renderers',
+            'designer', 'sqldrivers', 'multimedia', 'position', 'sensors', 'webview', 'canbus')
+
+        foreach ($dir in $pluginDirs) {
+            if ($allowedPluginDirs -contains $dir) { continue }
+
+            Remove-Junk (Join-Path $OutDir $dir)
+        }
+
+        # 图片插件：程序只画自己资源里的 SVG（PNG 是 QtGui 内置的），
+        # 不读用户的 gif / jpeg / ico。
+        $imageDir = Join-Path $OutDir 'imageformats'
+
+        if (Test-Path -LiteralPath $imageDir) {
+            Get-ChildItem -Path $imageDir -File | Where-Object { $_.Name -ne 'qsvg.dll' } |
+                ForEach-Object { Remove-Junk $_.FullName }
+        }
+
+        # Qt 自带翻译：界面语言用的是程序内嵌的 zh_CN / zh_TW / en_US，
+        # 其余几十种语言的 qt_*.qm 都没用。
+        $translationDir = Join-Path $OutDir 'translations'
+
+        if (Test-Path -LiteralPath $translationDir) {
+            Get-ChildItem -Path $translationDir -File |
+                Where-Object { $_.Name -notin @('qt_zh_CN.qm', 'qt_zh_TW.qm') } |
+                ForEach-Object { Remove-Junk $_.FullName }
+
+            if (-not (Get-ChildItem -Path $translationDir -File -ErrorAction SilentlyContinue)) {
+                Remove-Junk $translationDir
+            }
+        }
+    } else {
+        Write-Dim '保留 windeployqt 的全部输出（与原版发布包一致）；要最小体积请加 -TrimQt。'
     }
 
     Write-Host ("  共删掉 {0} 个（目录/文件）" -f $removed.Count) -ForegroundColor Green
@@ -373,8 +402,9 @@ $runtime = @()
 $runtime += Get-Item -LiteralPath $exe -ErrorAction SilentlyContinue
 $runtime += Get-ChildItem -Path $OutDir -Filter '*.dll' -File -ErrorAction SilentlyContinue
 
-foreach ($dir in 'platforms', 'imageformats', 'iconengines', 'styles') {
-    $runtime += Get-ChildItem -Path (Join-Path $OutDir $dir) -File -ErrorAction SilentlyContinue
+foreach ($dir in 'platforms', 'imageformats', 'iconengines', 'styles', 'generic', 'tls',
+    'networkinformation', 'translations') {
+    $runtime += Get-ChildItem -Path (Join-Path $OutDir $dir) -File -Recurse -ErrorAction SilentlyContinue
 }
 
 $templatesTarget = Join-Path $OutDir 'statement-templates'

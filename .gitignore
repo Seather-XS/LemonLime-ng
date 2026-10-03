@@ -61,6 +61,7 @@ lemon-*-Linux.tar.gz
 # Build output directories
 /build/
 /dist/
+release/
 
 # Generated translations and helper logs
 *.qm
