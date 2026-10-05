@@ -1,0 +1,87 @@
+% ======================================================================
+%  LemonLime 准考证模板（程序内置，不提供给用户编辑）
+%
+%  锁定区：6 行，由程序按名单填充，任何人都不应改动：
+%      姓名 / 准考证号 / 测试时间 / 考点 / 考场 / 座位号
+%  可替换的占位符（{{...}}）：
+%      {{title}}        准考证标题（config.json 的 title，留空时用比赛日标题）
+%      {{name}} {{id}} {{seat}}        选手级（contestants.csv 的内置列）
+%      {{examTime}}               比赛日级（config.json 的 examTime）
+%      {{room}}        考场：选手级（contestants.csv）
+%      {{photo}}        照片：整个 \multirow 片段，无照片时是空的 multirow
+%      {{venue}}        选手级考点（contestants.csv）
+%      {{extraRows}}    额外行（自定义列，纯文本 + [文字](链接)）
+%      {{notes}}        注意事项（regions/.../notes.md，纯文本 + [文字](链接)）
+%      {{contestNotes}} 比赛注意（admission/contest-notes.md，纯文本 + [文字](链接)）
+%      {{beforeTable}} / {{afterTable}}  表格之外的自定义内容
+%  字体：优先用随程序发布的思源宋体（沙箱里的 ./fonts/），缺失时回退系统字体。
+% ======================================================================
+\documentclass[12pt,a4paper,fontset=none]{ctexart}
+\usepackage[margin=2cm]{geometry}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+
+\usepackage{unicode-math}
+\setmathfont{Cambria Math}
+\setmathrm{Cambria Math}
+
+\IfFileExists{./fonts/SourceHanSerifCN-Light-5.otf}{%
+  \setCJKmainfont{SourceHanSerifCN-Light-5.otf}[%
+    Path       = ./fonts/,
+    BoldFont   = SourceHanSerifCN-SemiBold-7.otf,
+    ItalicFont = SourceHanSerifCN-Light-5.otf
+  ]%
+  \setmainfont{SourceHanSerifCN-Light-5.otf}[%
+    Path       = ./fonts/,
+    BoldFont   = SourceHanSerifCN-SemiBold-7.otf,
+    ItalicFont = SourceHanSerifCN-Light-5.otf
+  ]%
+}{%
+  \setCJKmainfont[BoldFont={SimHei}]{SimSun}%
+  \setmainfont[BoldFont={SimHei}]{SimSun}%
+}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+{{beforeTable}}
+
+\begin{center}
+    {\zihao{1}{{title}}}\mbox{}\\[0.4cm]
+    {\zihao{1}准考证}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\setlength{\arrayrulewidth}{0.4pt}
+\begin{tabular}{!{\vrule width 1.2pt}>{\centering\arraybackslash}p{2.5cm}|p{9.3cm}|p{3.3cm}!{\vrule width 1.2pt}}
+\noalign{\hrule height 1.2pt}
+% === LOCKED ROWS BEGIN ===
+姓\qquad 名 & {{name}} & \multirow{6}{*}{\centering {{photo}}} \\
+\cline{1-2}
+准考证号 & {{id}} & \\
+\cline{1-2}
+测试时间 & {{examTime}} & \\
+\cline{1-2}
+考\qquad 点 & {{venue}} & \\
+\cline{1-2}
+考\qquad 场 & {{room}} & \\
+\cline{1-2}
+座位号 & {{seat}} & \\
+% === LOCKED ROWS END ===
+{{extraRows}}
+\hline
+注意事项 & \multicolumn{2}{p{13cm}!{\vrule width 1.2pt}}{{{notes}}} \\
+\hline
+比赛注意 & \multicolumn{2}{p{13cm}!{\vrule width 1.2pt}}{{{contestNotes}}} \\
+\noalign{\hrule height 1.2pt}
+\end{tabular}
+\end{center}
+
+{{afterTable}}
+
+\end{document}

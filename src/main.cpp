@@ -8,6 +8,16 @@
  */
 
 #include "lemon.h"
+#include "admission/admissionassign.h"
+#include "admission/admissiongenerator.h"
+#include "admission/admissionnotes.h"
+#include "admission/admissionproject.h"
+#include "admission/admissiontemplate.h"
+#include "admission/admissionwidget.h"
+#include "admission/csveditordialog.h"
+#include "admission/idruledialog.h"
+#include "admission/notesdialog.h"
+#include "admission/venuedialog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 //
 #include "base/LemonBase.hpp"
@@ -34,17 +44,23 @@
 #include <QDir>
 #include <QEventLoop>
 #include <QFileInfo>
+#include <QHash>
 #include <QIcon>
 #include <QImageReader>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QKeySequence>
 #include <QLineEdit>
 #include <QPixmap>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSplashScreen>
+#include <QTableWidget>
+#include <QTemporaryDir>
 #include <QTextStream>
 #include <QTimer>
 #include <chrono>
+#include <utility>
 
 #define LEMON_MODULE_NAME "Main"
 
@@ -237,6 +253,62 @@ int main(int argc, char *argv[]) {
 		ExportUtil::exportResult(nullptr, &contest);
 		StatisticsBrowser::exportStatistics(nullptr, &contest);
 		return 0;
+	}
+
+	// 隐藏入口：命令行编译某个比赛日的准考证 PDF（与界面里「准考证 -> 生成」同一套引擎）。
+	// 用法：lemon.exe --build-admission <比赛日.cdf> [赛区 ...]
+	//   不带赛区就把 admission/ 里的名单全部生成一遍；PDF 固定写到 <比赛日>/dist/admission/ 下。
+	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--build-admission")) {
+		QApplication app(argc, argv);
+		const QString dayFile = QString::fromLocal8Bit(argv[2]);
+		const QString dayFolder = QFileInfo(dayFile).absolutePath();
+		// 标题上下文与界面一致：有工程文件（contest.conf）就用里面的比赛标题 / 比赛日标题。
+		// 注意要在 chdir 之前读，否则相对的 dayFile 就找不到自己了。
+		QString projectTitle;
+		QString dayTitle;
+		readProjectContext(dayFile, projectTitle, dayTitle);
+		QFile day(dayFile);
+
+		if (! day.open(QIODevice::ReadOnly)) {
+			LOG("build-admission: cannot open", dayFile);
+			return 2;
+		}
+
+		Settings settings;
+		settings.loadSettings();
+		QDir::setCurrent(dayFolder);
+		Contest contest(nullptr);
+		contest.setSettings(&settings);
+
+		if (contest.readFromJson(QJsonDocument::fromJson(day.readAll()).object()) == -1) {
+			LOG("build-admission: broken contest file", dayFile);
+			return 3;
+		}
+
+		AdmissionProject admission;
+		QString loadError;
+
+		if (! admission.load(contest.getRegionEnabled(), &loadError))
+			LOG("build-admission: load warning:", loadError);
+
+		AdmissionGenerator generator;
+		QObject::connect(&generator, &AdmissionGenerator::logMessage,
+		                 [](const QString &line) { LOG("admission:", line); });
+		QStringList regions;
+
+		for (int i = 3; i < argc; i++)
+			regions << QString::fromLocal8Bit(argv[i]);
+
+		QString error;
+		const int failed = generator.generate(admission, regions,
+		                                      dayTitle.isEmpty() ? projectTitle : dayTitle, &error);
+
+		if (failed < 0) {
+			LOG("build-admission: failed:", error);
+			return 1;
+		}
+
+		return failed == 0 ? 0 : 1;
 	}
 
 	// 隐藏入口：命令行跑一遍评测（与界面「重测」同一段逻辑）。
@@ -737,6 +809,732 @@ int main(int argc, char *argv[]) {
 		}
 
 		LOG("check-statement-ui: problems", problems);
+		return problems == 0 ? 0 : 1;
+	}
+
+#if 0
+	// 旧版自检（编辑器改版前的实现，留作参考）
+	if (argc >= 4 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--check-admission-ui-old")) {
+		QApplication app(argc, argv);
+		const QString dayFile = QString::fromLocal8Bit(argv[2]);
+		const QString reportFile = QString::fromLocal8Bit(argv[3]);
+		QStringList report;
+		int problems = 0;
+		auto fail = [&report, &problems](const QString &what) {
+			++problems;
+			report << QStringLiteral("FAILED: ") + what;
+		};
+
+		QFile day(dayFile);
+
+		if (! day.open(QIODevice::ReadOnly)) {
+			LOG("check-admission-ui: cannot open", dayFile);
+			return 2;
+		}
+
+		Settings settings;
+		settings.loadSettings();
+		const QString dayFolder = QFileInfo(dayFile).absolutePath();
+		const QString dayBase = QFileInfo(dayFile).completeBaseName();
+		Contest contest(nullptr);
+		contest.setSettings(&settings);
+
+		if (contest.readFromJson(QJsonDocument::fromJson(day.readAll()).object()) == -1) {
+			LOG("check-admission-ui: broken contest file", dayFile);
+			return 3;
+		}
+
+		QTemporaryDir scratch;
+
+		if (! scratch.isValid()) {
+			LOG("check-admission-ui: cannot create a temporary directory");
+			return 4;
+		}
+
+		QDir::setCurrent(scratch.path());
+		const QString region = QStringLiteral("HN");
+
+		// 1) 选项卡：能列出赛区、表格列数对
+		{
+			AdmissionWidget widget;
+			widget.setContest(&contest);
+			widget.setDayContext(dayBase, QStringLiteral("Day 1"), contest.getContestTitle());
+			widget.refresh();
+			QTableWidget *table = widget.findChild<QTableWidget *>();
+			report << QStringLiteral("tab table: rows=%1 columns=%2")
+			              .arg(table ? table->rowCount() : -1)
+			              .arg(table ? table->columnCount() : -1);
+
+			if (! table || table->columnCount() != 5)
+				fail(QStringLiteral("admission tab has no 5-column table"));
+		}
+
+		AdmissionBuilder builder;
+		builder.setContest(&contest);
+		builder.setDayContext(dayBase, QStringLiteral("Day 1"), contest.getContestTitle());
+
+		// 2) 名单：写下去再读回来
+		{
+			const QStringList header = AdmissionBuilder::defaultListHeader();
+			QList<QStringList> rows;
+			rows << QStringList{QStringLiteral("张三"), QStringLiteral("HN-S01192"), QStringLiteral("26"),
+			                    QString()};
+			rows << QStringList{QStringLiteral("李四"), QStringLiteral("HN-S01193"), QStringLiteral("27"),
+			                    QString()};
+			QString error;
+
+			if (! builder.writeList(region, header, rows, error))
+				fail(QStringLiteral("writeList: ") + error);
+
+			QStringList readHeader;
+			QList<QStringList> readRows;
+
+			if (! builder.readList(region, readHeader, readRows, error))
+				fail(QStringLiteral("readList: ") + error);
+
+			if (readHeader != header || readRows.size() != 2 ||
+			    readRows.value(0).value(0) != QStringLiteral("张三"))
+				fail(QStringLiteral("list round-trip"));
+
+			report << QStringLiteral("list round-trip: header=%1 rows=%2 first=%3")
+			              .arg(readHeader.join(QChar('/')))
+			              .arg(readRows.size())
+			              .arg(readRows.value(0).value(0));
+		}
+
+		// 3) 注意事项：赛区信息 + 两节通告的来回
+		{
+			QMap<QString, QString> info;
+			info.insert(QStringLiteral("测试时间"), QStringLiteral("2026-09-19 14:30:00"));
+			info.insert(QStringLiteral("考点"), QStringLiteral("长沙市"));
+			info.insert(QStringLiteral("考场"), QStringLiteral("08考场"));
+			QString error;
+
+			if (! builder.writeNotes(region, info, QStringLiteral("1. 甲\n2. 乙"), QStringLiteral("1. 丙"),
+			                         error))
+				fail(QStringLiteral("writeNotes: ") + error);
+
+			QMap<QString, QString> readInfo;
+			QString notes;
+			QString general;
+
+			if (! builder.readNotes(region, readInfo, notes, general, error))
+				fail(QStringLiteral("readNotes: ") + error);
+
+			if (readInfo != info || notes != QStringLiteral("1. 甲\n2. 乙") ||
+			    general != QStringLiteral("1. 丙"))
+				fail(QStringLiteral("notes round-trip"));
+
+			report << QStringLiteral("notes round-trip: fields=%1 notes=%2 general=%3")
+			              .arg(readInfo.size())
+			              .arg(notes.simplified())
+			              .arg(general.simplified());
+		}
+
+		// 4) 三个内置编辑器：能读出东西就算过
+		{
+			AdmissionListDialog dialog(&builder, region);
+			QTableWidget *table = dialog.findChild<QTableWidget *>();
+			report << QStringLiteral("list editor: rows=%1 columns=%2")
+			              .arg(table ? table->rowCount() : -1)
+			              .arg(table ? table->columnCount() : -1);
+
+			if (! table || table->rowCount() != 2 || table->columnCount() != 4)
+				fail(QStringLiteral("list editor did not load the list"));
+		}
+		{
+			AdmissionNotesDialog dialog(&builder, region);
+			QTableWidget *table = dialog.findChild<QTableWidget *>();
+			const QList<QPlainTextEdit *> edits = dialog.findChildren<QPlainTextEdit *>();
+			report << QStringLiteral("notes editor: fields=%1 text boxes=%2")
+			              .arg(table ? table->rowCount() : -1)
+			              .arg(edits.size());
+
+			if (! table || table->rowCount() < 3 || edits.size() != 2)
+				fail(QStringLiteral("notes editor did not load the notes"));
+			else if (! edits.at(0)->toPlainText().contains(QStringLiteral("甲")))
+				fail(QStringLiteral("notes editor lost the 注意事项 text"));
+		}
+		{
+			QString error;
+			const QString path = AdmissionBuilder::ensureTemplate(&error);
+
+			if (path.isEmpty())
+				fail(QStringLiteral("ensureTemplate: ") + error);
+
+			AdmissionTextDialog dialog(QStringLiteral("template"), path);
+			QPlainTextEdit *edit = dialog.findChild<QPlainTextEdit *>();
+			const int chars = edit ? edit->toPlainText().size() : -1;
+			report << QStringLiteral("template editor: chars=%1").arg(chars);
+
+			if (! edit || chars < 100 ||
+			    ! edit->toPlainText().contains(QStringLiteral("\\begin{document}")))
+				fail(QStringLiteral("template editor did not load the template"));
+		}
+
+		report.prepend(QStringLiteral("problems=%1").arg(problems));
+
+		QFile out(QDir(dayFolder).absoluteFilePath(reportFile));
+
+		if (out.open(QIODevice::WriteOnly | QIODevice::Text)) {
+			QTextStream stream(&out);
+			stream << report.join(QChar('\n')) << '\n';
+		}
+
+		LOG("check-admission-ui: problems", problems);
+		return problems == 0 ? 0 : 1;
+	}
+#endif
+
+	// 隐藏入口：检查准考证的选项卡、数据层与两个编辑窗口（在临时目录里跑，不动比赛日目录）。
+	// 用法：lemon.exe --check-admission-ui <比赛日.cdf> <报告文件>
+	if (argc >= 4 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--check-admission-ui")) {
+		QApplication app(argc, argv);
+		const QString dayFile = QString::fromLocal8Bit(argv[2]);
+		const QString reportFile = QString::fromLocal8Bit(argv[3]);
+		QStringList report;
+		int problems = 0;
+		auto fail = [&report, &problems](const QString &what) {
+			++problems;
+			report << QStringLiteral("FAILED: ") + what;
+		};
+
+		QFile day(dayFile);
+
+		if (! day.open(QIODevice::ReadOnly)) {
+			LOG("check-admission-ui: cannot open", dayFile);
+			return 2;
+		}
+
+		Settings settings;
+		settings.loadSettings();
+		const QString dayFolder = QFileInfo(dayFile).absolutePath();
+		Contest contest(nullptr);
+		contest.setSettings(&settings);
+
+		if (contest.readFromJson(QJsonDocument::fromJson(day.readAll()).object()) == -1) {
+			LOG("check-admission-ui: broken contest file", dayFile);
+			return 3;
+		}
+
+		QTemporaryDir scratch;
+
+		if (! scratch.isValid()) {
+			LOG("check-admission-ui: cannot create a temporary directory");
+			return 4;
+		}
+
+		QDir::setCurrent(scratch.path());
+
+		// 1) 内置模板：存在、锁定区结构对、字体目录在
+		{
+			const QString text = AdmissionTemplate::source();
+			QString error;
+
+			if (text.isEmpty())
+				fail(QStringLiteral("built-in template not found"));
+			else if (! AdmissionTemplate::validate(text, &error))
+				fail(QStringLiteral("template: ") + error);
+
+			report << QStringLiteral("template: locked rows=%1 placeholders ok, bundled fonts=%2")
+			              .arg(AdmissionTemplate::lockedRowLabels().size())
+			              .arg(AdmissionTemplate::fontDir().isEmpty() ? 0 : 1);
+		}
+
+		// 2) 数据层：建赛区 → 写名单 / 赛区信息 / 通告 → 重新读回来
+		{
+			AdmissionProject project;
+			QString error;
+
+			if (! project.createRegion(QStringLiteral("A赛区"), &error))
+				fail(QStringLiteral("createRegion: ") + error);
+
+			if (! project.load(true, &error))
+				fail(QStringLiteral("load: ") + error);
+
+			AdmissionRegion *region = project.find(QStringLiteral("A赛区"));
+
+			if (! region) {
+				fail(QStringLiteral("region not discovered from regions/"));
+			} else {
+				project.examTime = QStringLiteral("2026-09-19 14:30:00");
+				// 准考证号策略也是比赛日级的配置，跟着 config.json 走
+				project.idTemplate = QStringLiteral("<section>-<number><number>");
+				project.idNumberSources = QStringList{QStringLiteral("row")};
+				project.idCharSources = QStringList{QStringLiteral("name")};
+				project.idOverwrite = true;
+				// 自定义列（锁定行之外）会在生成时印成额外行，这里顺带验一遍它能不能原样过一遍磁盘。
+				region->table.header << QStringLiteral("考场位置");
+				region->table.rows << QStringList{QStringLiteral("张三"), QStringLiteral("A-001"),
+				                                  QStringLiteral("长沙市"), QStringLiteral("08考场"),
+				                                  QStringLiteral("26"), QString(),
+				                                  QStringLiteral("<row>排")};
+				region->notes = QStringLiteral("1. 甲");
+				project.contestNotes = QStringLiteral("1. 丙");
+				// 考点 → 考场（含容量）：存 regions/<赛区>/rooms.json，排座位唯一根据
+				AdmissionVenue venue1;
+				venue1.name = QStringLiteral("考点一");
+				venue1.rooms << AdmissionRoom{QStringLiteral("101"), 3}
+				             << AdmissionRoom{QStringLiteral("102"), 2};
+				AdmissionVenue venue2;
+				venue2.name = QStringLiteral("考点二");
+				venue2.rooms << AdmissionRoom{QStringLiteral("201"), 4};
+				region->venues = {venue1, venue2};
+
+				if (! project.save(&error))
+					fail(QStringLiteral("save: ") + error);
+			}
+
+			AdmissionProject again;
+
+			if (! again.load(true, &error))
+				fail(QStringLiteral("reload: ") + error);
+
+			const AdmissionRegion *check = again.find(QStringLiteral("A赛区"));
+
+			if (! check || check->table.rows.size() != 1 || check->table.cell(0, 0) != QStringLiteral("张三") ||
+			    check->table.cell(0, 2) != QStringLiteral("长沙市") ||
+			    check->table.cell(0, 4) != QStringLiteral("26") ||
+			    check->table.header.indexOf(QStringLiteral("考场位置")) !=
+			        AdmissionTable::builtinColumns().size() ||
+			    check->table.cell(0, AdmissionTable::builtinColumns().size()) != QStringLiteral("<row>排") ||
+			    check->notes.trimmed() != QStringLiteral("1. 甲") ||
+			    again.examTime != QStringLiteral("2026-09-19 14:30:00") ||
+			    again.idTemplate != QStringLiteral("<section>-<number><number>") ||
+			    again.idNumberSources != QStringList{QStringLiteral("row")} ||
+			    again.idCharSources != QStringList{QStringLiteral("name")} || ! again.idOverwrite ||
+			    again.regions.size() != 1 || again.regions.at(0).venues.size() != 2 ||
+			    again.regions.at(0).venues.at(0).rooms.value(1).capacity != 2 ||
+			    again.regions.at(0).roomCount() != 3 || again.regions.at(0).totalCapacity() != 9 ||
+			    again.contestNotes.trimmed() != QStringLiteral("1. 丙"))
+				fail(QStringLiteral("admission project round-trip"));
+
+			report << QStringLiteral("project round-trip: regions=%1 rows=%2 examTime=%3")
+			              .arg(again.regions.size())
+			              .arg(check ? check->table.rows.size() : -1)
+			              .arg(again.examTime);
+			report << QStringLiteral("id rule: %1 / %2 / overwrite=%3")
+			              .arg(again.idTemplate, again.idNumberSources.join(QStringLiteral(",")))
+			              .arg(again.idOverwrite ? 1 : 0);
+			report << QStringLiteral("venues: %1 / rooms=%2 / capacity=%3")
+			              .arg(again.regions.value(0).venues.size())
+			              .arg(again.regions.value(0).roomCount())
+			              .arg(again.regions.value(0).totalCapacity());
+		}
+
+		// 3) 选项卡：4 列的赛区表，能列出来自磁盘的赛区
+		{
+			AdmissionWidget widget;
+			widget.setContest(&contest);
+			widget.setDayContext(QFileInfo(dayFile).completeBaseName(), QStringLiteral("Day 1"),
+			                     contest.getContestTitle());
+			widget.refresh();
+			QTableWidget *table = widget.findChild<QTableWidget *>();
+			report << QStringLiteral("tab table: rows=%1 columns=%2")
+			              .arg(table ? table->rowCount() : -1)
+			              .arg(table ? table->columnCount() : -1);
+
+			QStringList listed;
+
+			for (int row = 0; table && row < table->rowCount(); ++row)
+				listed << (table->item(row, 0) ? table->item(row, 0)->text() : QString());
+
+			report << QStringLiteral("tab regions: %1").arg(listed.join(QStringLiteral(" | ")));
+
+			if (! table || table->columnCount() != 4 || table->rowCount() < 1)
+				fail(QStringLiteral("admission tab table"));
+
+			if (table && table->contextMenuPolicy() != Qt::CustomContextMenu)
+				fail(QStringLiteral("admission tab table has no context menu"));
+
+			const QStringList tools = AdmissionGenerator::toolsReport().split(QStringLiteral(", "));
+			report << QStringLiteral("tools: %1")
+			              .arg(tools.isEmpty() ? QStringLiteral("ok") : tools.join(QStringLiteral(", ")));
+
+			// 标题 / 测试时间：敲完没离开输入框（没有 editingFinished）也要存住 —— 直接关程序不能丢
+			QLineEdit *titleEdit = widget.findChild<QLineEdit *>(QStringLiteral("titleEdit"));
+			const QPushButton *venuesButton =
+			    widget.findChild<QPushButton *>(QStringLiteral("venuesButton"));
+			report << QStringLiteral("tab widgets: title=%1 venues=%2")
+			              .arg(titleEdit ? 1 : 0)
+			              .arg(venuesButton ? 1 : 0);
+
+			if (! titleEdit || ! venuesButton)
+				fail(QStringLiteral("the tab is missing the title box or the venues button"));
+
+			if (titleEdit) {
+				titleEdit->setText(QStringLiteral("day1"));
+				QEventLoop loop;
+				QTimer::singleShot(1500, &loop, &QEventLoop::quit);
+				loop.exec();
+
+				AdmissionProject saved;
+				saved.load(true, nullptr);
+				report << QStringLiteral("title after typing: %1").arg(saved.title);
+
+				if (saved.title != QStringLiteral("day1"))
+					fail(QStringLiteral("the title was not saved while typing"));
+			}
+
+			// 敲完立刻关窗口（连防抖都来不及跑）也不能丢：析构里还要再存一次
+			{
+				AdmissionWidget quick;
+				quick.setContest(&contest);
+				quick.setDayContext(QStringLiteral("day"), QStringLiteral("Day 1"),
+				                    contest.getContestTitle());
+				QLineEdit *quickTitle = quick.findChild<QLineEdit *>(QStringLiteral("titleEdit"));
+
+				if (! quickTitle)
+					fail(QStringLiteral("the quick widget has no title box"));
+				else
+					quickTitle->setText(QStringLiteral("closed right away"));
+			}
+
+			AdmissionProject afterClose;
+			afterClose.load(true, nullptr);
+			report << QStringLiteral("title after an immediate close: %1").arg(afterClose.title);
+
+			if (afterClose.title != QStringLiteral("closed right away"))
+				fail(QStringLiteral("closing the window dropped the title"));
+
+			// 工作目录被别人改掉，也不许把标题写到别的目录去
+			{
+				const QString here = QDir::currentPath();
+				QTemporaryDir other;
+
+				if (other.isValid()) {
+					AdmissionWidget pinned;
+					pinned.setContest(&contest);
+					pinned.setDayContext(QStringLiteral("day"), QStringLiteral("Day 1"),
+					                     contest.getContestTitle());
+					QDir::setCurrent(other.path());
+					QLineEdit *pinnedTitle = pinned.findChild<QLineEdit *>(QStringLiteral("titleEdit"));
+
+					if (! pinnedTitle)
+						fail(QStringLiteral("the pinned widget has no title box"));
+					else {
+						pinnedTitle->setText(QStringLiteral("pinned title"));
+						pinned.saveIfNeeded();
+					}
+
+					QDir::setCurrent(here);
+					AdmissionProject pinnedCheck;
+					pinnedCheck.load(true, nullptr);
+					report << QStringLiteral("title with a changed cwd: %1").arg(pinnedCheck.title);
+
+					if (pinnedCheck.title != QStringLiteral("pinned title"))
+						fail(QStringLiteral("the title went to the wrong folder after the cwd changed"));
+
+					if (QFileInfo::exists(other.path() + QStringLiteral("/admission")))
+						fail(QStringLiteral("an admission/ folder was created outside the day"));
+				}
+			}
+
+			// 生成日志：开始前要清空，而且要写到「谁 → 哪个文件」这一级
+			QPlainTextEdit *buildLog = widget.findChild<QPlainTextEdit *>(QStringLiteral("buildLog"));
+
+			if (! buildLog)
+				fail(QStringLiteral("the build log box is missing"));
+			else if (! AdmissionGenerator::toolsReport().isEmpty())
+				report << QStringLiteral("build log: skipped (missing tools)");
+			else {
+				buildLog->setPlainText(QStringLiteral("stale line from the last run"));
+				widget.build(QStringList{QStringLiteral("A赛区")});
+				const QString text = buildLog->toPlainText();
+				report << QStringLiteral("build log: %1")
+				              .arg(text.split(QChar('\n')).join(QStringLiteral(" | ")));
+
+				if (text.contains(QStringLiteral("stale line")))
+					fail(QStringLiteral("the build log was not cleared"));
+
+				if (! text.contains(QStringLiteral("张三")) || ! text.contains(QStringLiteral(".pdf")))
+					fail(QStringLiteral("the build log says nothing about the tickets"));
+			}
+		}
+
+		// 4) 名单编辑器（上半部分名单 + 下半部分赛区设置）：能读出刚才写的数据
+		{
+			AdmissionProject project;
+			project.load(true, nullptr);
+			AdmissionRegion *region = project.find(QStringLiteral("A赛区"));
+
+			if (! region)
+				fail(QStringLiteral("region missing for the editors"));
+			else {
+				CsvEditorDialog dialog(region->name, region->table, &project);
+				QTableWidget *grid = dialog.findChild<QTableWidget *>(QStringLiteral("listGrid"));
+				report << QStringLiteral("csv editor: rows=%1 columns=%2")
+				              .arg(grid ? grid->rowCount() : -1)
+				              .arg(grid ? grid->columnCount() : -1);
+
+				if (! grid || grid->columnCount() != region->table.header.size() ||
+				    grid->rowCount() != region->table.rows.size() || grid->rowCount() < 1)
+					fail(QStringLiteral("csv editor did not load the list"));
+
+				// 右键菜单必须挂在视图上：挂在 viewport 上会被滚动区域接管，菜单根本不会弹
+				if (grid) {
+					report << QStringLiteral("csv editor context menu: view=%1 viewport=%2")
+					              .arg(grid->contextMenuPolicy() == Qt::CustomContextMenu
+					                       ? QStringLiteral("custom")
+					                       : QStringLiteral("no"))
+					              .arg(grid->viewport()->contextMenuPolicy() == Qt::CustomContextMenu
+					                       ? QStringLiteral("custom")
+					                       : QStringLiteral("no"));
+
+					if (grid->contextMenuPolicy() != Qt::CustomContextMenu)
+						fail(QStringLiteral("csv editor grid has no context menu"));
+				}
+
+				QPlainTextEdit *notes = dialog.findChild<QPlainTextEdit *>(QStringLiteral("notesEdit"));
+				const QPushButton *venues =
+				    dialog.findChild<QPushButton *>(QStringLiteral("venuesButton"));
+				report << QStringLiteral("list editor widgets: notes=%1 venues=%2")
+				              .arg(notes ? 1 : 0)
+				              .arg(venues ? 1 : 0);
+
+				if (! venues)
+					fail(QStringLiteral("the list editor has no venues button"));
+
+				QStringList extra;
+
+				for (const QString &name : region->table.header)
+					if (! AdmissionTable::builtinColumns().contains(name))
+						extra << name;
+
+				report << QStringLiteral("list editor extras: %1")
+				              .arg(extra.isEmpty() ? QStringLiteral("none") : extra.join(QStringLiteral(", ")));
+
+				if (! extra.contains(QStringLiteral("考场位置")))
+					fail(QStringLiteral("custom column lost while saving"));
+
+				if (! notes || ! notes->toPlainText().contains(QStringLiteral("甲")))
+					fail(QStringLiteral("notes box did not load the region notes"));
+
+				NotesDialog notesDialog(QStringLiteral("Notes"), region->notes, nullptr);
+
+				if (notesDialog.text() != region->notes)
+					fail(QStringLiteral("notes dialog did not load the text"));
+
+				// 撤销 / 重做：以前这里一点重做就闪退 —— 应用快照时整表重填会发 itemChanged，
+				// 又被当成「用户改了格子」再 push 一步，撤销栈的 index 中途被改乱，
+				// undo()/redo() 接着 at() 就越界了。
+				{
+					QAction *undoAction = nullptr;
+					QAction *redoAction = nullptr;
+
+					for (QAction *action : dialog.actions()) {
+						if (action->shortcut() == QKeySequence(QKeySequence::Undo))
+							undoAction = action;
+						else if (action->shortcut() == QKeySequence(QKeySequence::Redo))
+							redoAction = action;
+					}
+
+					if (! undoAction || ! redoAction)
+						fail(QStringLiteral("undo/redo actions missing"));
+					else if (undoAction->isEnabled())
+						fail(QStringLiteral("the undo stack was touched while loading the grid"));
+					else {
+						grid->setItem(0, 0, new QTableWidgetItem(QStringLiteral("李四")));
+						undoAction->trigger();
+						const QString back = grid->item(0, 0) ? grid->item(0, 0)->text() : QString();
+						redoAction->trigger();
+						const QString forward =
+						    grid->item(0, 0) ? grid->item(0, 0)->text() : QString();
+						report << QStringLiteral("undo/redo: %1 -> %2").arg(back, forward);
+
+						if (back != QStringLiteral("张三") || forward != QStringLiteral("李四"))
+							fail(QStringLiteral("undo/redo did not restore the list"));
+					}
+				}
+			}
+		}
+
+		// 4b) 注意事项 / 比赛注意：只认 [文字](链接)，其余全部当纯文本
+		{
+			const QString text = QStringLiteral("第一行 [官网](https://a.b/c_d#e)\n第二行 100% & A_B\n\n第三段");
+			const QString latex = AdmissionNotes::toLatex(text);
+			const QString markdown = AdmissionNotes::toLatex(QStringLiteral("**加粗** # 标题"));
+			report << QStringLiteral("notes render: %1").arg(latex);
+
+			if (! latex.contains(QStringLiteral("\\href{https://a.b/c\\_d\\#e}{官网}")) ||
+			    ! latex.contains(QStringLiteral("100\\% \\& A\\_B")) ||
+			    ! latex.contains(QStringLiteral("\\newline")) ||
+			    ! latex.contains(QStringLiteral("\\par")) ||
+			    ! markdown.contains(QStringLiteral("**加粗** \\# 标题")))
+				fail(QStringLiteral("notes rendering: ") + latex + QStringLiteral(" / ") + markdown);
+		}
+
+		// 4c) 准考证号策略：默认规则能出号、全局序号跨赛区、对话框能原样带回策略
+		{
+			AdmissionProject project;
+			project.load(true, nullptr);
+			AdmissionRegion *item = project.find(QStringLiteral("A赛区"));
+			AdmissionAssign::IdOptions options;
+			options.templateText =
+			    QStringLiteral("<section>-S<number><number><number><number><number>");
+			options.overwrite = true;
+			QStringList ids;
+			QString error;
+
+			if (! item || ! AdmissionAssign::planIds(item->table, item->name, options, ids, &error))
+				fail(QStringLiteral("planIds: ") + error);
+			else {
+				report << QStringLiteral("ticket numbers: %1").arg(ids.value(0));
+
+				if (ids.value(0) != QStringLiteral("A赛区-S00001"))
+					fail(QStringLiteral("default ticket number: ") + ids.value(0));
+			}
+
+			options.templateText = QStringLiteral("<number><number><number>");
+			options.numberSources = QStringList{QStringLiteral("globalSeq")};
+			options.globalOffset = 41;
+
+			if (! item || ! AdmissionAssign::planIds(item->table, item->name, options, ids, &error))
+				fail(QStringLiteral("planIds (global): ") + error);
+			else if (ids.value(0) != QStringLiteral("042"))
+				fail(QStringLiteral("global sequence did not continue: ") + ids.value(0));
+
+			if (item) {
+				IdRuleDialog dialog(item->table, item->name, options);
+				const AdmissionAssign::IdOptions back = dialog.options();
+				report << QStringLiteral("id rule dialog: %1 / %2 / overwrite=%3")
+				              .arg(back.templateText, back.numberSources.join(QStringLiteral(",")))
+				              .arg(back.overwrite ? 1 : 0);
+
+				if (back.templateText != options.templateText ||
+				    back.numberSources != options.numberSources ||
+				    back.charSources != options.charSources || back.overwrite != options.overwrite)
+					fail(QStringLiteral("the id rule dialog did not keep the strategy"));
+			}
+		}
+
+		// 4d) 排座位：考点 / 考场方案（容量）是唯一根据，两种摊法 + 座位号位数
+		{
+			AdmissionTable seats;
+			seats.header = AdmissionTable::builtinColumns();
+
+			for (int index = 0; index < 15; ++index)
+				seats.rows << QStringList{QStringLiteral("选手%1").arg(index + 1), QString(), QString(),
+				                          QString(), QString(), QString()};
+
+			AdmissionVenue venue;
+			venue.name = QStringLiteral("考点一");
+			venue.rooms << AdmissionRoom{QStringLiteral("101"), 20}
+			            << AdmissionRoom{QStringLiteral("102"), 20};
+			QList<AdmissionVenue> venues{venue};
+
+			AdmissionAssign::SeatOptions options;
+			options.layout = AdmissionAssign::FillFirst;
+			QStringList venueValues;
+			QStringList roomValues;
+			QStringList seatValues;
+			QString seatError;
+
+			if (! AdmissionAssign::planSeats(seats, venues, options, venueValues, roomValues, seatValues,
+			                                 &seatError))
+				fail(QStringLiteral("planSeats (fill first): ") + seatError);
+			else {
+				QHash<QString, int> filled;
+
+				for (const QString &room : roomValues)
+					filled[room] += 1;
+
+				report << QStringLiteral("seats (fill first): 101=%1 102=%2 first=%3 last=%4")
+				              .arg(filled.value(QStringLiteral("101")))
+				              .arg(filled.value(QStringLiteral("102")))
+				              .arg(seatValues.value(0), seatValues.value(14));
+
+				if (filled.value(QStringLiteral("101")) != 15 || filled.value(QStringLiteral("102")) != 0 ||
+				    seatValues.value(0) != QStringLiteral("01") ||
+				    seatValues.value(14) != QStringLiteral("15") ||
+				    venueValues.value(0) != QStringLiteral("考点一"))
+					fail(QStringLiteral("fill-first seating"));
+			}
+
+			options.layout = AdmissionAssign::Balanced;
+
+			if (! AdmissionAssign::planSeats(seats, venues, options, venueValues, roomValues, seatValues,
+			                                 &seatError))
+				fail(QStringLiteral("planSeats (balanced): ") + seatError);
+			else {
+				QHash<QString, int> filled;
+
+				for (const QString &room : roomValues)
+					filled[room] += 1;
+
+				report << QStringLiteral("seats (balanced): 101=%1 102=%2 last101=%3 first102=%4")
+				              .arg(filled.value(QStringLiteral("101")))
+				              .arg(filled.value(QStringLiteral("102")))
+				              .arg(seatValues.value(7), seatValues.value(8));
+
+				// 15 人 2 个考场 → 8 / 7：第 8 行还是 101 的 8 号（最大人数 8 是一位数，不补零），
+				// 第 9 行才是 102 的 1 号
+				if (filled.value(QStringLiteral("101")) != 8 || filled.value(QStringLiteral("102")) != 7 ||
+				    roomValues.value(8) != QStringLiteral("102") ||
+				    seatValues.value(7) != QStringLiteral("8") || seatValues.value(8) != QStringLiteral("1"))
+					fail(QStringLiteral("balanced seating"));
+			}
+
+			AdmissionVenue small;
+			small.name = QStringLiteral("考点二");
+			small.rooms << AdmissionRoom{QStringLiteral("201"), 4};
+
+			if (AdmissionAssign::planSeats(seats, QList<AdmissionVenue>{small}, options, venueValues,
+			                               roomValues, seatValues, &seatError))
+				fail(QStringLiteral("seating should fail when the rooms are too small"));
+			else
+				report << QStringLiteral("seats (overflow): %1").arg(seatError);
+		}
+
+		// 4e) 考点 / 考场编辑区：树建得起来也读得回来（考点只存名字，容量在考场那一行）
+		{
+			AdmissionProject project;
+			project.load(true, nullptr);
+			AdmissionRegion *item = project.find(QStringLiteral("A赛区"));
+
+			if (! item)
+				fail(QStringLiteral("the venue editor has no region to work on"));
+			else {
+				VenueDialog dialog(item->name, item->venues);
+				const QList<AdmissionVenue> back = dialog.venues();
+				report << QStringLiteral("venue editor: venues=%1 rooms=%2 capacity=%3")
+				              .arg(back.size())
+				              .arg(back.value(0).rooms.size() + back.value(1).rooms.size())
+				              .arg(back.value(0).rooms.value(0).capacity + back.value(0).rooms.value(1).capacity +
+				                   back.value(1).rooms.value(0).capacity);
+
+				if (back.size() != 2 || back.value(0).rooms.size() != 2 || back.value(1).rooms.size() != 1 ||
+				    back.value(0).name != QStringLiteral("考点一") ||
+				    back.value(0).rooms.value(1).capacity != 2 ||
+				    back.value(1).rooms.value(0).name != QStringLiteral("201"))
+					fail(QStringLiteral("the venue editor did not keep the plan"));
+			}
+		}
+
+		// 5) 删除赛区：整个赛区目录（名单 / 通告 / 列规则）一起没
+		{
+			AdmissionProject project;
+			project.load(true, nullptr);
+			QString error;
+			const bool removed = project.removeRegion(QStringLiteral("A赛区"), &error);
+			const bool gone = ! QDir(AdmissionProject::regionFolder(QStringLiteral("A赛区"))).exists();
+			report << QStringLiteral("remove region: %1")
+			              .arg(removed && gone ? QStringLiteral("ok") : QStringLiteral("FAILED"));
+
+			if (! removed || ! gone)
+				fail(QStringLiteral("removeRegion: ") + error);
+		}
+
+		report.prepend(QStringLiteral("problems=%1").arg(problems));
+
+		QFile out(QDir(dayFolder).absoluteFilePath(reportFile));
+
+		if (out.open(QIODevice::WriteOnly | QIODevice::Text)) {
+			QTextStream stream(&out);
+			stream << report.join(QChar('\n')) << '\n';
+		}
+
+		LOG("check-admission-ui: problems", problems);
 		return problems == 0 ? 0 : 1;
 	}
 

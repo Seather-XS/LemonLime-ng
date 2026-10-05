@@ -10,7 +10,8 @@
       2. windeployqt 拉齐 Qt 运行库、插件（platforms / styles / iconengines / imageformats /
          generic / tls / networkinformation / translations）与 MinGW 运行库
          （libgcc / libstdc++ / libwinpthread）——与原版发布包一致；
-      3. 复制题面模板 assets\statement-templates（PDF 导出要用）与 LICENSE；
+      3. 复制题面模板 assets\statement-templates（PDF 导出要用）与准考证模板
+         assets\admission-templates（含字体，xelatex 编译要用）以及 LICENSE；
       4. 清掉调试 / 打包残留（*.pdb、*.ilk、*.prl、vc_redist 等）；
          默认保留 windeployqt 的全部输出（插件目录、Qt 自带的 qt_*.qm 翻译、
          opengl32sw.dll / D3Dcompiler 全铺），发布目录的形态与原版一致；
@@ -225,6 +226,19 @@ if (-not $NoTemplates) {
     } else {
         Write-Warning "没有找到 $templates，导出 PDF 会失败"
     }
+
+    # 准考证的内置模板与自带字体（源宋体）：xelatex 编译时要能用上
+    $admissionTemplates = Join-Path $root 'assets\templates\admission'
+    $admissionTarget = Join-Path $OutDir 'templates\admission'
+
+    if (Test-Path -LiteralPath $admissionTemplates) {
+        if (Test-Path -LiteralPath $admissionTarget) { Remove-Item -LiteralPath $admissionTarget -Recurse -Force }
+
+        Copy-Item -LiteralPath $admissionTemplates -Destination $admissionTarget -Recurse
+        Write-Host "  + templates\admission\（准考证模板与字体）"
+    } else {
+        Write-Warning "没有找到 $admissionTemplates，生成准考证会失败"
+    }
 }
 
 $license = Join-Path $root 'LICENSE'
@@ -411,6 +425,12 @@ $templatesTarget = Join-Path $OutDir 'statement-templates'
 
 if (Test-Path -LiteralPath $templatesTarget) {
     $runtime += Get-ChildItem -Path $templatesTarget -Recurse -File -ErrorAction SilentlyContinue
+}
+
+$admissionTarget = Join-Path $OutDir 'templates\admission'
+
+if (Test-Path -LiteralPath $admissionTarget) {
+    $runtime += Get-ChildItem -Path $admissionTarget -Recurse -File -ErrorAction SilentlyContinue
 }
 
 $runtimeSize = [math]::Round((($runtime | Measure-Object Length -Sum).Sum) / 1MB, 1)

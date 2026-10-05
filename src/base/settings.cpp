@@ -681,9 +681,18 @@ auto Settings::exportPath() -> QString {
 	return QString("dist") + QDir::separator() + QStringLiteral("export") + QDir::separator();
 }
 
+// 准考证：admission/ 放名单（CSV）、注意事项（Markdown）与模板（.tex），
+// 生成的 PDF 固定写到 dist/admission/ 下。
+auto Settings::admissionPath() -> QString { return QString("admission") + QDir::separator(); }
+
+auto Settings::admissionOutputPath() -> QString {
+	return QString("dist") + QDir::separator() + QStringLiteral("admission") + QDir::separator();
+}
+
 void Settings::ensureDistDirs() {
 	QDir().mkpath(reportsPath());
 	QDir().mkpath(exportPath());
+	QDir().mkpath(admissionOutputPath());
 
 	// 早期版本把导出物直接放在比赛日根目录下（reports/、export/）：老工程里残留的这两个
 	// 目录清掉（里面是上一次的导出结果，重新导出会在 dist/ 下生成）。有东西的话记一条日志。

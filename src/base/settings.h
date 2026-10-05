@@ -149,7 +149,10 @@ class Settings {
 	/// 导出目录：每个比赛日下的 `dist/reports/`（成绩单、统计）与 `dist/export/`（压缩包）。
 	static QString reportsPath();
 	static QString exportPath();
-	/// 建好 dist/reports/ 与 dist/export/，并清掉早期版本留在比赛日根目录的 reports/、export/。
+	/// 准考证：名单 / 注意事项 / 模板放 `admission/`，生成的 PDF 放 `dist/admission/`。
+	static QString admissionPath();
+	static QString admissionOutputPath();
+	/// 建好 dist/reports/、dist/export/ 与 dist/admission/，并清掉早期版本留在比赛日根目录的 reports/、export/。
 	static void ensureDistDirs();
 	/// 交互库 / 校验器只允许放在 <题>/graders/ 下，返回相对 dataPath() 的该目录（带结尾分隔符）。
 	static QString gradersPath(const QString &taskName);

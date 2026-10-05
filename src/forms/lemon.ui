@@ -478,6 +478,26 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="admissionTab">
+       <attribute name="title">
+        <string>Admission</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="admissionLayout">
+        <item>
+         <widget class="AdmissionWidget" name="admissionWidget" native="true">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="statusTip">
+           <string>Compile the admission tickets of this contest day (LaTeX)...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -1035,6 +1055,12 @@
    <class>ExportWidget</class>
    <extends>QWidget</extends>
    <header>exportwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AdmissionWidget</class>
+   <extends>QWidget</extends>
+   <header>admission/admissionwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

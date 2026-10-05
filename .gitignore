@@ -63,6 +63,7 @@ lemon-*-Linux.tar.gz
 /dist/
 release/
 LemonLime-*-v*.*.*-win-x64.zip
+tmp-*/
 
 # Generated translations and helper logs
 *.qm
