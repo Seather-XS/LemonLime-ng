@@ -332,12 +332,7 @@ bool AdmissionProject::load(bool regionEnabled, QString *error) {
 		// 准考证号规则
 		const QJsonObject rule = config.value(QStringLiteral("idRule")).toObject();
 		idTemplate = rule.value(QStringLiteral("template")).toString(idTemplate);
-		idOverwrite = rule.value(QStringLiteral("overwrite")).toBool(idOverwrite);
-		idNumberSources.clear();
 		idCharSources.clear();
-
-		for (const auto &value : rule.value(QStringLiteral("numberGroups")).toArray())
-			idNumberSources << value.toObject().value(QStringLiteral("source")).toString();
 
 		for (const auto &value : rule.value(QStringLiteral("charGroups")).toArray())
 			idCharSources << value.toObject().value(QStringLiteral("source")).toString();
@@ -489,14 +484,7 @@ bool AdmissionProject::saveConfig(QString *error) const {
 	QJsonObject idRule;
 	idRule.insert(QStringLiteral("template"), idTemplate);
 	{
-		QJsonArray numbers;
 		QJsonArray chars;
-
-		for (const QString &source : idNumberSources) {
-			QJsonObject item;
-			item.insert(QStringLiteral("source"), source);
-			numbers.append(item);
-		}
 
 		for (const QString &source : idCharSources) {
 			QJsonObject item;
@@ -504,9 +492,7 @@ bool AdmissionProject::saveConfig(QString *error) const {
 			chars.append(item);
 		}
 
-		idRule.insert(QStringLiteral("numberGroups"), numbers);
 		idRule.insert(QStringLiteral("charGroups"), chars);
-		idRule.insert(QStringLiteral("overwrite"), idOverwrite);
 		idRule.insert(QStringLiteral("scope"), QStringLiteral("region"));
 		idRule.insert(QStringLiteral("order"), QStringLiteral("row"));
 	}

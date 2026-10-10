@@ -136,6 +136,18 @@ void AdmissionWidget::buildUi() {
 	packageBox = new QComboBox(this);
 	overwriteBox = new QCheckBox(this);
 	overwriteBox->setChecked(true);
+	// 条目现在就要填好：等 reload() 里现填会触发 currentIndexChanged → optionsChanged() →
+	// 拿还没 load() 的空 project 写盘，把 config.json 与 contest-notes.md 冲掉
+	// （「标题重启就没了」就是这么来的）。填的时候屏蔽信号。
+	{
+		QSignalBlocker layoutBlocker(layoutBox);
+		QSignalBlocker packageBlocker(packageBox);
+		layoutBox->addItem(QString(), QStringLiteral("byRegion"));
+		layoutBox->addItem(QString(), QStringLiteral("flat"));
+		layoutBox->addItem(QString(), QStringLiteral("byRoom"));
+		packageBox->addItem(QString(), QStringLiteral("byRegion"));
+		packageBox->addItem(QString(), QStringLiteral("none"));
+	}
 	buildSelectedButton = new QPushButton(this);
 	buildAllButton = new QPushButton(this);
 	stopButton = new QPushButton(this);
@@ -265,6 +277,7 @@ void AdmissionWidget::reload() {
 	if (! contest) {
 		// 比赛日关了：解除钉定，免得还往刚才那个目录里写
 		AdmissionProject::useRoot(QString());
+		loaded = false;
 		return;
 	}
 
@@ -276,16 +289,6 @@ void AdmissionWidget::reload() {
 		saveTextEdits();
 	}
 
-	// 下拉框没有条目时先补上（retranslate 只改文字）
-	if (layoutBox->count() == 0) {
-		layoutBox->addItem(QString(), QStringLiteral("byRegion"));
-		layoutBox->addItem(QString(), QStringLiteral("flat"));
-		layoutBox->addItem(QString(), QStringLiteral("byRoom"));
-		packageBox->addItem(QString(), QStringLiteral("byRegion"));
-		packageBox->addItem(QString(), QStringLiteral("none"));
-		retranslate();
-	}
-
 	QStringList migrationLog;
 	project->migrateLegacy(&migrationLog);
 
@@ -293,6 +296,7 @@ void AdmissionWidget::reload() {
 		appendLog(tr("migration: %1").arg(line));
 
 	QString error;
+	loaded = true;
 
 	if (! project->load(contest->getRegionEnabled(), &error))
 		appendLog(tr("Cannot load admission data: %1").arg(error));
@@ -389,6 +393,10 @@ void AdmissionWidget::openOutputClicked() {
 }
 
 void AdmissionWidget::optionsChanged() {
+	// 还没读盘就改选项：内存里是空 project，写下去就把盘上的设置清了
+	if (! loaded || ! contest)
+		return;
+
 	project->dirLayout = layoutBox->currentData().toString();
 	project->packageByRegion = packageBox->currentData().toString() != QStringLiteral("none");
 	project->overwrite = overwriteBox->isChecked();
@@ -508,6 +516,9 @@ void AdmissionWidget::saveIfNeeded() {
 }
 
 void AdmissionWidget::saveTextEdits() {
+	if (! loaded || ! contest)
+		return;
+
 	const QString title = titleEdit->text().trimmed();
 	const QString examTime = examTimeEdit->text().trimmed();
 
@@ -518,12 +529,10 @@ void AdmissionWidget::saveTextEdits() {
 	project->examTime = examTime;
 	QString error;
 
-	// 只动 config.json：标题 / 测试时间跟名单无关，别为了它把各赛区的 CSV 重写一遍
+	// 只动 config.json：标题 / 测试时间跟名单无关，别为了它把各赛区的 CSV 重写一遍。
+	// 存盘是后台行为，成功不吭声；只有失败才提示。
 	if (! project->saveConfig(&error))
 		appendLog(tr("Cannot save admission config: %1").arg(error));
-	else
-		appendLog(tr("title / test time saved → %1")
-		              .arg(QDir::toNativeSeparators(AdmissionProject::configPath())));
 }
 
 void AdmissionWidget::notesClicked() {

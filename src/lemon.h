@@ -34,6 +34,8 @@ class LemonLime : public QMainWindow {
 	void closeEvent(QCloseEvent *);
 	int getSplashTime();
 	void welcome();
+	/// 自检（--check-close）用：按路径打开比赛日，不走文件对话框。返回是否真的载入了。
+	bool openContestForCheck(const QString &fileName);
 
   private:
 	Ui::LemonLime *ui;

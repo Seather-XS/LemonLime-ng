@@ -11,8 +11,8 @@
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QFormLayout>
-#include <QLabel>
 #include <QLineEdit>
+#include <QPlainTextEdit>
 #include <QVBoxLayout>
 
 namespace {
@@ -28,8 +28,7 @@ namespace {
 
 IdRuleDialog::IdRuleDialog(const AdmissionTable &table, const QString &section,
                            const AdmissionAssign::IdOptions &current, QWidget *parent)
-    : QDialog(parent), table(table), section(section), initialNumberSources(current.numberSources),
-      initialCharSources(current.charSources) {
+    : QDialog(parent), table(table), section(section), initialCharSources(current.charSources) {
 	setWindowTitle(tr("Ticket numbers"));
 
 	auto *layout = new QVBoxLayout(this);
@@ -37,49 +36,42 @@ IdRuleDialog::IdRuleDialog(const AdmissionTable &table, const QString &section,
 	auto *templateForm = new QFormLayout();
 	templateEdit = new QLineEdit(current.templateText, this);
 	templateEdit->setToolTip(tr("Placeholders: <section> <number> <char> <row> <seat> <room> <name> <id>, plus any "
-	                            "column of the list (e.g. <学号>). Repeating a placeholder counts the digits: "
-	                            "<number><number><number> is three digits."));
+	                            "column of the list (e.g. <学号>). The digits always come from the row number of "
+	                            "the list; repeating the placeholder sets the width: <number><number><number> is "
+	                            "001, 002, …"));
 	templateForm->addRow(tr("Template:"), templateEdit);
 	layout->addLayout(templateForm);
 
 	groupsForm = new QFormLayout();
 	layout->addLayout(groupsForm);
 
-	auto *stateForm = new QFormLayout();
-	overwriteBox = new QComboBox(this);
-	overwriteBox->addItem(tr("Fill in the empty ones only"), false);
-	overwriteBox->addItem(tr("Overwrite the existing ones"), true);
-	overwriteBox->setCurrentIndex(current.overwrite ? 1 : 0);
-	stateForm->addRow(tr("Existing ticket numbers:"), overwriteBox);
-	layout->addLayout(stateForm);
-
-	preview = new QLabel(this);
-	preview->setTextInteractionFlags(Qt::TextSelectableByMouse);
+	// 预览放在只读文本框里：人数一多标签就把对话框撑爆了，这里让它自己滚。
+	preview = new QPlainTextEdit(this);
+	preview->setObjectName(QStringLiteral("previewText"));
+	preview->setReadOnly(true);
+	preview->setLineWrapMode(QPlainTextEdit::NoWrap);
+	preview->setMinimumHeight(160);
+	preview->setTabChangesFocus(true);
 	QFont mono = preview->font();
 	mono.setFamily(QStringLiteral("monospace"));
 	preview->setFont(mono);
-	preview->setMinimumHeight(90);
-	preview->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 	layout->addWidget(preview, 1);
 
 	buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
 	layout->addWidget(buttons);
 
 	connect(templateEdit, &QLineEdit::textChanged, this, &IdRuleDialog::updateState);
-	connect(overwriteBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &IdRuleDialog::updateState);
 	connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
 	connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
 	updateState();
-	resize(600, 420);
+	resize(600, 460);
 }
 
 auto IdRuleDialog::options() const -> AdmissionAssign::IdOptions {
 	AdmissionAssign::IdOptions value;
 	value.templateText = templateEdit->text().trimmed();
-	value.numberSources = currentSources(numberBoxes);
 	value.charSources = currentSources(charBoxes);
-	value.overwrite = overwriteBox->currentIndex() == 1;
 	return value;
 }
 
@@ -107,27 +99,18 @@ QComboBox *IdRuleDialog::makeSourceBox(const QString &key) {
 
 void IdRuleDialog::syncGroups() {
 	const QString pattern = templateEdit->text();
-	const int numbers = AdmissionNaming::groupCount(pattern, QStringLiteral("number"));
 	const int chars = AdmissionNaming::groupCount(pattern, QStringLiteral("char"));
 
-	if (numbers == numberBoxes.size() && chars == charBoxes.size())
+	// 数字固定取行号，没有下拉；只有模板里写了 <char> 才有「字母取自」。
+	if (chars == charBoxes.size())
 		return;
 
-	const QStringList keepNumbers = currentSources(numberBoxes);
 	const QStringList keepChars = currentSources(charBoxes);
 
 	while (groupsForm->rowCount() > 0)
 		groupsForm->removeRow(0);
 
-	numberBoxes.clear();
 	charBoxes.clear();
-
-	for (int group = 0; group < numbers; ++group) {
-		auto *box = makeSourceBox(keepNumbers.value(group, initialNumberSources.value(
-		                                                 group, QStringLiteral("regionSeq"))));
-		numberBoxes << box;
-		groupsForm->addRow(tr("Digits from:"), box);
-	}
 
 	for (int group = 0; group < chars; ++group) {
 		auto *box = makeSourceBox(
@@ -147,21 +130,21 @@ void IdRuleDialog::updatePreview() {
 	QString error;
 
 	if (! AdmissionAssign::planIds(table, section, options(), ids, &error)) {
-		preview->setText(error);
+		preview->setPlainText(error);
 		return;
 	}
 
 	const int nameColumn = table.columnIndex(QStringLiteral("姓名"));
-	const int rows = qMin(6, ids.size());
 	QStringList lines;
 
-	for (int row = 0; row < rows; ++row)
+	// 全都列出来：预览是能滚的文本框，不用再截断，用户想看第 500 个号码也行。
+	for (int row = 0; row < ids.size(); ++row)
 		lines << QStringLiteral("%1. %2 → %3")
 		             .arg(row + 1)
 		             .arg(table.cell(row, nameColumn), ids.at(row));
 
-	if (ids.size() > rows)
-		lines << QStringLiteral("…");
+	if (lines.isEmpty())
+		lines << tr("The list is empty.");
 
-	preview->setText(lines.join(QChar('\n')));
+	preview->setPlainText(lines.join(QChar('\n')));
 }

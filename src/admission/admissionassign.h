@@ -24,17 +24,16 @@ namespace AdmissionAssign {
 
 	/// 排座位选项。考点 / 考场 / 容量只能来自 AdmissionRegion::venues。
 	struct SeatOptions {
-		QString order{QStringLiteral("row")}; ///< row / name / random
+		QString order{QStringLiteral("row")}; ///< row / random
 		int layout{FillFirst};                ///< SeatLayout
 	};
 
-	/// 生成准考证号选项。
+	/// 生成准考证号选项。号码一律覆盖已有值（用户要求：生成它就是为了重编）；
+	/// 数字组固定取自名单行号，只有字母组还能选来源。
 	struct IdOptions {
 		QString templateText;
-		QStringList numberSources;
 		QStringList charSources;
-		bool overwrite{false}; ///< 已有准考证号：覆盖 / 只填空
-		/// 本赛区之前已经有多少人（选「全局序号」时用它把序号接上）。
+		/// 本赛区之前已经有多少人（字母组选「全场序号」时用它把序号接上）。
 		int globalOffset{0};
 	};
 

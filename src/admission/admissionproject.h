@@ -73,10 +73,7 @@ class AdmissionProject {
 	QString contestNotes;          ///< 比赛注意（纯文本 + [文字](链接)）
 	/// 准考证号规则（idRule）：每赛区独立编号、按 CSV 行序。
 	QString idTemplate{QStringLiteral("<section>-S<number><number><number><number><number>")};
-	QStringList idNumberSources{QStringLiteral("regionSeq")};
 	QStringList idCharSources;
-	/// 生成时已有号码怎么办（「生成准考证号」对话框里选，一起存进 idRule）。
-	bool idOverwrite{false};
 	/// 输出文件名规则（generatePolicy.naming）：不启用时用 <准考证号>.pdf。
 	bool namingEnabled{false};
 	QString namingTemplate;

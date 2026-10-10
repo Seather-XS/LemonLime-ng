@@ -29,7 +29,6 @@ SeatDialog::SeatDialog(const AdmissionTable &table, const QList<AdmissionVenue> 
 	layoutBox->setCurrentIndex(current.layout == AdmissionAssign::Balanced ? 1 : 0);
 	orderBox = new QComboBox(this);
 	orderBox->addItem(tr("List order"), QStringLiteral("row"));
-	orderBox->addItem(tr("By name"), QStringLiteral("name"));
 	orderBox->addItem(tr("Random"), QStringLiteral("random"));
 	orderBox->setCurrentIndex(qMax(0, orderBox->findData(current.order)));
 
@@ -38,8 +37,11 @@ SeatDialog::SeatDialog(const AdmissionTable &table, const QList<AdmissionVenue> 
 	layout->addLayout(form);
 
 	preview = new QPlainTextEdit(this);
+	preview->setObjectName(QStringLiteral("previewText"));
 	preview->setReadOnly(true);
-	preview->setMinimumHeight(220);
+	preview->setLineWrapMode(QPlainTextEdit::NoWrap);
+	preview->setMinimumHeight(200);
+	preview->setTabChangesFocus(true);
 	QFont mono = preview->font();
 	mono.setFamily(QStringLiteral("monospace"));
 	preview->setFont(mono);
@@ -121,10 +123,10 @@ void SeatDialog::updatePreview() {
 	}
 
 	const int nameColumn = table.columnIndex(QStringLiteral("姓名"));
-	const int rows = qMin(5, seatValues.size());
 	lines << QString();
 
-	for (int row = 0; row < rows; ++row)
+	// 全都列出来（文本框自己滚）：“谁坐在哪个考场哪个座位”能一路看到最后一个。
+	for (int row = 0; row < seatValues.size(); ++row)
 		lines << QStringLiteral("%1. %2 → %3 / %4")
 		             .arg(row + 1)
 		             .arg(table.cell(row, nameColumn), venueValues.at(row),

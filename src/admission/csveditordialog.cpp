@@ -1150,11 +1150,9 @@ void CsvEditorDialog::idsClicked() {
 	AdmissionAssign::IdOptions options;
 	options.templateText = project ? project->idTemplate
 	                              : QStringLiteral("<section>-S<number><number><number><number><number>");
-	options.numberSources = project ? project->idNumberSources : QStringList{QStringLiteral("regionSeq")};
 	options.charSources = project ? project->idCharSources : QStringList();
-	options.overwrite = project ? project->idOverwrite : false;
 
-	// 「全局序号」要把前面赛区的人数接上
+	// 「全场序号」要把前面赛区的人数接上（模板里有 <char> 且选了它才用得到）
 	if (project)
 		for (const AdmissionRegion &item : project->regions) {
 			if (item.name == region)
@@ -1172,9 +1170,7 @@ void CsvEditorDialog::idsClicked() {
 
 	if (project) {
 		project->idTemplate = options.templateText;
-		project->idNumberSources = options.numberSources;
 		project->idCharSources = options.charSources;
-		project->idOverwrite = options.overwrite;
 		QString saveError;
 
 		if (! project->save(&saveError))

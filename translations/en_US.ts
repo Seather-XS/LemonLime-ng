@@ -662,252 +662,247 @@
 <context>
     <name>AdmissionWidget</name>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="213"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="451"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="225"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="459"/>
         <source>Edit list</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="227"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="239"/>
         <source>Overwrite</source>
         <translation>Overwrite</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="229"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="241"/>
         <source>Region</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="211"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="223"/>
         <source>Refresh</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="207"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="219"/>
         <source>Title:</source>
         <translation>Title:</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="208"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="220"/>
         <source>Test time:</source>
         <translation>Test time:</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="209"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="452"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="221"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="460"/>
         <source>Notes</source>
         <translation>Notes</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="210"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="550"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="222"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="559"/>
         <source>Contest notes</source>
         <translation>Contest notes</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="212"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="224"/>
         <source>Open admission/</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="214"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="226"/>
         <source>Venues / rooms</source>
         <translation>Venues / rooms</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="215"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="455"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="573"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="227"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="463"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="582"/>
         <source>New region</source>
         <translation>New region</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="216"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="428"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="456"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="228"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="436"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="464"/>
         <source>Delete region</source>
         <translation>Delete region</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="217"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="229"/>
         <source>Build selected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="218"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="230"/>
         <source>Build all</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="219"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="231"/>
         <source>Stop</source>
         <translation>Stop</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="220"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="232"/>
         <source>Open dist/admission/</source>
         <translation>Open dist/admission/</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="222"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="234"/>
         <source>Folders: by region</source>
         <translation>Folders: by region</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="223"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="235"/>
         <source>Folders: flat</source>
         <translation>Folders: flat</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="224"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="236"/>
         <source>Folders: by room</source>
         <translation>Folders: by room</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="225"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="237"/>
         <source>Zip: by region</source>
         <translation>Zip: by region</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="226"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="238"/>
         <source>Zip: none</source>
         <translation>Zip: none</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="229"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="241"/>
         <source>List</source>
         <translation>List</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="229"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="241"/>
         <source>Output</source>
         <translation>Output</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="229"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="241"/>
         <source>Zip</source>
         <translation>Zip</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="293"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="296"/>
         <source>migration: %1</source>
         <translation>migration: %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="298"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="302"/>
         <source>Cannot load admission data: %1</source>
         <translation>Cannot load admission data: %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="343"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="347"/>
         <source>%1 contestants</source>
         <translation>%1 contestants</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="344"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="348"/>
         <source>%1 PDFs · %2</source>
         <translation>%1 PDFs · %2</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="398"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="495"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="523"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="406"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="503"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="535"/>
         <source>Cannot save admission config: %1</source>
         <translation>Cannot save admission config: %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="425"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="433"/>
         <source>Delete the list and all of its settings?</source>
         <translation>Delete the list and all of its settings?</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="426"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="434"/>
         <source>Delete region &quot;%1&quot; and all of its files?</source>
         <translation>Delete region &quot;%1&quot; and all of its files?</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="438"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="446"/>
         <source>deleted region %1</source>
         <translation>deleted region %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="453"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="461"/>
         <source>Venues / rooms…</source>
         <translation>Venues / rooms…</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="525"/>
-        <source>title / test time saved → %1</source>
-        <translation>title / test time saved → %1</translation>
-    </message>
-    <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="537"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="546"/>
         <source>Notes — %1</source>
         <translation>Notes — %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="574"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="583"/>
         <source>Region folder name:</source>
         <translation>Region folder name:</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="575"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="584"/>
         <source>Region folder name (this contest has: %1):</source>
         <translation>Region folder name (this contest has: %1):</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="610"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="619"/>
         <source>— build started %1 · folders: %2 · packages: %3 —</source>
         <translation>— build started %1 · folders: %2 · packages: %3 —</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="613"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="622"/>
         <source>regions: %1</source>
         <translation>regions: %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="613"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="622"/>
         <source>all</source>
         <translation>all</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="626"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="635"/>
         <source>build failed: %1</source>
         <translation>build failed: %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="637"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="646"/>
         <source>— done in %1 s · %2 of %3 generated · %4 failed —</source>
         <translation>— done in %1 s · %2 of %3 generated · %4 failed —</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="642"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="651"/>
         <source>output: %1</source>
         <translation>output: %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="645"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="654"/>
         <source>failed tickets keep their .tex / .log in the _failed folder.</source>
         <translation>failed tickets keep their .tex / .log in the _failed folder.</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="665"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="674"/>
         <source>Stopping after the current ticket…</source>
         <translation>Stopping after the current ticket…</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="342"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="423"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="536"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="346"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="431"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="545"/>
         <source>(no region)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="434"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="546"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="559"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="584"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="627"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="442"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="555"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="568"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="593"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="636"/>
         <source>Admission tickets</source>
         <translation></translation>
     </message>
@@ -1398,7 +1393,7 @@
     </message>
     <message>
         <location filename="../src/admission/csveditordialog.cpp" line="266"/>
-        <location filename="../src/admission/csveditordialog.cpp" line="1194"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1190"/>
         <source>Generate ticket numbers</source>
         <translation>Generate ticket numbers</translation>
     </message>
@@ -1448,10 +1443,10 @@
         <location filename="../src/admission/csveditordialog.cpp" line="1094"/>
         <location filename="../src/admission/csveditordialog.cpp" line="1125"/>
         <location filename="../src/admission/csveditordialog.cpp" line="1135"/>
-        <location filename="../src/admission/csveditordialog.cpp" line="1181"/>
-        <location filename="../src/admission/csveditordialog.cpp" line="1188"/>
-        <location filename="../src/admission/csveditordialog.cpp" line="1277"/>
-        <location filename="../src/admission/csveditordialog.cpp" line="1282"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1177"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1184"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1273"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1278"/>
         <source>Admission tickets</source>
         <translation>Admission tickets</translation>
     </message>
@@ -1647,72 +1642,72 @@
         <translation>Remove a column rule</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1199"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1195"/>
         <source>Fill the selection with a fixed value…</source>
         <translation>Fill the selection with a fixed value…</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1200"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1196"/>
         <source>Fill the selection with a sequence…</source>
         <translation>Fill the selection with a sequence…</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1201"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1197"/>
         <source>Clear the selection</source>
         <translation>Clear the selection</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1202"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1198"/>
         <source>Choose a photo…</source>
         <translation>Choose a photo…</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1204"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1200"/>
         <source>Add a row at the end</source>
         <translation>Add a row at the end</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1205"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1201"/>
         <source>Add a column at the end</source>
         <translation>Add a column at the end</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1206"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1202"/>
         <source>Delete the selected rows</source>
         <translation>Delete the selected rows</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1207"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1203"/>
         <source>Delete the selected columns</source>
         <translation>Delete the selected columns</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1248"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1244"/>
         <source>row %1: the test site is empty</source>
         <translation>row %1: the test site is empty</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1253"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1249"/>
         <source>row %1: the name is empty</source>
         <translation>row %1: the name is empty</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1258"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1254"/>
         <source>row %1: the seat is empty</source>
         <translation>row %1: the seat is empty</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1263"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1259"/>
         <source>row %1: the ticket number is empty</source>
         <translation>row %1: the ticket number is empty</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1266"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1262"/>
         <source>row %1: the ticket number %2 is duplicated (row %3)</source>
         <translation>row %1: the ticket number %2 is duplicated (row %3)</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1278"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1274"/>
         <source>Looks good: %1 contestants.</source>
         <translation>Looks good: %1 contestants.</translation>
     </message>
@@ -2890,14 +2885,14 @@ Depends: </source>
 <context>
     <name>IdRuleDialog</name>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="33"/>
+        <location filename="../src/admission/idruledialog.cpp" line="32"/>
         <source>Ticket numbers</source>
         <translation>Ticket numbers</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="39"/>
-        <source>Placeholders: &lt;section&gt; &lt;number&gt; &lt;char&gt; &lt;row&gt; &lt;seat&gt; &lt;room&gt; &lt;name&gt; &lt;id&gt;, plus any column of the list (e.g. &lt;学号&gt;). Repeating a placeholder counts the digits: &lt;number&gt;&lt;number&gt;&lt;number&gt; is three digits.</source>
-        <translation>Placeholders: &lt;section&gt; &lt;number&gt; &lt;char&gt; &lt;row&gt; &lt;seat&gt; &lt;room&gt; &lt;name&gt; &lt;id&gt;, plus any column of the list (e.g. &lt;学号&gt;). Repeating a placeholder counts the digits: &lt;number&gt;&lt;number&gt;&lt;number&gt; is three digits.</translation>
+        <location filename="../src/admission/idruledialog.cpp" line="38"/>
+        <source>Placeholders: &lt;section&gt; &lt;number&gt; &lt;char&gt; &lt;row&gt; &lt;seat&gt; &lt;room&gt; &lt;name&gt; &lt;id&gt;, plus any column of the list (e.g. &lt;学号&gt;). The digits always come from the row number of the list; repeating the placeholder sets the width: &lt;number&gt;&lt;number&gt;&lt;number&gt; is 001, 002, …</source>
+        <translation>Placeholders: &lt;section&gt; &lt;number&gt; &lt;char&gt; &lt;row&gt; &lt;seat&gt; &lt;room&gt; &lt;name&gt; &lt;id&gt;, plus any column of the list (e.g. &lt;学号&gt;). The digits always come from the row number of the list; repeating the placeholder sets the width: &lt;number&gt;&lt;number&gt;&lt;number&gt; is 001, 002, …</translation>
     </message>
     <message>
         <location filename="../src/admission/idruledialog.cpp" line="42"/>
@@ -2905,69 +2900,54 @@ Depends: </source>
         <translation>Template:</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="50"/>
-        <source>Fill in the empty ones only</source>
-        <translation>Fill in the empty ones only</translation>
-    </message>
-    <message>
-        <location filename="../src/admission/idruledialog.cpp" line="51"/>
-        <source>Overwrite the existing ones</source>
-        <translation>Overwrite the existing ones</translation>
-    </message>
-    <message>
-        <location filename="../src/admission/idruledialog.cpp" line="53"/>
-        <source>Existing ticket numbers:</source>
-        <translation>Existing ticket numbers:</translation>
-    </message>
-    <message>
-        <location filename="../src/admission/idruledialog.cpp" line="89"/>
+        <location filename="../src/admission/idruledialog.cpp" line="81"/>
         <source>Sequence in the region</source>
         <translation>Sequence in the region</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="90"/>
+        <location filename="../src/admission/idruledialog.cpp" line="82"/>
         <source>Sequence in the whole contest</source>
         <translation>Sequence in the whole contest</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="91"/>
+        <location filename="../src/admission/idruledialog.cpp" line="83"/>
         <source>Row number of the list</source>
         <translation>Row number of the list</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="92"/>
+        <location filename="../src/admission/idruledialog.cpp" line="84"/>
         <source>Seat number</source>
         <translation>Seat number</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="93"/>
+        <location filename="../src/admission/idruledialog.cpp" line="85"/>
         <source>Room number</source>
         <translation>Room number</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="94"/>
+        <location filename="../src/admission/idruledialog.cpp" line="86"/>
         <source>Digits at the end of the ticket number</source>
         <translation>Digits at the end of the ticket number</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="95"/>
+        <location filename="../src/admission/idruledialog.cpp" line="87"/>
         <source>Digits at the end of the name</source>
         <translation>Digits at the end of the name</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="98"/>
+        <location filename="../src/admission/idruledialog.cpp" line="90"/>
         <source>Column: %1</source>
         <translation>Column: %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="129"/>
-        <source>Digits from:</source>
-        <translation>Digits from:</translation>
-    </message>
-    <message>
-        <location filename="../src/admission/idruledialog.cpp" line="136"/>
+        <location filename="../src/admission/idruledialog.cpp" line="119"/>
         <source>Letters from:</source>
         <translation>Letters from:</translation>
+    </message>
+    <message>
+        <location filename="../src/admission/idruledialog.cpp" line="147"/>
+        <source>The list is empty.</source>
+        <translation>The list is empty.</translation>
     </message>
 </context>
 <context>
@@ -3279,8 +3259,8 @@ Depends: </source>
     <name>LemonLime</name>
     <message>
         <location filename="../src/forms/lemon.ui" line="20"/>
-        <location filename="../src/lemon.cpp" line="1106"/>
-        <location filename="../src/lemon.cpp" line="1291"/>
+        <location filename="../src/lemon.cpp" line="1117"/>
+        <location filename="../src/lemon.cpp" line="1302"/>
         <source>LemonLime</source>
         <translation></translation>
     </message>
@@ -3596,13 +3576,13 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="813"/>
-        <location filename="../src/lemon.cpp" line="378"/>
-        <location filename="../src/lemon.cpp" line="396"/>
-        <location filename="../src/lemon.cpp" line="400"/>
-        <location filename="../src/lemon.cpp" line="408"/>
-        <location filename="../src/lemon.cpp" line="414"/>
-        <location filename="../src/lemon.cpp" line="572"/>
-        <location filename="../src/lemon.cpp" line="574"/>
+        <location filename="../src/lemon.cpp" line="385"/>
+        <location filename="../src/lemon.cpp" line="403"/>
+        <location filename="../src/lemon.cpp" line="407"/>
+        <location filename="../src/lemon.cpp" line="415"/>
+        <location filename="../src/lemon.cpp" line="421"/>
+        <location filename="../src/lemon.cpp" line="579"/>
+        <location filename="../src/lemon.cpp" line="581"/>
         <source>Clean up Files</source>
         <translation></translation>
     </message>
@@ -3767,202 +3747,202 @@ Depends: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="375"/>
+        <location filename="../src/lemon.cpp" line="382"/>
         <source>Are you sure to Clean up Files?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="376"/>
+        <location filename="../src/lemon.cpp" line="383"/>
         <source>Reading guide are recommended.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="394"/>
+        <location filename="../src/lemon.cpp" line="401"/>
         <source>Making backup files to dir &lt;br&gt; `%1&apos;?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="400"/>
+        <location filename="../src/lemon.cpp" line="407"/>
         <source>Aborted.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="409"/>
+        <location filename="../src/lemon.cpp" line="416"/>
         <source>Aborted: `%1&apos; already exist.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="415"/>
+        <location filename="../src/lemon.cpp" line="422"/>
         <source>Aborted: Cannot make dir `%1&apos;.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="420"/>
+        <location filename="../src/lemon.cpp" line="427"/>
         <source>Making Backup...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="441"/>
+        <location filename="../src/lemon.cpp" line="448"/>
         <source>Cleaning</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="448"/>
+        <location filename="../src/lemon.cpp" line="455"/>
         <source>Working on it...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="453"/>
+        <location filename="../src/lemon.cpp" line="460"/>
         <source>Fetching Data...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="461"/>
+        <location filename="../src/lemon.cpp" line="468"/>
         <source>Initing...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="493"/>
+        <location filename="../src/lemon.cpp" line="500"/>
         <source>Now Cleaning...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="571"/>
+        <location filename="../src/lemon.cpp" line="578"/>
         <source>Finished.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="574"/>
+        <location filename="../src/lemon.cpp" line="581"/>
         <source>Aborted</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="695"/>
-        <location filename="../src/lemon.cpp" line="743"/>
-        <location filename="../src/lemon.cpp" line="759"/>
-        <location filename="../src/lemon.cpp" line="768"/>
-        <location filename="../src/lemon.cpp" line="900"/>
-        <location filename="../src/lemon.cpp" line="911"/>
+        <location filename="../src/lemon.cpp" line="702"/>
+        <location filename="../src/lemon.cpp" line="750"/>
+        <location filename="../src/lemon.cpp" line="766"/>
+        <location filename="../src/lemon.cpp" line="775"/>
+        <location filename="../src/lemon.cpp" line="907"/>
         <location filename="../src/lemon.cpp" line="922"/>
-        <location filename="../src/lemon.cpp" line="932"/>
-        <location filename="../src/lemon.cpp" line="945"/>
-        <location filename="../src/lemon.cpp" line="1041"/>
-        <location filename="../src/lemon.cpp" line="1436"/>
-        <location filename="../src/lemon.cpp" line="1502"/>
+        <location filename="../src/lemon.cpp" line="933"/>
+        <location filename="../src/lemon.cpp" line="943"/>
+        <location filename="../src/lemon.cpp" line="956"/>
+        <location filename="../src/lemon.cpp" line="1052"/>
+        <location filename="../src/lemon.cpp" line="1447"/>
+        <location filename="../src/lemon.cpp" line="1513"/>
         <source>Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="695"/>
-        <location filename="../src/lemon.cpp" line="760"/>
-        <location filename="../src/lemon.cpp" line="900"/>
-        <location filename="../src/lemon.cpp" line="1436"/>
+        <location filename="../src/lemon.cpp" line="702"/>
+        <location filename="../src/lemon.cpp" line="767"/>
+        <location filename="../src/lemon.cpp" line="907"/>
+        <location filename="../src/lemon.cpp" line="1447"/>
         <source>Cannot open file %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="687"/>
-        <location filename="../src/lemon.cpp" line="696"/>
+        <location filename="../src/lemon.cpp" line="694"/>
+        <location filename="../src/lemon.cpp" line="703"/>
         <source>Save Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="714"/>
+        <location filename="../src/lemon.cpp" line="721"/>
         <source>Saved</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="744"/>
-        <location filename="../src/lemon.cpp" line="769"/>
-        <location filename="../src/lemon.cpp" line="912"/>
-        <location filename="../src/lemon.cpp" line="922"/>
-        <location filename="../src/lemon.cpp" line="932"/>
-        <location filename="../src/lemon.cpp" line="945"/>
+        <location filename="../src/lemon.cpp" line="751"/>
+        <location filename="../src/lemon.cpp" line="776"/>
+        <location filename="../src/lemon.cpp" line="923"/>
+        <location filename="../src/lemon.cpp" line="933"/>
+        <location filename="../src/lemon.cpp" line="943"/>
+        <location filename="../src/lemon.cpp" line="956"/>
         <source>File %1 is broken</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1010"/>
-        <location filename="../src/lemon.cpp" line="1413"/>
+        <location filename="../src/lemon.cpp" line="1021"/>
+        <location filename="../src/lemon.cpp" line="1424"/>
         <source>LemonLime - %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1012"/>
-        <location filename="../src/lemon.cpp" line="1415"/>
-        <location filename="../src/lemon.cpp" line="1653"/>
+        <location filename="../src/lemon.cpp" line="1023"/>
+        <location filename="../src/lemon.cpp" line="1426"/>
+        <location filename="../src/lemon.cpp" line="1664"/>
         <source>LemonLime - %1 / %2</source>
         <translation>LemonLime - %1 / %2</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1041"/>
-        <location filename="../src/lemon.cpp" line="1502"/>
+        <location filename="../src/lemon.cpp" line="1052"/>
+        <location filename="../src/lemon.cpp" line="1513"/>
         <source>Cannot make contest path</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1291"/>
+        <location filename="../src/lemon.cpp" line="1302"/>
         <source>No task found</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1390"/>
-        <location filename="../src/lemon.cpp" line="1395"/>
-        <location filename="../src/lemon.cpp" line="1399"/>
-        <location filename="../src/lemon.cpp" line="1642"/>
+        <location filename="../src/lemon.cpp" line="1401"/>
+        <location filename="../src/lemon.cpp" line="1406"/>
+        <location filename="../src/lemon.cpp" line="1410"/>
+        <location filename="../src/lemon.cpp" line="1653"/>
         <source>Rename Contest</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1390"/>
+        <location filename="../src/lemon.cpp" line="1401"/>
         <source>No Contest Yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1395"/>
-        <location filename="../src/lemon.cpp" line="1643"/>
+        <location filename="../src/lemon.cpp" line="1406"/>
+        <location filename="../src/lemon.cpp" line="1654"/>
         <source>Write the name you want.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1396"/>
+        <location filename="../src/lemon.cpp" line="1407"/>
         <source>New Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1399"/>
+        <location filename="../src/lemon.cpp" line="1410"/>
         <source>The name did not changes.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1485"/>
-        <location filename="../src/lemon.cpp" line="1495"/>
-        <location filename="../src/lemon.cpp" line="1607"/>
+        <location filename="../src/lemon.cpp" line="1496"/>
+        <location filename="../src/lemon.cpp" line="1506"/>
+        <location filename="../src/lemon.cpp" line="1618"/>
         <source>New Contest Day</source>
         <translation>New Contest Day</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1486"/>
+        <location filename="../src/lemon.cpp" line="1497"/>
         <source>The folder name cannot contain path separators.</source>
         <translation>The folder name cannot contain path separators.</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1496"/>
+        <location filename="../src/lemon.cpp" line="1507"/>
         <source>A contest day with this folder already exists.</source>
         <translation>A contest day with this folder already exists.</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1607"/>
+        <location filename="../src/lemon.cpp" line="1618"/>
         <source>Please create or open a contest first</source>
         <translation>Please create or open a contest first</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1622"/>
+        <location filename="../src/lemon.cpp" line="1633"/>
         <source>Remove Contest Day</source>
         <translation>Remove Contest Day</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1623"/>
+        <location filename="../src/lemon.cpp" line="1634"/>
         <source>Remove contest day &quot;%1&quot;?
 
 Yes: also delete its files.
@@ -3973,52 +3953,52 @@ Yes: also delete its files.
 No: remove it from the contest only.</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1667"/>
+        <location filename="../src/lemon.cpp" line="1678"/>
         <source>Version: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1669"/>
+        <location filename="../src/lemon.cpp" line="1680"/>
         <source>This is a tiny judging environment for OI contest based on Project LemonPlus.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1670"/>
+        <location filename="../src/lemon.cpp" line="1681"/>
         <source>Based on Project Lemon version 1.2 Beta by Zhipeng Jia, 2011</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1671"/>
+        <location filename="../src/lemon.cpp" line="1682"/>
         <source>Based on Project LemonPlus by Dust1404, 2019</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1672"/>
+        <location filename="../src/lemon.cpp" line="1683"/>
         <source>Update by iotang and Coelacanthus</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1673"/>
+        <location filename="../src/lemon.cpp" line="1684"/>
         <source>Build Info: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1674"/>
+        <location filename="../src/lemon.cpp" line="1685"/>
         <source>Build Extra Info: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1675"/>
+        <location filename="../src/lemon.cpp" line="1686"/>
         <source>Build Date: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1676"/>
+        <location filename="../src/lemon.cpp" line="1687"/>
         <source>This program is under the &lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;GPLv3&lt;/a&gt; license</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1679"/>
+        <location filename="../src/lemon.cpp" line="1690"/>
         <source>About LemonLime</source>
         <translation></translation>
     </message>
@@ -4329,51 +4309,51 @@ No: remove it from the contest only.</translation>
 <context>
     <name>PdfPreviewWidget</name>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="49"/>
+        <location filename="../src/pdfpreview.cpp" line="58"/>
         <source>PDF Preview</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="51"/>
+        <location filename="../src/pdfpreview.cpp" line="60"/>
         <source>Refresh</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="80"/>
-        <location filename="../src/pdfpreview.cpp" line="107"/>
-        <location filename="../src/pdfpreview.cpp" line="179"/>
+        <location filename="../src/pdfpreview.cpp" line="89"/>
+        <location filename="../src/pdfpreview.cpp" line="116"/>
+        <location filename="../src/pdfpreview.cpp" line="231"/>
         <source>Compile the statement to see the preview here.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="191"/>
+        <location filename="../src/pdfpreview.cpp" line="243"/>
         <source>pdftocairo / pdftoppm not found in PATH, so the PDF cannot be previewed.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="134"/>
-        <location filename="../src/pdfpreview.cpp" line="209"/>
+        <location filename="../src/pdfpreview.cpp" line="143"/>
+        <location filename="../src/pdfpreview.cpp" line="261"/>
         <source>Rendering ...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="226"/>
-        <location filename="../src/pdfpreview.cpp" line="246"/>
+        <location filename="../src/pdfpreview.cpp" line="285"/>
+        <location filename="../src/pdfpreview.cpp" line="305"/>
         <source>Rendering the PDF preview failed.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="276"/>
+        <location filename="../src/pdfpreview.cpp" line="339"/>
         <source>%1 page(s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="257"/>
+        <location filename="../src/pdfpreview.cpp" line="316"/>
         <source>Nothing could be rendered from %1.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="184"/>
+        <location filename="../src/pdfpreview.cpp" line="236"/>
         <source>%1 does not exist yet.</source>
         <translation></translation>
     </message>
@@ -4547,17 +4527,17 @@ No: remove it from the contest only.</translation>
         <translation>The template is missing %1.</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionproject.cpp" line="412"/>
+        <location filename="../src/admission/admissionproject.cpp" line="407"/>
         <source>Cannot delete %1</source>
         <translation>Cannot delete %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionassign.cpp" line="47"/>
+        <location filename="../src/admission/admissionassign.cpp" line="46"/>
         <source>No venue / room plan yet. Add venues and rooms first.</source>
         <translation>No venue / room plan yet. Add venues and rooms first.</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionassign.cpp" line="59"/>
+        <location filename="../src/admission/admissionassign.cpp" line="58"/>
         <source>%1 contestants but the rooms hold only %2.</source>
         <translation>%1 contestants but the rooms hold only %2.</translation>
     </message>
@@ -4685,36 +4665,31 @@ No: remove it from the contest only.</translation>
     </message>
     <message>
         <location filename="../src/admission/seatdialog.cpp" line="32"/>
-        <source>By name</source>
-        <translation>By name</translation>
-    </message>
-    <message>
-        <location filename="../src/admission/seatdialog.cpp" line="33"/>
         <source>Random</source>
         <translation>Random</translation>
     </message>
     <message>
-        <location filename="../src/admission/seatdialog.cpp" line="36"/>
+        <location filename="../src/admission/seatdialog.cpp" line="35"/>
         <source>Rooms:</source>
         <translation>Rooms:</translation>
     </message>
     <message>
-        <location filename="../src/admission/seatdialog.cpp" line="37"/>
+        <location filename="../src/admission/seatdialog.cpp" line="36"/>
         <source>Order:</source>
         <translation>Order:</translation>
     </message>
     <message>
-        <location filename="../src/admission/seatdialog.cpp" line="49"/>
+        <location filename="../src/admission/seatdialog.cpp" line="51"/>
         <source>Edit venues / rooms…</source>
         <translation>Edit venues / rooms…</translation>
     </message>
     <message>
-        <location filename="../src/admission/seatdialog.cpp" line="94"/>
+        <location filename="../src/admission/seatdialog.cpp" line="96"/>
         <source>The list is empty.</source>
         <translation>The list is empty.</translation>
     </message>
     <message>
-        <location filename="../src/admission/seatdialog.cpp" line="104"/>
+        <location filename="../src/admission/seatdialog.cpp" line="106"/>
         <source>Seat numbers: %1 digit(s)</source>
         <translation>Seat numbers: %1 digit(s)</translation>
     </message>

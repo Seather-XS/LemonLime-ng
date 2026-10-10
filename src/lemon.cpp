@@ -137,6 +137,13 @@ LemonLime::~LemonLime() {
 	delete ui;
 }
 
+bool LemonLime::openContestForCheck(const QString &fileName) {
+	LOG("check-close: opening", fileName, "exists", QFileInfo::exists(fileName) ? 1 : 0);
+	loadContest(fileName);
+	LOG("check-close: opened", curContest ? "ok" : "failed", "cwd", QDir::currentPath().toStdString());
+	return curContest != nullptr;
+}
+
 void LemonLime::changeEvent(QEvent *event) {
 	if (event->type() == QEvent::LanguageChange) {
 		ui->retranslateUi(this);
@@ -901,6 +908,10 @@ void LemonLime::loadDay(const QString &filePath) {
 		abort();
 		return;
 	}
+	// 有些编辑器（记事本 / VS Code）存 UTF-8 会带 BOM：不跳过的话下面 peek 到的不是 '{'，
+	// 会被当成老的二进制比赛文件，报「File is broken」。
+	if (file.peek(3).startsWith(QByteArrayLiteral("\xEF\xBB\xBF")))
+		file.seek(3);
 	char firstChar;
 	file.peek(&firstChar, 1);
 	// Don't support RFC 7159, but support RFC 4627

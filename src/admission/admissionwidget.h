@@ -89,6 +89,9 @@ class AdmissionWidget : public QWidget {
 	QString contestTitle;
 	QStringList groups;
 	bool building{false};
+	/// 已经读过盘（reload 成功）才允许写盘：否则写下去的是空 project，
+	/// 会把 config.json（标题 / 测试时间 / 各种策略）和 contest-notes.md 一起清空。
+	bool loaded{false};
 
 	QLabel *titleLabel{};
 	QLineEdit *titleEdit{};

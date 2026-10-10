@@ -670,252 +670,247 @@
 <context>
     <name>AdmissionWidget</name>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="213"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="451"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="225"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="459"/>
         <source>Edit list</source>
         <translation>編輯名單</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="227"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="239"/>
         <source>Overwrite</source>
         <translation>覆寫</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="229"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="241"/>
         <source>Region</source>
         <translation>賽區</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="211"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="223"/>
         <source>Refresh</source>
         <translation>重新整理</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="207"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="219"/>
         <source>Title:</source>
         <translation>標題：</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="208"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="220"/>
         <source>Test time:</source>
         <translation>測試時間：</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="209"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="452"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="221"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="460"/>
         <source>Notes</source>
         <translation>注意事項</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="210"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="550"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="222"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="559"/>
         <source>Contest notes</source>
         <translation>比賽注意</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="212"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="224"/>
         <source>Open admission/</source>
         <translation>開啟 admission 目錄</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="214"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="226"/>
         <source>Venues / rooms</source>
         <translation>考點 / 考場</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="215"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="455"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="573"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="227"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="463"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="582"/>
         <source>New region</source>
         <translation>新增賽區</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="216"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="428"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="456"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="228"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="436"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="464"/>
         <source>Delete region</source>
         <translation>刪除賽區</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="217"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="229"/>
         <source>Build selected</source>
         <translation>產生選取項目</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="218"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="230"/>
         <source>Build all</source>
         <translation>全部產生</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="219"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="231"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="220"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="232"/>
         <source>Open dist/admission/</source>
         <translation>開啟 dist/admission/</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="222"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="234"/>
         <source>Folders: by region</source>
         <translation>資料夾：依賽區</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="223"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="235"/>
         <source>Folders: flat</source>
         <translation>資料夾：不分層</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="224"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="236"/>
         <source>Folders: by room</source>
         <translation>資料夾：依考場</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="225"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="237"/>
         <source>Zip: by region</source>
         <translation>壓縮：依賽區</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="226"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="238"/>
         <source>Zip: none</source>
         <translation>壓縮：不壓縮</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="229"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="241"/>
         <source>List</source>
         <translation>名單</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="229"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="241"/>
         <source>Output</source>
         <translation>輸出</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="229"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="241"/>
         <source>Zip</source>
         <translation>壓縮檔</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="293"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="296"/>
         <source>migration: %1</source>
         <translation>移轉：%1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="298"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="302"/>
         <source>Cannot load admission data: %1</source>
         <translation>無法讀取准考證資料：%1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="343"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="347"/>
         <source>%1 contestants</source>
         <translation>%1 位選手</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="344"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="348"/>
         <source>%1 PDFs · %2</source>
         <translation>%1 份 PDF · %2</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="398"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="495"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="523"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="406"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="503"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="535"/>
         <source>Cannot save admission config: %1</source>
         <translation>無法儲存准考證設定：%1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="425"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="433"/>
         <source>Delete the list and all of its settings?</source>
         <translation>刪除名單和它的全部設定？</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="426"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="434"/>
         <source>Delete region &quot;%1&quot; and all of its files?</source>
         <translation>刪除賽區「%1」及其所有檔案？</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="438"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="446"/>
         <source>deleted region %1</source>
         <translation>已刪除賽區 %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="453"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="461"/>
         <source>Venues / rooms…</source>
         <translation>考點 / 考場…</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="525"/>
-        <source>title / test time saved → %1</source>
-        <translation>標題 / 測試時間已儲存 → %1</translation>
-    </message>
-    <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="537"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="546"/>
         <source>Notes — %1</source>
         <translation>注意事項 — %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="574"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="583"/>
         <source>Region folder name:</source>
         <translation>賽區資料夾名稱：</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="575"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="584"/>
         <source>Region folder name (this contest has: %1):</source>
         <translation>賽區資料夾名稱（本場比賽已有：%1）：</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="610"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="619"/>
         <source>— build started %1 · folders: %2 · packages: %3 —</source>
         <translation>— 開始生成 %1 · 目錄：%2 · 打包：%3 —</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="613"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="622"/>
         <source>regions: %1</source>
         <translation>賽區：%1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="613"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="622"/>
         <source>all</source>
         <translation>全部</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="626"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="635"/>
         <source>build failed: %1</source>
         <translation>生成失敗：%1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="637"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="646"/>
         <source>— done in %1 s · %2 of %3 generated · %4 failed —</source>
         <translation>— 完成，用時 %1 秒 · 成功 %2 / %3 · 失敗 %4 —</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="642"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="651"/>
         <source>output: %1</source>
         <translation>輸出目錄：%1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="645"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="654"/>
         <source>failed tickets keep their .tex / .log in the _failed folder.</source>
         <translation>失敗的那些把 .tex / .log 留在 _failed 目錄裡。</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="665"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="674"/>
         <source>Stopping after the current ticket…</source>
         <translation>將在目前這份產生完成後停止…</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="342"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="423"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="536"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="346"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="431"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="545"/>
         <source>(no region)</source>
         <translation>（未啟用賽區）</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionwidget.cpp" line="434"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="546"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="559"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="584"/>
-        <location filename="../src/admission/admissionwidget.cpp" line="627"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="442"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="555"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="568"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="593"/>
+        <location filename="../src/admission/admissionwidget.cpp" line="636"/>
         <source>Admission tickets</source>
         <translation>准考證</translation>
     </message>
@@ -1408,7 +1403,7 @@
     </message>
     <message>
         <location filename="../src/admission/csveditordialog.cpp" line="266"/>
-        <location filename="../src/admission/csveditordialog.cpp" line="1194"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1190"/>
         <source>Generate ticket numbers</source>
         <translation>產生准考證號</translation>
     </message>
@@ -1458,10 +1453,10 @@
         <location filename="../src/admission/csveditordialog.cpp" line="1094"/>
         <location filename="../src/admission/csveditordialog.cpp" line="1125"/>
         <location filename="../src/admission/csveditordialog.cpp" line="1135"/>
-        <location filename="../src/admission/csveditordialog.cpp" line="1181"/>
-        <location filename="../src/admission/csveditordialog.cpp" line="1188"/>
-        <location filename="../src/admission/csveditordialog.cpp" line="1277"/>
-        <location filename="../src/admission/csveditordialog.cpp" line="1282"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1177"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1184"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1273"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1278"/>
         <source>Admission tickets</source>
         <translation>准考證</translation>
     </message>
@@ -1657,72 +1652,72 @@
         <translation>刪除欄位規則</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1199"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1195"/>
         <source>Fill the selection with a fixed value…</source>
         <translation>以固定值填滿選取範圍…</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1200"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1196"/>
         <source>Fill the selection with a sequence…</source>
         <translation>以序列填滿選取範圍…</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1201"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1197"/>
         <source>Clear the selection</source>
         <translation>清空選取範圍</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1202"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1198"/>
         <source>Choose a photo…</source>
         <translation>選擇照片…</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1204"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1200"/>
         <source>Add a row at the end</source>
         <translation>在最後新增一列</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1205"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1201"/>
         <source>Add a column at the end</source>
         <translation>在最後新增一欄</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1206"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1202"/>
         <source>Delete the selected rows</source>
         <translation>刪除選取的列</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1207"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1203"/>
         <source>Delete the selected columns</source>
         <translation>刪除選取的欄</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1248"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1244"/>
         <source>row %1: the test site is empty</source>
         <translation>第 %1 列：考點為空</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1253"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1249"/>
         <source>row %1: the name is empty</source>
         <translation>第 %1 列：姓名為空</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1258"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1254"/>
         <source>row %1: the seat is empty</source>
         <translation>第 %1 列：座位號為空</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1263"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1259"/>
         <source>row %1: the ticket number is empty</source>
         <translation>第 %1 列：准考證號為空</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1266"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1262"/>
         <source>row %1: the ticket number %2 is duplicated (row %3)</source>
         <translation>第 %1 列：准考證號 %2 與第 %3 列重複</translation>
     </message>
     <message>
-        <location filename="../src/admission/csveditordialog.cpp" line="1278"/>
+        <location filename="../src/admission/csveditordialog.cpp" line="1274"/>
         <source>Looks good: %1 contestants.</source>
         <translation>檢查通過：共 %1 位選手。</translation>
     </message>
@@ -2911,14 +2906,14 @@ Depends: </source>
 <context>
     <name>IdRuleDialog</name>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="33"/>
+        <location filename="../src/admission/idruledialog.cpp" line="32"/>
         <source>Ticket numbers</source>
         <translation>准考證號</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="39"/>
-        <source>Placeholders: &lt;section&gt; &lt;number&gt; &lt;char&gt; &lt;row&gt; &lt;seat&gt; &lt;room&gt; &lt;name&gt; &lt;id&gt;, plus any column of the list (e.g. &lt;学号&gt;). Repeating a placeholder counts the digits: &lt;number&gt;&lt;number&gt;&lt;number&gt; is three digits.</source>
-        <translation>佔位符：&lt;section&gt; &lt;number&gt; &lt;char&gt; &lt;row&gt; &lt;seat&gt; &lt;room&gt; &lt;name&gt; &lt;id&gt;，以及名單裡的任意欄（例如 &lt;學號&gt;）。同一個佔位符連著寫幾位就是幾位：&lt;number&gt;&lt;number&gt;&lt;number&gt; 是三位數。</translation>
+        <location filename="../src/admission/idruledialog.cpp" line="38"/>
+        <source>Placeholders: &lt;section&gt; &lt;number&gt; &lt;char&gt; &lt;row&gt; &lt;seat&gt; &lt;room&gt; &lt;name&gt; &lt;id&gt;, plus any column of the list (e.g. &lt;学号&gt;). The digits always come from the row number of the list; repeating the placeholder sets the width: &lt;number&gt;&lt;number&gt;&lt;number&gt; is 001, 002, …</source>
+        <translation>佔位符：&lt;section&gt; &lt;number&gt; &lt;char&gt; &lt;row&gt; &lt;seat&gt; &lt;room&gt; &lt;name&gt; &lt;id&gt;，以及名單裡的任意欄（如 &lt;學號&gt;）。數字永遠取自名單行號；重複同一個佔位符就是位數：&lt;number&gt;&lt;number&gt;&lt;number&gt; 就是 001、002……</translation>
     </message>
     <message>
         <location filename="../src/admission/idruledialog.cpp" line="42"/>
@@ -2926,69 +2921,54 @@ Depends: </source>
         <translation>模板：</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="50"/>
-        <source>Fill in the empty ones only</source>
-        <translation>只填空著的</translation>
-    </message>
-    <message>
-        <location filename="../src/admission/idruledialog.cpp" line="51"/>
-        <source>Overwrite the existing ones</source>
-        <translation>覆蓋已有的</translation>
-    </message>
-    <message>
-        <location filename="../src/admission/idruledialog.cpp" line="53"/>
-        <source>Existing ticket numbers:</source>
-        <translation>已有准考證號：</translation>
-    </message>
-    <message>
-        <location filename="../src/admission/idruledialog.cpp" line="89"/>
+        <location filename="../src/admission/idruledialog.cpp" line="81"/>
         <source>Sequence in the region</source>
         <translation>賽區內序號</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="90"/>
+        <location filename="../src/admission/idruledialog.cpp" line="82"/>
         <source>Sequence in the whole contest</source>
         <translation>全場序號（跨賽區連續）</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="91"/>
+        <location filename="../src/admission/idruledialog.cpp" line="83"/>
         <source>Row number of the list</source>
         <translation>名單行號</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="92"/>
+        <location filename="../src/admission/idruledialog.cpp" line="84"/>
         <source>Seat number</source>
         <translation>座位號</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="93"/>
+        <location filename="../src/admission/idruledialog.cpp" line="85"/>
         <source>Room number</source>
         <translation>考場號</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="94"/>
+        <location filename="../src/admission/idruledialog.cpp" line="86"/>
         <source>Digits at the end of the ticket number</source>
         <translation>准考證號末尾的數字</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="95"/>
+        <location filename="../src/admission/idruledialog.cpp" line="87"/>
         <source>Digits at the end of the name</source>
         <translation>姓名末尾的數字</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="98"/>
+        <location filename="../src/admission/idruledialog.cpp" line="90"/>
         <source>Column: %1</source>
         <translation>欄：%1</translation>
     </message>
     <message>
-        <location filename="../src/admission/idruledialog.cpp" line="129"/>
-        <source>Digits from:</source>
-        <translation>數字取自：</translation>
-    </message>
-    <message>
-        <location filename="../src/admission/idruledialog.cpp" line="136"/>
+        <location filename="../src/admission/idruledialog.cpp" line="119"/>
         <source>Letters from:</source>
         <translation>字母取自：</translation>
+    </message>
+    <message>
+        <location filename="../src/admission/idruledialog.cpp" line="147"/>
+        <source>The list is empty.</source>
+        <translation>名單為空。</translation>
     </message>
 </context>
 <context>
@@ -3304,8 +3284,8 @@ Depends: </source>
     <name>LemonLime</name>
     <message>
         <location filename="../src/forms/lemon.ui" line="20"/>
-        <location filename="../src/lemon.cpp" line="1106"/>
-        <location filename="../src/lemon.cpp" line="1291"/>
+        <location filename="../src/lemon.cpp" line="1117"/>
+        <location filename="../src/lemon.cpp" line="1302"/>
         <source>LemonLime</source>
         <translation>LemonLime</translation>
     </message>
@@ -3621,13 +3601,13 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="813"/>
-        <location filename="../src/lemon.cpp" line="378"/>
-        <location filename="../src/lemon.cpp" line="396"/>
-        <location filename="../src/lemon.cpp" line="400"/>
-        <location filename="../src/lemon.cpp" line="408"/>
-        <location filename="../src/lemon.cpp" line="414"/>
-        <location filename="../src/lemon.cpp" line="572"/>
-        <location filename="../src/lemon.cpp" line="574"/>
+        <location filename="../src/lemon.cpp" line="385"/>
+        <location filename="../src/lemon.cpp" line="403"/>
+        <location filename="../src/lemon.cpp" line="407"/>
+        <location filename="../src/lemon.cpp" line="415"/>
+        <location filename="../src/lemon.cpp" line="421"/>
+        <location filename="../src/lemon.cpp" line="579"/>
+        <location filename="../src/lemon.cpp" line="581"/>
         <source>Clean up Files</source>
         <translation>整理檔案</translation>
     </message>
@@ -3792,202 +3772,202 @@ Depends: </source>
         <translation>使用者手冊</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="375"/>
+        <location filename="../src/lemon.cpp" line="382"/>
         <source>Are you sure to Clean up Files?</source>
         <translation>確定要整理檔案嗎？</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="376"/>
+        <location filename="../src/lemon.cpp" line="383"/>
         <source>Reading guide are recommended.</source>
         <translation>建議參看教程後再確認操作。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="394"/>
+        <location filename="../src/lemon.cpp" line="401"/>
         <source>Making backup files to dir &lt;br&gt; `%1&apos;?</source>
         <translation>建立備份檔案到 &lt;br&gt; `%1&apos;？</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="400"/>
+        <location filename="../src/lemon.cpp" line="407"/>
         <source>Aborted.</source>
         <translation>沒有進行整理。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="409"/>
+        <location filename="../src/lemon.cpp" line="416"/>
         <source>Aborted: `%1&apos; already exist.</source>
         <translation>沒有進行整理：`%1&apos; 已經存在。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="415"/>
+        <location filename="../src/lemon.cpp" line="422"/>
         <source>Aborted: Cannot make dir `%1&apos;.</source>
         <translation>沒有進行整理：沒法建立 `%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="420"/>
+        <location filename="../src/lemon.cpp" line="427"/>
         <source>Making Backup...</source>
         <translation>備份中…</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="441"/>
+        <location filename="../src/lemon.cpp" line="448"/>
         <source>Cleaning</source>
         <translation>整理中</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="448"/>
+        <location filename="../src/lemon.cpp" line="455"/>
         <source>Working on it...</source>
         <translation>正在整理…</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="453"/>
+        <location filename="../src/lemon.cpp" line="460"/>
         <source>Fetching Data...</source>
         <translation>抓取題目資料…</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="461"/>
+        <location filename="../src/lemon.cpp" line="468"/>
         <source>Initing...</source>
         <translation>預處理中…</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="493"/>
+        <location filename="../src/lemon.cpp" line="500"/>
         <source>Now Cleaning...</source>
         <translation>整理檔案中…</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="571"/>
+        <location filename="../src/lemon.cpp" line="578"/>
         <source>Finished.</source>
         <translation>整理完成。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="574"/>
+        <location filename="../src/lemon.cpp" line="581"/>
         <source>Aborted</source>
         <translation>沒有進行整理</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="695"/>
-        <location filename="../src/lemon.cpp" line="743"/>
-        <location filename="../src/lemon.cpp" line="759"/>
-        <location filename="../src/lemon.cpp" line="768"/>
-        <location filename="../src/lemon.cpp" line="900"/>
-        <location filename="../src/lemon.cpp" line="911"/>
+        <location filename="../src/lemon.cpp" line="702"/>
+        <location filename="../src/lemon.cpp" line="750"/>
+        <location filename="../src/lemon.cpp" line="766"/>
+        <location filename="../src/lemon.cpp" line="775"/>
+        <location filename="../src/lemon.cpp" line="907"/>
         <location filename="../src/lemon.cpp" line="922"/>
-        <location filename="../src/lemon.cpp" line="932"/>
-        <location filename="../src/lemon.cpp" line="945"/>
-        <location filename="../src/lemon.cpp" line="1041"/>
-        <location filename="../src/lemon.cpp" line="1436"/>
-        <location filename="../src/lemon.cpp" line="1502"/>
+        <location filename="../src/lemon.cpp" line="933"/>
+        <location filename="../src/lemon.cpp" line="943"/>
+        <location filename="../src/lemon.cpp" line="956"/>
+        <location filename="../src/lemon.cpp" line="1052"/>
+        <location filename="../src/lemon.cpp" line="1447"/>
+        <location filename="../src/lemon.cpp" line="1513"/>
         <source>Error</source>
         <translation>出錯了</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="695"/>
-        <location filename="../src/lemon.cpp" line="760"/>
-        <location filename="../src/lemon.cpp" line="900"/>
-        <location filename="../src/lemon.cpp" line="1436"/>
+        <location filename="../src/lemon.cpp" line="702"/>
+        <location filename="../src/lemon.cpp" line="767"/>
+        <location filename="../src/lemon.cpp" line="907"/>
+        <location filename="../src/lemon.cpp" line="1447"/>
         <source>Cannot open file %1</source>
         <translation>無法打開檔案 %1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="687"/>
-        <location filename="../src/lemon.cpp" line="696"/>
+        <location filename="../src/lemon.cpp" line="694"/>
+        <location filename="../src/lemon.cpp" line="703"/>
         <source>Save Failed</source>
         <translation>儲存失敗</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="714"/>
+        <location filename="../src/lemon.cpp" line="721"/>
         <source>Saved</source>
         <translation>已儲存</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="744"/>
-        <location filename="../src/lemon.cpp" line="769"/>
-        <location filename="../src/lemon.cpp" line="912"/>
-        <location filename="../src/lemon.cpp" line="922"/>
-        <location filename="../src/lemon.cpp" line="932"/>
-        <location filename="../src/lemon.cpp" line="945"/>
+        <location filename="../src/lemon.cpp" line="751"/>
+        <location filename="../src/lemon.cpp" line="776"/>
+        <location filename="../src/lemon.cpp" line="923"/>
+        <location filename="../src/lemon.cpp" line="933"/>
+        <location filename="../src/lemon.cpp" line="943"/>
+        <location filename="../src/lemon.cpp" line="956"/>
         <source>File %1 is broken</source>
         <translation>%1 已損壞</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1010"/>
-        <location filename="../src/lemon.cpp" line="1413"/>
+        <location filename="../src/lemon.cpp" line="1021"/>
+        <location filename="../src/lemon.cpp" line="1424"/>
         <source>LemonLime - %1</source>
         <translation>LemonLime - %1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1012"/>
-        <location filename="../src/lemon.cpp" line="1415"/>
-        <location filename="../src/lemon.cpp" line="1653"/>
+        <location filename="../src/lemon.cpp" line="1023"/>
+        <location filename="../src/lemon.cpp" line="1426"/>
+        <location filename="../src/lemon.cpp" line="1664"/>
         <source>LemonLime - %1 / %2</source>
         <translation>LemonLime - %1 / %2</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1041"/>
-        <location filename="../src/lemon.cpp" line="1502"/>
+        <location filename="../src/lemon.cpp" line="1052"/>
+        <location filename="../src/lemon.cpp" line="1513"/>
         <source>Cannot make contest path</source>
         <translation>無法建立比賽資料夾</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1291"/>
+        <location filename="../src/lemon.cpp" line="1302"/>
         <source>No task found</source>
         <translation>找不到任何試題</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1390"/>
-        <location filename="../src/lemon.cpp" line="1395"/>
-        <location filename="../src/lemon.cpp" line="1399"/>
-        <location filename="../src/lemon.cpp" line="1642"/>
+        <location filename="../src/lemon.cpp" line="1401"/>
+        <location filename="../src/lemon.cpp" line="1406"/>
+        <location filename="../src/lemon.cpp" line="1410"/>
+        <location filename="../src/lemon.cpp" line="1653"/>
         <source>Rename Contest</source>
         <translation>重新命名比賽</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1390"/>
+        <location filename="../src/lemon.cpp" line="1401"/>
         <source>No Contest Yet</source>
         <translation>還沒有比賽</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1395"/>
-        <location filename="../src/lemon.cpp" line="1643"/>
+        <location filename="../src/lemon.cpp" line="1406"/>
+        <location filename="../src/lemon.cpp" line="1654"/>
         <source>Write the name you want.</source>
         <translation>輸入你想要的名稱。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1396"/>
+        <location filename="../src/lemon.cpp" line="1407"/>
         <source>New Name</source>
         <translation>新名稱</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1399"/>
+        <location filename="../src/lemon.cpp" line="1410"/>
         <source>The name did not changes.</source>
         <translation>名稱沒有改變。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1485"/>
-        <location filename="../src/lemon.cpp" line="1495"/>
-        <location filename="../src/lemon.cpp" line="1607"/>
+        <location filename="../src/lemon.cpp" line="1496"/>
+        <location filename="../src/lemon.cpp" line="1506"/>
+        <location filename="../src/lemon.cpp" line="1618"/>
         <source>New Contest Day</source>
         <translation>新增比賽日</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1486"/>
+        <location filename="../src/lemon.cpp" line="1497"/>
         <source>The folder name cannot contain path separators.</source>
         <translation>資料夾名稱不能包含路徑分隔符號。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1496"/>
+        <location filename="../src/lemon.cpp" line="1507"/>
         <source>A contest day with this folder already exists.</source>
         <translation>已有使用此資料夾的比賽日。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1607"/>
+        <location filename="../src/lemon.cpp" line="1618"/>
         <source>Please create or open a contest first</source>
         <translation>請先建立或開啟一場比賽</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1622"/>
+        <location filename="../src/lemon.cpp" line="1633"/>
         <source>Remove Contest Day</source>
         <translation>移除比賽日</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1623"/>
+        <location filename="../src/lemon.cpp" line="1634"/>
         <source>Remove contest day &quot;%1&quot;?
 
 Yes: also delete its files.
@@ -3998,52 +3978,52 @@ No: remove it from the contest only.</source>
 否：僅從比賽中移除。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1667"/>
+        <location filename="../src/lemon.cpp" line="1678"/>
         <source>Version: %1</source>
         <translation>版本：%1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1669"/>
+        <location filename="../src/lemon.cpp" line="1680"/>
         <source>This is a tiny judging environment for OI contest based on Project LemonPlus.</source>
         <translation>這是一個基於 LemonPlus 的簡易 OI 競賽測試環境。</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1670"/>
+        <location filename="../src/lemon.cpp" line="1681"/>
         <source>Based on Project Lemon version 1.2 Beta by Zhipeng Jia, 2011</source>
         <translation>基於 Lemon v1.2 by Zhipeng Jia, 2011</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1671"/>
+        <location filename="../src/lemon.cpp" line="1682"/>
         <source>Based on Project LemonPlus by Dust1404, 2019</source>
         <translation>基於 LemonPlus by Dust1404, 2019</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1672"/>
+        <location filename="../src/lemon.cpp" line="1683"/>
         <source>Update by iotang and Coelacanthus</source>
         <translation>由 iotang 和 Coelacanthus 更新</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1673"/>
+        <location filename="../src/lemon.cpp" line="1684"/>
         <source>Build Info: %1</source>
         <translation>編譯訊息：%1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1674"/>
+        <location filename="../src/lemon.cpp" line="1685"/>
         <source>Build Extra Info: %1</source>
         <translation>附加編譯訊息：%1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1675"/>
+        <location filename="../src/lemon.cpp" line="1686"/>
         <source>Build Date: %1</source>
         <translation>構建日期：%1</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1676"/>
+        <location filename="../src/lemon.cpp" line="1687"/>
         <source>This program is under the &lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;GPLv3&lt;/a&gt; license</source>
         <translation>本程式基於&lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;GPLv3&lt;/a&gt;許可協議</translation>
     </message>
     <message>
-        <location filename="../src/lemon.cpp" line="1679"/>
+        <location filename="../src/lemon.cpp" line="1690"/>
         <source>About LemonLime</source>
         <translation>關於 LemonLime</translation>
     </message>
@@ -4354,51 +4334,51 @@ No: remove it from the contest only.</source>
 <context>
     <name>PdfPreviewWidget</name>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="49"/>
+        <location filename="../src/pdfpreview.cpp" line="58"/>
         <source>PDF Preview</source>
         <translation>PDF 預覽</translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="51"/>
+        <location filename="../src/pdfpreview.cpp" line="60"/>
         <source>Refresh</source>
         <translation>重新整理</translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="80"/>
-        <location filename="../src/pdfpreview.cpp" line="107"/>
-        <location filename="../src/pdfpreview.cpp" line="179"/>
+        <location filename="../src/pdfpreview.cpp" line="89"/>
+        <location filename="../src/pdfpreview.cpp" line="116"/>
+        <location filename="../src/pdfpreview.cpp" line="231"/>
         <source>Compile the statement to see the preview here.</source>
         <translation>編譯題面後，這裡會顯示 statement.pdf 的分頁預覽。</translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="191"/>
+        <location filename="../src/pdfpreview.cpp" line="243"/>
         <source>pdftocairo / pdftoppm not found in PATH, so the PDF cannot be previewed.</source>
         <translation>在 PATH 中找不到 pdftocairo / pdftoppm，無法預覽 PDF。</translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="134"/>
-        <location filename="../src/pdfpreview.cpp" line="209"/>
+        <location filename="../src/pdfpreview.cpp" line="143"/>
+        <location filename="../src/pdfpreview.cpp" line="261"/>
         <source>Rendering ...</source>
         <translation>正在算圖預覽…</translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="226"/>
-        <location filename="../src/pdfpreview.cpp" line="246"/>
+        <location filename="../src/pdfpreview.cpp" line="285"/>
+        <location filename="../src/pdfpreview.cpp" line="305"/>
         <source>Rendering the PDF preview failed.</source>
         <translation>算圖 PDF 預覽失敗。</translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="276"/>
+        <location filename="../src/pdfpreview.cpp" line="339"/>
         <source>%1 page(s)</source>
         <translation>共 %1 頁</translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="257"/>
+        <location filename="../src/pdfpreview.cpp" line="316"/>
         <source>Nothing could be rendered from %1.</source>
         <translation>無法從 %1 繪製出任何頁面。</translation>
     </message>
     <message>
-        <location filename="../src/pdfpreview.cpp" line="184"/>
+        <location filename="../src/pdfpreview.cpp" line="236"/>
         <source>%1 does not exist yet.</source>
         <translation>%1 還不存在。</translation>
     </message>
@@ -4572,17 +4552,17 @@ No: remove it from the contest only.</source>
         <translation>範本缺少 %1。</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionproject.cpp" line="412"/>
+        <location filename="../src/admission/admissionproject.cpp" line="407"/>
         <source>Cannot delete %1</source>
         <translation>無法刪除 %1</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionassign.cpp" line="47"/>
+        <location filename="../src/admission/admissionassign.cpp" line="46"/>
         <source>No venue / room plan yet. Add venues and rooms first.</source>
         <translation>還沒有考點 / 考場方案，請先編輯考點 / 考場。</translation>
     </message>
     <message>
-        <location filename="../src/admission/admissionassign.cpp" line="59"/>
+        <location filename="../src/admission/admissionassign.cpp" line="58"/>
         <source>%1 contestants but the rooms hold only %2.</source>
         <translation>%1 名選手，考點 / 考場一共只能坐 %2 人。</translation>
     </message>
@@ -4712,36 +4692,31 @@ No: remove it from the contest only.</source>
     </message>
     <message>
         <location filename="../src/admission/seatdialog.cpp" line="32"/>
-        <source>By name</source>
-        <translation>按姓名</translation>
-    </message>
-    <message>
-        <location filename="../src/admission/seatdialog.cpp" line="33"/>
         <source>Random</source>
         <translation>隨機</translation>
     </message>
     <message>
-        <location filename="../src/admission/seatdialog.cpp" line="36"/>
+        <location filename="../src/admission/seatdialog.cpp" line="35"/>
         <source>Rooms:</source>
         <translation>分配方式：</translation>
     </message>
     <message>
-        <location filename="../src/admission/seatdialog.cpp" line="37"/>
+        <location filename="../src/admission/seatdialog.cpp" line="36"/>
         <source>Order:</source>
         <translation>順序：</translation>
     </message>
     <message>
-        <location filename="../src/admission/seatdialog.cpp" line="49"/>
+        <location filename="../src/admission/seatdialog.cpp" line="51"/>
         <source>Edit venues / rooms…</source>
         <translation>編輯考點 / 考場…</translation>
     </message>
     <message>
-        <location filename="../src/admission/seatdialog.cpp" line="94"/>
+        <location filename="../src/admission/seatdialog.cpp" line="96"/>
         <source>The list is empty.</source>
         <translation>名單為空。</translation>
     </message>
     <message>
-        <location filename="../src/admission/seatdialog.cpp" line="104"/>
+        <location filename="../src/admission/seatdialog.cpp" line="106"/>
         <source>Seat numbers: %1 digit(s)</source>
         <translation>座位號：%1 位</translation>
     </message>

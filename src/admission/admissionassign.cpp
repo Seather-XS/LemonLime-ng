@@ -11,7 +11,6 @@
 #include <QMap>
 #include <QObject>
 #include <QRandomGenerator>
-#include <algorithm>
 
 namespace AdmissionAssign {
 	namespace {
@@ -108,18 +107,13 @@ namespace AdmissionAssign {
 		for (const Slot &slot : seatSlots)
 			width = qMax(width, QString::number(slot.count).size());
 
-		// 处理顺序（最后按原行号填回去）
+		// 处理顺序：名单行号（默认）或随机
 		QList<int> pending;
 
 		for (int row = 0; row < count; ++row)
 			pending << row;
 
-		if (options.order == QStringLiteral("name")) {
-			const int column = table.columnIndex(QStringLiteral("姓名"));
-			std::stable_sort(pending.begin(), pending.end(), [&table, column](int a, int b) {
-				return table.cell(a, column) < table.cell(b, column);
-			});
-		} else if (options.order == QStringLiteral("random")) {
+		if (options.order == QStringLiteral("random")) {
 			// 随机排座不需要可复现的种子
 			for (int i = pending.size() - 1; i > 0; --i)
 				pending.swapItemsAt(i, int(QRandomGenerator::global()->bounded(i + 1)));
@@ -157,6 +151,14 @@ namespace AdmissionAssign {
 		const int seatColumn = table.columnIndex(QStringLiteral("座位号"));
 		const int roomColumn = table.columnIndex(QStringLiteral("考场"));
 
+		// 数字一律取自名单行号（用户要求：其它来源基本没用）；位数由 <number> 的个数决定。
+		QStringList numberSources;
+		const int numberGroups =
+		    AdmissionNaming::groupCount(options.templateText, QStringLiteral("number"));
+
+		for (int group = 0; group < numberGroups; ++group)
+			numberSources << QStringLiteral("row");
+
 		for (int row = 0; row < table.rows.size(); ++row) {
 			AdmissionNamingContext context;
 			context.section = section;
@@ -172,7 +174,7 @@ namespace AdmissionAssign {
 				context.columns.insert(table.header.at(index), table.cell(row, index));
 
 			QString renderError;
-			const QString value = AdmissionNaming::render(options.templateText, context, options.numberSources,
+			const QString value = AdmissionNaming::render(options.templateText, context, numberSources,
 			                                              options.charSources, &renderError);
 
 			if (! renderError.isEmpty()) {
@@ -181,8 +183,7 @@ namespace AdmissionAssign {
 				return false;
 			}
 
-			const QString existing = table.cell(row, idColumn);
-			ids << ((! options.overwrite && ! existing.isEmpty()) ? existing : value);
+			ids << value;
 		}
 
 		return true;

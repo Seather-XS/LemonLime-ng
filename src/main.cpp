@@ -17,6 +17,7 @@
 #include "admission/csveditordialog.h"
 #include "admission/idruledialog.h"
 #include "admission/notesdialog.h"
+#include "admission/seatdialog.h"
 #include "admission/venuedialog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 //
@@ -55,7 +56,9 @@
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSplashScreen>
+#include <QStandardPaths>
 #include <QTableWidget>
+#include <QTabWidget>
 #include <QTemporaryDir>
 #include <QTextStream>
 #include <QTimer>
@@ -762,6 +765,87 @@ int main(int argc, char *argv[]) {
 			settle();
 		}
 
+		// 2b) 预览清晰度：按「预览窗宽度 × 设备像素比 + 一点超采样」渲染，
+		//     页图按 css 宽度显示（像素比 = 图片宽 ÷ 显示宽），Qt 不再放大它。
+		{
+			widget.resize(1400, 900);
+			widget.show();
+			settle();
+
+			if (! preview) {
+				problems++;
+				report << QStringLiteral("no PDF preview widget found");
+			} else {
+				const int css = preview->pageWidthCss();
+				const int px = preview->plannedRenderWidthPx();
+				report << QStringLiteral("preview sharpness: css=%1 px=%2 dpr=%3")
+				              .arg(css)
+				              .arg(px)
+				              .arg(preview->devicePixelRatioF());
+
+				// 出图必须比显示尺寸更细（原来是按 72dpi 出图、1:1 贴上去，缩放屏上一放大就糊）
+				if (px <= css || px < 640)
+					problems++;
+
+				// 页图按 css 宽显示：像素比 = 图片宽 ÷ css 宽，Qt 不会再去插值放大
+				QPixmap page(1500, 2121); // 假装是一张 A4 @ ~180dpi 的渲染结果
+				PdfPreviewWidget::fitPagePixmap(page, 600);
+				const double dpr = page.devicePixelRatio();
+				report << QStringLiteral("page pixmap: dpr=%1 css=%2")
+				              .arg(dpr, 0, 'f', 2)
+				              .arg(page.deviceIndependentSize().width(), 0, 'f', 0);
+
+				if (qAbs(dpr - 2.5) > 0.01 || qAbs(page.deviceIndependentSize().width() - 600.0) > 0.01)
+					problems++;
+
+				// 真有 PDF、又装了渲染器的话，等它渲染完，检查真的页图是不是也按新规则贴上去的
+				const bool canRender =
+				    ! QStandardPaths::findExecutable(QStringLiteral("pdftocairo")).isEmpty() ||
+				    ! QStandardPaths::findExecutable(QStringLiteral("pdftoppm")).isEmpty();
+				const QString realPdf = Settings::statementPath() + widget.pdfFileName();
+				report << QStringLiteral("real pdf: %1 exists=%2 renderer=%3")
+				              .arg(widget.pdfFileName())
+				              .arg(QFileInfo::exists(realPdf) ? 1 : 0)
+				              .arg(canRender ? 1 : 0);
+
+				if (canRender && QFileInfo::exists(realPdf)) {
+					for (int attempt = 0; attempt < 30 && preview->renderedPages() == 0; ++attempt) {
+						QEventLoop loop;
+						QTimer::singleShot(200, &loop, &QEventLoop::quit);
+						loop.exec();
+					}
+
+					int pages = 0;
+					double pageDpr = 0.0;
+					double pageCss = 0.0;
+
+					for (auto *label : preview->findChildren<QLabel *>()) {
+						const QPixmap shot = label->pixmap();
+
+						if (shot.isNull())
+							continue;
+
+						++pages;
+						pageDpr = shot.devicePixelRatio();
+						pageCss = shot.deviceIndependentSize().width();
+					}
+
+					report << QStringLiteral("rendered page: pages=%1 dpr=%2 css=%3 (wanted %4)")
+					              .arg(pages)
+					              .arg(pageDpr, 0, 'f', 2)
+					              .arg(pageCss, 0, 'f', 0)
+					              .arg(preview->pageWidthCss());
+
+					// 页图必须比显示尺寸更细（dpr > 1），显示宽度就是预览窗宽度（允许滚动条之类的几像素误差）
+					if (pages == 0 || pageDpr <= 1.0 ||
+					    qAbs(pageCss - preview->pageWidthCss()) > preview->pageWidthCss() * 0.05)
+						problems++;
+				}
+
+				widget.hide();
+			}
+		}
+
 		// 3) 导出选项卡里的「题面文件」下拉框：列 statement/ 下的文件，默认选模板算出的那个。
 		{
 			ExportWidget exportWidget;
@@ -1060,9 +1144,7 @@ int main(int argc, char *argv[]) {
 				project.examTime = QStringLiteral("2026-09-19 14:30:00");
 				// 准考证号策略也是比赛日级的配置，跟着 config.json 走
 				project.idTemplate = QStringLiteral("<section>-<number><number>");
-				project.idNumberSources = QStringList{QStringLiteral("row")};
 				project.idCharSources = QStringList{QStringLiteral("name")};
-				project.idOverwrite = true;
 				// 自定义列（锁定行之外）会在生成时印成额外行，这里顺带验一遍它能不能原样过一遍磁盘。
 				region->table.header << QStringLiteral("考场位置");
 				region->table.rows << QStringList{QStringLiteral("张三"), QStringLiteral("A-001"),
@@ -1101,8 +1183,7 @@ int main(int argc, char *argv[]) {
 			    check->notes.trimmed() != QStringLiteral("1. 甲") ||
 			    again.examTime != QStringLiteral("2026-09-19 14:30:00") ||
 			    again.idTemplate != QStringLiteral("<section>-<number><number>") ||
-			    again.idNumberSources != QStringList{QStringLiteral("row")} ||
-			    again.idCharSources != QStringList{QStringLiteral("name")} || ! again.idOverwrite ||
+			    again.idCharSources != QStringList{QStringLiteral("name")} ||
 			    again.regions.size() != 1 || again.regions.at(0).venues.size() != 2 ||
 			    again.regions.at(0).venues.at(0).rooms.value(1).capacity != 2 ||
 			    again.regions.at(0).roomCount() != 3 || again.regions.at(0).totalCapacity() != 9 ||
@@ -1113,9 +1194,7 @@ int main(int argc, char *argv[]) {
 			              .arg(again.regions.size())
 			              .arg(check ? check->table.rows.size() : -1)
 			              .arg(again.examTime);
-			report << QStringLiteral("id rule: %1 / %2 / overwrite=%3")
-			              .arg(again.idTemplate, again.idNumberSources.join(QStringLiteral(",")))
-			              .arg(again.idOverwrite ? 1 : 0);
+			report << QStringLiteral("id rule: %1").arg(again.idTemplate);
 			report << QStringLiteral("venues: %1 / rooms=%2 / capacity=%3")
 			              .arg(again.regions.value(0).venues.size())
 			              .arg(again.regions.value(0).roomCount())
@@ -1372,7 +1451,6 @@ int main(int argc, char *argv[]) {
 			AdmissionAssign::IdOptions options;
 			options.templateText =
 			    QStringLiteral("<section>-S<number><number><number><number><number>");
-			options.overwrite = true;
 			QStringList ids;
 			QString error;
 
@@ -1385,26 +1463,56 @@ int main(int argc, char *argv[]) {
 					fail(QStringLiteral("default ticket number: ") + ids.value(0));
 			}
 
+			// 数字固定取自名单行号：模板里 <number> 的个数就是位数
 			options.templateText = QStringLiteral("<number><number><number>");
-			options.numberSources = QStringList{QStringLiteral("globalSeq")};
-			options.globalOffset = 41;
+			options.globalOffset = 41; // 行号跟它无关，应该完全忽略
 
 			if (! item || ! AdmissionAssign::planIds(item->table, item->name, options, ids, &error))
-				fail(QStringLiteral("planIds (global): ") + error);
-			else if (ids.value(0) != QStringLiteral("042"))
-				fail(QStringLiteral("global sequence did not continue: ") + ids.value(0));
+				fail(QStringLiteral("planIds (row): ") + error);
+			else if (ids.value(0) != QStringLiteral("001"))
+				fail(QStringLiteral("the digits are not the row number: ") + ids.value(0));
+			else
+				report << QStringLiteral("row-numbered ticket: %1").arg(ids.value(0));
 
 			if (item) {
 				IdRuleDialog dialog(item->table, item->name, options);
 				const AdmissionAssign::IdOptions back = dialog.options();
-				report << QStringLiteral("id rule dialog: %1 / %2 / overwrite=%3")
-				              .arg(back.templateText, back.numberSources.join(QStringLiteral(",")))
-				              .arg(back.overwrite ? 1 : 0);
+				report << QStringLiteral("id rule dialog: %1 (combos=%2)")
+				              .arg(back.templateText)
+				              .arg(dialog.findChildren<QComboBox *>().size());
 
 				if (back.templateText != options.templateText ||
-				    back.numberSources != options.numberSources ||
-				    back.charSources != options.charSources || back.overwrite != options.overwrite)
+				    back.charSources != options.charSources)
 					fail(QStringLiteral("the id rule dialog did not keep the strategy"));
+
+				// 数字的取值来源已经强制成行号：不该再出现「数字取自」的下拉
+				if (! dialog.findChildren<QComboBox *>().isEmpty())
+					fail(QStringLiteral("the id rule dialog still asks where the digits come from"));
+
+				// 预览必须放在只读、能滚的文本框里：人数一多标签就会把对话框撑爆
+				auto *preview = dialog.findChild<QPlainTextEdit *>(QStringLiteral("previewText"));
+				report << QStringLiteral("id rule preview: %1 lines=%2 readOnly=%3")
+				              .arg(preview ? 1 : 0)
+				              .arg(preview ? preview->toPlainText().count(QChar('\n')) + 1 : -1)
+				              .arg(preview && preview->isReadOnly() ? 1 : 0);
+
+				if (! preview || ! preview->isReadOnly() ||
+				    preview->verticalScrollBarPolicy() == Qt::ScrollBarAlwaysOff)
+					fail(QStringLiteral("the id rule preview is not a read-only scroll area"));
+
+				// 号码一律覆盖已有的：名单里原来有号也要重新编
+				AdmissionTable existing = item->table;
+				const int idColumn = existing.columnIndex(QStringLiteral("准考证号"));
+				existing.rows[0][idColumn] = QStringLiteral("OLD-NUMBER");
+				AdmissionAssign::IdOptions always = options;
+				always.templateText = QStringLiteral("<number>");
+				always.charSources = QStringList();
+
+				if (! AdmissionAssign::planIds(existing, item->name, always, ids, &error) ||
+				    ids.value(0) != QStringLiteral("1"))
+					fail(QStringLiteral("existing ticket numbers are not overwritten"));
+				else
+					report << QStringLiteral("existing ticket number: OLD-NUMBER -> %1").arg(ids.value(0));
 			}
 		}
 
@@ -1484,6 +1592,58 @@ int main(int argc, char *argv[]) {
 				fail(QStringLiteral("seating should fail when the rooms are too small"));
 			else
 				report << QStringLiteral("seats (overflow): %1").arg(seatError);
+
+			// 排座位的预览也必须是只读、能滚的文本框（考场一多标签就撑爆面板）
+			options.layout = AdmissionAssign::FillFirst;
+			SeatDialog seatDialog(seats, venues, options);
+			auto *seatPreview = seatDialog.findChild<QPlainTextEdit *>(QStringLiteral("previewText"));
+			report << QStringLiteral("seat preview: %1 lines=%2 readOnly=%3")
+			              .arg(seatPreview ? 1 : 0)
+			              .arg(seatPreview ? seatPreview->toPlainText().count(QChar('\n')) + 1 : -1)
+			              .arg(seatPreview && seatPreview->isReadOnly() ? 1 : 0);
+
+			if (! seatPreview || ! seatPreview->isReadOnly() ||
+			    seatPreview->verticalScrollBarPolicy() == Qt::ScrollBarAlwaysOff)
+				fail(QStringLiteral("the seat preview is not a read-only scroll area"));
+
+			// 顺序只允许「名单顺序 / 随机」：不该再有「按姓名」
+			int seatCombos = 0;
+			bool nameOrder = false;
+
+			for (auto *box : seatDialog.findChildren<QComboBox *>()) {
+				++seatCombos;
+
+				if (box->findData(QStringLiteral("name")) >= 0)
+					nameOrder = true;
+			}
+
+			report << QStringLiteral("seat dialog: combos=%1 byName=%2").arg(seatCombos).arg(nameOrder ? 1 : 0);
+
+			if (nameOrder)
+				fail(QStringLiteral("the seat dialog still offers sorting by name"));
+
+			// 传个老配置里的 order=name 也不能改变结果：一律按名单行号
+			QStringList rowVenues;
+			QStringList rowRooms;
+			QStringList rowSeats;
+			options.order = QStringLiteral("row");
+
+			if (! AdmissionAssign::planSeats(seats, venues, options, rowVenues, rowRooms, rowSeats, &seatError))
+				fail(QStringLiteral("planSeats (row order): ") + seatError);
+			else {
+				options.order = QStringLiteral("name");
+				QStringList nameVenues;
+				QStringList nameRooms;
+				QStringList nameSeats;
+
+				if (! AdmissionAssign::planSeats(seats, venues, options, nameVenues, nameRooms, nameSeats,
+				                                 &seatError))
+					fail(QStringLiteral("planSeats (unknown order): ") + seatError);
+				else if (nameSeats != rowSeats || nameRooms != rowRooms || nameVenues != rowVenues)
+					fail(QStringLiteral("an unknown order should fall back to the list order"));
+				else
+					report << QStringLiteral("unknown seat order fell back to the list order");
+			}
 		}
 
 		// 4e) 考点 / 考场编辑区：树建得起来也读得回来（考点只存名字，容量在考场那一行）
@@ -1535,6 +1695,132 @@ int main(int argc, char *argv[]) {
 		}
 
 		LOG("check-admission-ui: problems", problems);
+		return problems == 0 ? 0 : 1;
+	}
+
+	// 隐藏入口：走一遍最真实的「写完就关程序」——真的建主窗口、真的打开比赛日、
+	// 真的切到准考证页、真的 close()，再看磁盘上存没存住。
+	// 用法：lemon.exe --check-close <比赛日.cdf> <报告文件>
+	if (argc >= 4 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--check-close")) {
+		QApplication app(argc, argv);
+		Q_INIT_RESOURCE(resource);
+		const QString dayFile = QFileInfo(QString::fromLocal8Bit(argv[2])).absoluteFilePath();
+		const QString dayFolder = QFileInfo(dayFile).absolutePath();
+		const QString configFile = dayFolder + QStringLiteral("/admission/config.json");
+		const QString contestNotesFile = dayFolder + QStringLiteral("/admission/contest-notes.md");
+		QStringList report;
+		int problems = 0;
+		const auto fail = [&](const QString &line) {
+			problems++;
+			report << (QStringLiteral("FAIL ") + line);
+		};
+		const auto savedTitle = [&configFile]() {
+			QFile file(configFile);
+
+			if (! file.open(QIODevice::ReadOnly))
+				return QStringLiteral("<missing>");
+
+			return QJsonDocument::fromJson(file.readAll())
+			    .object()
+			    .value(QStringLiteral("title"))
+			    .toString();
+		};
+		const auto readFile = [](const QString &path) {
+			QFile file(path);
+			return file.open(QIODevice::ReadOnly) ? QString::fromUtf8(file.readAll()) : QString();
+		};
+		const auto writeFile = [](const QString &path, const QByteArray &data) {
+			QDir().mkpath(QFileInfo(path).absolutePath());
+			QFile file(path);
+
+			if (! file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+				return false;
+
+			return file.write(data) == data.size();
+		};
+
+		// 先铺一份「用户原来的数据」：标题 + 比赛注意 + 一个赛区。
+		// 打开比赛日不该把它冲掉 —— 这曾经是「重启以后标题没了」的真凶。
+		writeFile(configFile,
+		          QStringLiteral("{\n\t\"version\": \"1.0\",\n\t\"title\": \"pre-existing title\"\n}\n").toUtf8());
+		writeFile(contestNotesFile, QStringLiteral("比赛注意内容\n").toUtf8());
+
+		{
+			LemonLime window;
+			window.show();
+			// .cdf 自己从 C++ 写（外部用 PowerShell 写的会带 UTF-8 BOM，正好拿来试 BOM 兼容）
+			const QString checkDay = QFileInfo::exists(dayFile) ? dayFile
+			                                                   : dayFolder + QStringLiteral("/check-day.cdf");
+
+			if (checkDay != dayFile)
+				writeFile(checkDay, QStringLiteral("{\"version\":\"1.0\",\"contestTitle\":\"CheckDay\","
+				                                   "\"regionEnabled\":true}").toUtf8());
+
+			const bool opened = window.openContestForCheck(checkDay);
+			report << QStringLiteral("opened=%1 title=%2 cwd=%3")
+			              .arg(opened ? 1 : 0)
+			              .arg(window.windowTitle(), QDir::currentPath());
+
+			auto *tabs = window.findChild<QTabWidget *>();
+			auto *tab = window.findChild<QWidget *>(QStringLiteral("admissionTab"));
+			auto *admission = window.findChild<AdmissionWidget *>();
+			QLineEdit *title =
+			    admission ? admission->findChild<QLineEdit *>(QStringLiteral("titleEdit")) : nullptr;
+			report << QStringLiteral("window: tabs=%1 tab=%2 admission=%3 title=%4")
+			              .arg(tabs ? 1 : 0)
+			              .arg(tab ? 1 : 0)
+			              .arg(admission ? 1 : 0)
+			              .arg(title ? 1 : 0);
+
+			if (! tabs || ! tab || ! admission || ! title)
+				fail(QStringLiteral("the main window has no admission tab"));
+			else {
+				report << QStringLiteral("cwd=%1 root=%2 config=%3 window=\"%4\" modal=%5")
+				              .arg(QDir::currentPath(), AdmissionProject::root())
+				              .arg(QFileInfo::exists(configFile) ? 1 : 0)
+				              .arg(window.windowTitle())
+				              .arg(QApplication::activeModalWidget() ? QStringLiteral("yes")
+				                                                     : QStringLiteral("no"));
+				tabs->setCurrentWidget(tab);
+				QCoreApplication::processEvents();
+				report << QStringLiteral("title loaded from disk: \"%1\" / notes: \"%2\"")
+				              .arg(title->text(), readFile(contestNotesFile).trimmed());
+
+				// 打开比赛日就把盘上的设置清了（combo 填条目触发的首次写盘）—— 必须不能发生
+				if (title->text() != QStringLiteral("pre-existing title"))
+					fail(QStringLiteral("opening the day wiped the saved title"));
+
+				if (readFile(configFile).trimmed().isEmpty())
+					fail(QStringLiteral("opening the day wiped config.json"));
+
+				if (readFile(contestNotesFile).trimmed() != QStringLiteral("比赛注意内容"))
+					fail(QStringLiteral("opening the day wiped contest-notes.md"));
+
+				// 敲完立刻关窗口：连 400ms 的防抖都来不及跑
+				title->setText(QStringLiteral("closed right away"));
+				window.close();
+				report << QStringLiteral("saved right after close(): \"%1\" (via %2)")
+				              .arg(savedTitle(), AdmissionProject::configPath());
+				report << QStringLiteral("config.json now: %1")
+				              .arg(QString(readFile(configFile)).split(QChar('\n')).join(QStringLiteral(" ")));
+			}
+		}
+
+		const QString finalTitle = savedTitle();
+		report << QStringLiteral("title after the window was gone: \"%1\"").arg(finalTitle);
+
+		if (finalTitle != QStringLiteral("closed right away"))
+			fail(QStringLiteral("closing the program dropped the title"));
+
+		report.prepend(QStringLiteral("problems=%1").arg(problems));
+		QFile out(QString::fromLocal8Bit(argv[3]));
+
+		if (out.open(QIODevice::WriteOnly | QIODevice::Text)) {
+			QTextStream stream(&out);
+			stream << report.join(QChar('\n')) << '\n';
+		}
+
+		LOG("check-close: problems", problems);
 		return problems == 0 ? 0 : 1;
 	}
 
