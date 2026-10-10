@@ -83,6 +83,8 @@ void JudgingThread::setMemoryLimit(int limit) { memoryLimit = limit; }
 
 void JudgingThread::setRawMemoryLimit(int limit) { rawMemoryLimit = limit; }
 
+void JudgingThread::setRequireReturnZero(bool required) { requireReturnZero = required; }
+
 void JudgingThread::setInterpreterAsWatcher(bool use) { interpreterAsWatcher = use; }
 
 auto JudgingThread::getTimeUsed() const -> int { return timeUsed; }
@@ -822,6 +824,7 @@ void JudgingThread::judgeTraditionalTask() {
 	cfg.memoryLimit = memoryLimit;
 	cfg.rawMemoryLimit = rawMemoryLimit;
 	cfg.extraTimeRatio = extraTimeRatio;
+	cfg.requireReturnZero = requireReturnZero;
 	cfg.standardInputCheck = task->getStandardInputCheck();
 	cfg.standardOutputCheck = task->getStandardOutputCheck();
 	cfg.inputFileName = task->getInputFileName();

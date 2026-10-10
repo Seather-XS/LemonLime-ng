@@ -85,6 +85,8 @@ class Settings {
 	int getFileSizeLimit() const;
 	int getRejudgeTimes() const;
 	int getMaxJudgingThreads() const;
+	/// CCF 编程通则 3：选手程序应正常结束且主函数返回 0（非 0 → 运行时错误）。
+	bool getRequireReturnZero() const;
 	double getDefaultExtraTimeRatio() const;
 	const QString &getDefaultInputFileExtension() const;
 	const QString &getDefaultOutputFileExtension() const;
@@ -106,6 +108,7 @@ class Settings {
 	void setFileSizeLimit(int);
 	void setRejudgeTimes(int);
 	void setMaxJudgingThreads(int);
+	void setRequireReturnZero(bool);
 	void setDefaultInputFileExtension(const QString &);
 	void setDefaultOutputFileExtension(const QString &);
 	void setInputFileExtensions(const QString &);
@@ -172,6 +175,7 @@ class Settings {
 	int fileSizeLimit{};
 	int rejudgeTimes{};
 	int maxJudgingThreads{};
+	bool requireReturnZero{true};
 	double defaultExtraTimeRatio{};
 	QString defaultInputFileExtension;
 	QString defaultOutputFileExtension;

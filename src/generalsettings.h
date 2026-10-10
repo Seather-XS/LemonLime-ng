@@ -43,5 +43,7 @@ class GeneralSettings : public QWidget {
 	void maxJudgingThreadsChanged(const QString &);
 	void inputFileExtensionsChanged(const QString &);
 	void outputFileExtensionsChanged(const QString &);
+	/// CCF 编程通则 3：选手程序必须以 0 退出。
+	void requireReturnZeroChanged(int);
 	void onLanguageComboBoxChanged(const QString &);
 };

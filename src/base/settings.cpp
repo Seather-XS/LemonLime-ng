@@ -124,6 +124,8 @@ auto Settings::getRejudgeTimes() const -> int { return rejudgeTimes; }
 
 auto Settings::getMaxJudgingThreads() const -> int { return maxJudgingThreads; }
 
+auto Settings::getRequireReturnZero() const -> bool { return requireReturnZero; }
+
 auto Settings::getDefaultExtraTimeRatio() const -> double { return defaultExtraTimeRatio; }
 
 auto Settings::getDefaultInputFileExtension() const -> const QString & { return defaultInputFileExtension; }
@@ -190,6 +192,11 @@ void Settings::setRejudgeTimes(int number) {
 void Settings::setMaxJudgingThreads(int number) {
 	maxJudgingThreads = number;
 	DEBUG("Set Max Judging Threads to " + QString::number(number));
+}
+
+void Settings::setRequireReturnZero(bool required) {
+	requireReturnZero = required;
+	DEBUG("Set Require Return Zero to " + QString::number(required));
 }
 
 void Settings::setDefaultInputFileExtension(const QString &extension) {
@@ -378,6 +385,7 @@ void Settings::copyFrom(Settings *other) {
 	setFileSizeLimit(other->getFileSizeLimit());
 	setRejudgeTimes(other->getRejudgeTimes());
 	setMaxJudgingThreads(other->getMaxJudgingThreads());
+	setRequireReturnZero(other->getRequireReturnZero());
 	setDefaultInputFileExtension(other->getDefaultInputFileExtension());
 	setDefaultOutputFileExtension(other->getDefaultOutputFileExtension());
 	setInputFileExtensions(other->getInputFileExtensions().join(";"));
@@ -427,6 +435,7 @@ void Settings::saveSettings() {
 	settings.setValue("FileSizeLimit", fileSizeLimit);
 	settings.setValue("MaximumRejudgeTimes", rejudgeTimes);
 	settings.setValue("MaximumJudgingThreads", maxJudgingThreads);
+	settings.setValue("RequireReturnZero", requireReturnZero);
 	settings.setValue("DefaultInputFileExtension", defaultInputFileExtension);
 	settings.setValue("DefaultOutputFileExtension", defaultOutputFileExtension);
 	settings.setValue("InputFileExtensions", inputFileExtensions);
@@ -526,12 +535,13 @@ void Settings::loadSettings() {
 	defaultFullScore = settings.value("DefaultFullScore", 10).toInt();
 	defaultTimeLimit = settings.value("DefaultTimeLimit", 1000).toInt();
 	defaultExtraTimeRatio = settings.value("DefaultExtraTimeRatio", 0.1).toDouble();
-	defaultMemoryLimit = settings.value("DefaultMemoryLimit", 512).toInt();
+	defaultMemoryLimit = settings.value("DefaultMemoryLimit", 128).toInt();
 	compileTimeLimit = settings.value("CompileTimeLimit", 10000).toInt();
 	specialJudgeTimeLimit = settings.value("SpecialJudgeTimeLimit", 10000).toInt();
-	fileSizeLimit = settings.value("FileSizeLimit", 50).toInt();
+	fileSizeLimit = settings.value("FileSizeLimit", 100).toInt();
 	rejudgeTimes = settings.value("MaximumRejudgeTimes", 1).toInt();
 	maxJudgingThreads = settings.value("MaximumJudgingThreads", 1).toInt();
+	requireReturnZero = settings.value("RequireReturnZero", true).toBool();
 	defaultInputFileExtension = settings.value("DefaultInputFileExtension", "in").toString();
 	defaultOutputFileExtension = settings.value("DefaultOutputFileExtension", "out").toString();
 	inputFileExtensions = settings.value("InputFileExtensions", QStringList() << "in").toStringList();

@@ -45,6 +45,7 @@ GeneralSettings::GeneralSettings(QWidget *parent) : QWidget(parent), ui(new Ui::
 	    new QRegularExpressionValidator(QRegularExpression("(\\w+;)*\\w+"), this));
 	ui->outputFileExtensions->setValidator(
 	    new QRegularExpressionValidator(QRegularExpression("(\\w+;)*\\w+"), this));
+
 	connect(ui->defaultFullScore, &QLineEdit::textChanged, this, &GeneralSettings::defaultFullScoreChanged);
 	connect(ui->defaultTimeLimit, &QLineEdit::textChanged, this, &GeneralSettings::defaultTimeLimitChanged);
 	connect(ui->defaultExtraTimeRatio, &QLineEdit::textChanged, this,
@@ -63,6 +64,8 @@ GeneralSettings::GeneralSettings(QWidget *parent) : QWidget(parent), ui(new Ui::
 	        &GeneralSettings::outputFileExtensionsChanged);
 	connect(ui->languageComboBox, qOverload<const QString &>(&QComboBox::currentTextChanged), this,
 	        &GeneralSettings::onLanguageComboBoxChanged);
+	connect(ui->requireReturnZero, &QCheckBox::checkStateChanged, this,
+	        &GeneralSettings::requireReturnZeroChanged);
 }
 
 GeneralSettings::~GeneralSettings() { delete ui; }
@@ -81,6 +84,7 @@ void GeneralSettings::resetEditSettings(Settings *settings) {
 	ui->inputFileExtensions->setText(editSettings->getInputFileExtensions().join(";"));
 	ui->outputFileExtensions->setText(editSettings->getOutputFileExtensions().join(";"));
 	ui->languageComboBox->setCurrentText(editSettings->getUiLanguage());
+	ui->requireReturnZero->setChecked(editSettings->getRequireReturnZero());
 }
 
 void GeneralSettings::onLanguageComboBoxChanged(const QString &arg) { editSettings->setUiLanguage(arg); }
@@ -177,4 +181,8 @@ void GeneralSettings::inputFileExtensionsChanged(const QString &text) {
 
 void GeneralSettings::outputFileExtensionsChanged(const QString &text) {
 	editSettings->setOutputFileExtensions(text);
+}
+
+void GeneralSettings::requireReturnZeroChanged(int state) {
+	editSettings->setRequireReturnZero(state == Qt::Checked);
 }

@@ -75,6 +75,17 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 比赛的导出物统一放在 `<比赛日>/dist/` 下；早期版本遗留在根目录的 `export/`、`reports/` 会在打开比赛日时自动清掉。
 
+### 评测：按 CCF 规范（可在「通用设置」里改）
+
+依据《关于NOI系列赛编程语言使用限制的规定》与《……补充说明》，评测环节按下面这些规则来（编程语言与编译选项的限定不在本系统的管辖范围）：
+
+-   **程序必须正常结束且 `main()` 返回 0**（编程通则 3）：非 0 退出码直接判**运行时错误**。开关：「通用设置 → Require Return 0」（默认开）。解释型语言看的是**解释器的退出码**：Python 脚本正常跑完就是 0，抛了未捕获的异常（Traceback）或 `sys.exit(1)` 就是非 0 → 判运行时错误；Java 同理（未捕获异常时 JVM 退出码非 0）。也就是说 Python 不需要写 `return 0`，只要别异常退出即可；如果你的脚本习惯用非 0 退出码表示别的东西，把这个开关取消勾选，就回到「只看输出」的判定。
+-   **源程序不得大于 100 KB**（编程通则 2）：超限的文件不会被编译，编译消息里会写清楚是哪个文件、超过了多少 —— 默认值是 CCF 的 100 KB，可在「通用设置 → Source File Size Limit」改。
+-   **同时提交多个源程序时的选取顺序**（编程通则 1）由**编译器列表的顺序**决定：评测按编译器列表逐个试，第一个能匹配到源文件并编译成功的编译器说了算。所以把 `gcc`（后缀 `c`）排在 `g++`（后缀 `cpp;cc;cxx`）前面，就得到 CCF 要求的 `.c → .cpp → .pas`；同一个语言声明多个后缀（`cpp;cc;cxx`、`pas;pp;inc`）时，也按声明的先后顺序取第一个存在的文件。要调整顺序就在「选项 → 编译器」里拖动 / 增删编译器。
+-   **静态与动态内存总和默认 128 MB**（编程通则 5）：「通用设置 → Default Memory Limit」的默认值已对齐 CCF，逐题还可以在试题设置里再改。
+-   **严禁的操作**（编程通则 4：访问网络、`fork` / `exec` / `system` 或其它进程 / 线程生成函数、运行其它程序……）：比赛日的「违规检测」里默认就带了一份 CCF 清单（`system`、`popen`、`fork`、`exec` / `execl` / `execv` / `execve`、`CreateProcess`、`WinExec`、`ShellExecute`、`CreateThread`、`_beginthread`、`pthread_create`、`socket`、`WSAStartup`、`gethostbyname`、`#pragma`、`__asm__`/`asm`，以及 `windows.h` / `unistd.h` / `sys/socket.h` / `winsock2.h` 这些头文件），逐条可增删；命中即整位选手判 0 分。检测时会先屏蔽注释与字符串，所以「注释里写了 system(」不算违规。
+-   源程序文件名与后缀要求全小写（编程通则 1）没有强制：国内很多比赛日的题目就叫 `T1` / `A+B`，强制小写会误伤；需要的话用违规检测的「字符串」规则自己加。
+
 ### 准考证：细节
 
 **产物与目录**

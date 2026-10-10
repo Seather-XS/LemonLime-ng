@@ -31,6 +31,25 @@
 // testlib.h is a large header, building a checker needs more time than a contestant source
 static const int CHECKER_COMPILE_TIME_LIMIT_MS = 90000;
 
+auto TaskJudger::suffixRank(const QStringList &extensionOrder, const QString &fileName) -> int {
+	const QString suffix = QFileInfo(fileName).suffix().toLower();
+
+	for (int index = 0; index < extensionOrder.size(); ++index)
+		if (extensionOrder.at(index).trimmed().toLower() == suffix)
+			return index;
+
+	return extensionOrder.size();
+}
+
+auto TaskJudger::orderSourceFiles(const QStringList &extensionOrder, const QStringList &files) -> QStringList {
+	QStringList ordered = files;
+	std::stable_sort(ordered.begin(), ordered.end(),
+	                 [&extensionOrder](const QString &left, const QString &right) {
+		                 return suffixRank(extensionOrder, left) < suffixRank(extensionOrder, right);
+	                 });
+	return ordered;
+}
+
 TaskJudger::TaskJudger(QObject *parent) : QObject(parent) { compileState = NoValidSourceFile; }
 
 void TaskJudger::setSettings(Settings *_settings) { settings = _settings; }
@@ -49,6 +68,7 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 
 	// Get the source code of contestant
 	compileState = NoValidSourceFile;
+	compileMessage.clear();
 	QString contestantName = contestant->getContestantName();
 	const QString contestantFolder = contestant->getSourceFolder();
 	QDir contestantDir;
@@ -77,17 +97,35 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 		QStringList files = contestantDir.entryList(filters, QDir::Files);
 		sourceFile = "";
 
+		// 同一个语言声明了多个后缀时（g++ 默认 `cpp;cc;cxx`、fpc 默认 `pas;pp;inc`），
+		// 按声明的先后顺序取第一个存在的源文件；跨语言的优先级由编译器列表的顺序决定
+		// （外层 for 按列表逐个试，第一个能编译成功的说了算）——CCF 的 .c → .cpp → .pas
+		// 就靠「gcc 排在 g++ 前面」实现，不需要另外配一份后缀顺序。
+		if (task->getTaskType() != Task::Communication && task->getTaskType() != Task::CommunicationExec)
+			files = TaskJudger::orderSourceFiles(i->getSourceExtensions(), files);
+
 		for (int j = 0; j < files.size(); j++) {
-			qint64 fileSize = QFileInfo(contestantDirName + QDir::separator() + files[j]).size();
-			// Refuse to compile if the source file is too large
-			if (fileSize <= settings->getFileSizeLimit() * 1024) {
-				if (task->getTaskType() == Task::Communication ||
-				    task->getTaskType() == Task::CommunicationExec) {
-					sourceFile = sourceFile + " " + files[j] + " ";
-				} else {
-					sourceFile = files[j];
-					break;
-				}
+			const QString candidate = contestantDirName + QDir::separator() + files[j];
+			const qint64 fileSize = QFileInfo(candidate).size();
+
+			// CCF 编程通则 2：每道题的源程序不得大于 100KB（通用设置里可改）。
+			// 超了就说明原因，别只报一句「没有有效源文件」——用户根本不知道哪里出了问题。
+			if (fileSize > qint64(settings->getFileSizeLimit()) * 1024) {
+				if (compileMessage.isEmpty())
+					compileMessage = tr("Source file %1 is larger than the %2 KB limit.")
+					                     .arg(files[j])
+					                     .arg(settings->getFileSizeLimit());
+
+				LOG("Source file too large:", files[j], fileSize, ">",
+				    qint64(settings->getFileSizeLimit()) * 1024);
+				continue;
+			}
+
+			if (task->getTaskType() == Task::Communication || task->getTaskType() == Task::CommunicationExec) {
+				sourceFile = sourceFile + " " + files[j] + " ";
+			} else {
+				sourceFile = files[j];
+				break;
 			}
 		}
 
@@ -499,6 +537,8 @@ int TaskJudger::judge() {
 
 			auto *thread = new JudgingThread();
 			thread->setExtraTimeRatio(settings->getDefaultExtraTimeRatio());
+			// CCF 编程通则 3：程序必须以 0 退出（通用设置里可关）
+			thread->setRequireReturnZero(settings->getRequireReturnZero());
 			// 全部测试点共用同一个工作目录（就是准备阶段放选手程序的那个目录）：
 			// 以前每个测试点都新开一个 _i.j 目录、把可执行文件再拷一份，而 Windows 会对
 			// 每次新出现的 .exe 做一遍实时扫描，实测一个测试点要白等 ~120ms。

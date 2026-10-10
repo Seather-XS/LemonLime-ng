@@ -79,17 +79,39 @@ namespace {
 } // namespace
 
 auto Violation::defaultRules() -> QVector<ViolationRule> {
+	// 依据《关于NOI系列赛编程语言使用限制的规定》「编程通则」第 4 条（严禁的操作）：
+	// 访问网络、使用 fork/exec/system 或其它进程 / 线程生成函数、运行其它程序……
+	// 这些默认规则只在比赛日打开「违规检测」后才生效，而且逐条可改。
 	return {
+	    // 与外部环境通信：执行别的程序 / 起进程
 	    {KIND_COMMAND, QStringLiteral("system")},
 	    {KIND_COMMAND, QStringLiteral("popen")},
 	    {KIND_COMMAND, QStringLiteral("fork")},
 	    {KIND_COMMAND, QStringLiteral("exec")},
+	    {KIND_COMMAND, QStringLiteral("execl")},
+	    {KIND_COMMAND, QStringLiteral("execv")},
+	    {KIND_COMMAND, QStringLiteral("execve")},
+	    {KIND_COMMAND, QStringLiteral("CreateProcess")},
+	    {KIND_COMMAND, QStringLiteral("WinExec")},
+	    {KIND_COMMAND, QStringLiteral("ShellExecute")},
+	    // 多线程 / 多进程
+	    {KIND_COMMAND, QStringLiteral("CreateThread")},
+	    {KIND_COMMAND, QStringLiteral("_beginthread")},
+	    {KIND_COMMAND, QStringLiteral("_beginthreadex")},
+	    {KIND_COMMAND, QStringLiteral("pthread_create")},
+	    // 访问网络
+	    {KIND_COMMAND, QStringLiteral("socket")},
+	    {KIND_COMMAND, QStringLiteral("WSAStartup")},
+	    {KIND_COMMAND, QStringLiteral("gethostbyname")},
+	    // 源码里自行指定编译选项 / 内嵌汇编
 	    {KIND_COMMAND, QStringLiteral("#pragma")},
 	    {KIND_COMMAND, QStringLiteral("__asm__")},
 	    {KIND_COMMAND, QStringLiteral("asm")},
+	    // 题目规定之外的头文件（含网络 / 系统调用）
 	    {KIND_STRING, QStringLiteral("windows.h")},
 	    {KIND_STRING, QStringLiteral("unistd.h")},
 	    {KIND_STRING, QStringLiteral("sys/socket.h")},
+	    {KIND_STRING, QStringLiteral("winsock2.h")},
 	};
 }
 

@@ -2765,6 +2765,16 @@ Depends: </source>
         <translation></translation>
     </message>
     <message>
+        <location filename="../src/forms/generalsettings.ui" line="788"/>
+        <source>Require Return 0</source>
+        <translation>要求傳回 0</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/generalsettings.ui" line="791"/>
+        <source>CCF rule: the program must end normally and main() must return 0. A non-zero exit code is reported as a runtime error. For interpreted languages (Python, Java, …) the interpreter&apos;s exit code is what counts, so an uncaught exception is a runtime error too.</source>
+        <translation>CCF rule: the program must end normally and main() must return 0. A non-zero exit code is reported as a runtime error. For interpreted languages (Python, Java, …) the interpreter&apos;s exit code is what counts, so an uncaught exception is a runtime error too.</translation>
+    </message>
+    <message>
         <location filename="../src/forms/generalsettings.ui" line="72"/>
         <source>(separated by &quot;;&quot;. Empty means no limitation.)</source>
         <translation></translation>
@@ -2815,49 +2825,49 @@ Depends: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/generalsettings.cpp" line="91"/>
-        <location filename="../src/generalsettings.cpp" line="97"/>
-        <location filename="../src/generalsettings.cpp" line="103"/>
-        <location filename="../src/generalsettings.cpp" line="109"/>
-        <location filename="../src/generalsettings.cpp" line="115"/>
-        <location filename="../src/generalsettings.cpp" line="121"/>
-        <location filename="../src/generalsettings.cpp" line="127"/>
-        <location filename="../src/generalsettings.cpp" line="133"/>
+        <location filename="../src/generalsettings.cpp" line="95"/>
+        <location filename="../src/generalsettings.cpp" line="101"/>
+        <location filename="../src/generalsettings.cpp" line="107"/>
+        <location filename="../src/generalsettings.cpp" line="113"/>
+        <location filename="../src/generalsettings.cpp" line="119"/>
+        <location filename="../src/generalsettings.cpp" line="125"/>
+        <location filename="../src/generalsettings.cpp" line="131"/>
+        <location filename="../src/generalsettings.cpp" line="137"/>
         <source>Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/generalsettings.cpp" line="91"/>
+        <location filename="../src/generalsettings.cpp" line="95"/>
         <source>Empty default full score!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/generalsettings.cpp" line="97"/>
+        <location filename="../src/generalsettings.cpp" line="101"/>
         <source>Empty default time limit!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/generalsettings.cpp" line="109"/>
+        <location filename="../src/generalsettings.cpp" line="113"/>
         <source>Empty default memory limit!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/generalsettings.cpp" line="115"/>
+        <location filename="../src/generalsettings.cpp" line="119"/>
         <source>Empty compile time limit!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/generalsettings.cpp" line="121"/>
+        <location filename="../src/generalsettings.cpp" line="125"/>
         <source>Empty special judge time limit!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/generalsettings.cpp" line="127"/>
+        <location filename="../src/generalsettings.cpp" line="131"/>
         <source>Empty source file size limit!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/generalsettings.cpp" line="133"/>
+        <location filename="../src/generalsettings.cpp" line="137"/>
         <source>Empty maximum rejudge times!</source>
         <translation></translation>
     </message>
@@ -2872,7 +2882,7 @@ Depends: </source>
         <translation>Default extra time ratio</translation>
     </message>
     <message>
-        <location filename="../src/generalsettings.cpp" line="103"/>
+        <location filename="../src/generalsettings.cpp" line="107"/>
         <source>Empty default extra time ratio!</source>
         <translation></translation>
     </message>
@@ -3167,90 +3177,90 @@ Depends: </source>
 <context>
     <name>JudgingThread</name>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="232"/>
-        <location filename="../src/core/judgingthread.cpp" line="288"/>
-        <location filename="../src/core/judgingthread.cpp" line="373"/>
+        <location filename="../src/core/judgingthread.cpp" line="234"/>
+        <location filename="../src/core/judgingthread.cpp" line="290"/>
+        <location filename="../src/core/judgingthread.cpp" line="375"/>
         <source>Cannot open contestant&apos;s output file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="239"/>
-        <location filename="../src/core/judgingthread.cpp" line="295"/>
-        <location filename="../src/core/judgingthread.cpp" line="382"/>
+        <location filename="../src/core/judgingthread.cpp" line="241"/>
+        <location filename="../src/core/judgingthread.cpp" line="297"/>
+        <location filename="../src/core/judgingthread.cpp" line="384"/>
         <source>Cannot open standard output file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="266"/>
-        <location filename="../src/core/judgingthread.cpp" line="333"/>
-        <location filename="../src/core/judgingthread.cpp" line="445"/>
+        <location filename="../src/core/judgingthread.cpp" line="268"/>
+        <location filename="../src/core/judgingthread.cpp" line="335"/>
+        <location filename="../src/core/judgingthread.cpp" line="447"/>
         <source>On line %3, Read &quot;%1&quot; but expect &quot;%2&quot;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="251"/>
-        <location filename="../src/core/judgingthread.cpp" line="318"/>
+        <location filename="../src/core/judgingthread.cpp" line="253"/>
+        <location filename="../src/core/judgingthread.cpp" line="320"/>
         <source>On line %1, Contestant&apos;s output has less contents</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="259"/>
-        <location filename="../src/core/judgingthread.cpp" line="326"/>
+        <location filename="../src/core/judgingthread.cpp" line="261"/>
+        <location filename="../src/core/judgingthread.cpp" line="328"/>
         <source>On line %1, Contestant&apos;s output has too much contents</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="310"/>
+        <location filename="../src/core/judgingthread.cpp" line="312"/>
         <source>Presentation error on line %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="405"/>
+        <location filename="../src/core/judgingthread.cpp" line="407"/>
         <source>On line %1, Invalid characters in contestant&apos;s output file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="414"/>
+        <location filename="../src/core/judgingthread.cpp" line="416"/>
         <source>On line %1, Invalid characters in standard output file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="426"/>
+        <location filename="../src/core/judgingthread.cpp" line="428"/>
         <source>On line %1, Contestant&apos;s Output has less contents</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="435"/>
+        <location filename="../src/core/judgingthread.cpp" line="437"/>
         <source>On line %1, Contestant&apos;s Output has too much contents</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="476"/>
-        <location filename="../src/core/judgingthread.cpp" line="597"/>
-        <location filename="../src/core/judgingthread.cpp" line="780"/>
+        <location filename="../src/core/judgingthread.cpp" line="478"/>
+        <location filename="../src/core/judgingthread.cpp" line="599"/>
+        <location filename="../src/core/judgingthread.cpp" line="782"/>
         <source>Cannot find standard input file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="483"/>
-        <location filename="../src/core/judgingthread.cpp" line="604"/>
+        <location filename="../src/core/judgingthread.cpp" line="485"/>
+        <location filename="../src/core/judgingthread.cpp" line="606"/>
         <source>Cannot find contestant&apos;s output file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="490"/>
-        <location filename="../src/core/judgingthread.cpp" line="611"/>
+        <location filename="../src/core/judgingthread.cpp" line="492"/>
+        <location filename="../src/core/judgingthread.cpp" line="613"/>
         <source>Cannot find standard output file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="511"/>
-        <location filename="../src/core/judgingthread.cpp" line="631"/>
+        <location filename="../src/core/judgingthread.cpp" line="513"/>
+        <location filename="../src/core/judgingthread.cpp" line="633"/>
         <source>Cannot start the special judge</source>
         <translation>Cannot start the special judge</translation>
     </message>
     <message>
-        <location filename="../src/core/judgingthread.cpp" line="809"/>
+        <location filename="../src/core/judgingthread.cpp" line="811"/>
         <source>Cannot copy standard input file</source>
         <translation></translation>
     </message>
@@ -4697,77 +4707,77 @@ No: remove it from the contest only.</translation>
 <context>
     <name>Settings</name>
     <message>
-        <location filename="../src/base/settings.cpp" line="288"/>
+        <location filename="../src/base/settings.cpp" line="295"/>
         <source>Correct Answer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="293"/>
+        <location filename="../src/base/settings.cpp" line="300"/>
         <source>Wrong Answer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="298"/>
+        <location filename="../src/base/settings.cpp" line="305"/>
         <source>Partly Correct</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="303"/>
+        <location filename="../src/base/settings.cpp" line="310"/>
         <source>Presentation Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="308"/>
+        <location filename="../src/base/settings.cpp" line="315"/>
         <source>Time Limit Exceeded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="313"/>
+        <location filename="../src/base/settings.cpp" line="320"/>
         <source>Memory Limit Exceeded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="318"/>
+        <location filename="../src/base/settings.cpp" line="325"/>
         <source>Output Limit Exceeded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="323"/>
+        <location filename="../src/base/settings.cpp" line="330"/>
         <source>Cannot Start Program</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="329"/>
+        <location filename="../src/base/settings.cpp" line="336"/>
         <source>File Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="335"/>
+        <location filename="../src/base/settings.cpp" line="342"/>
         <source>Run Time Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="340"/>
+        <location filename="../src/base/settings.cpp" line="347"/>
         <source>Invalid Special Judge</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="346"/>
+        <location filename="../src/base/settings.cpp" line="353"/>
         <source>Special Judge Time Limit Exceeded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="352"/>
+        <location filename="../src/base/settings.cpp" line="359"/>
         <source>Special Judge Run Time Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="358"/>
+        <location filename="../src/base/settings.cpp" line="365"/>
         <source>Skipped</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/base/settings.cpp" line="364"/>
+        <location filename="../src/base/settings.cpp" line="371"/>
         <source>Interactor Error</source>
         <translation></translation>
     </message>
@@ -5504,32 +5514,37 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>TaskJudger</name>
     <message>
-        <location filename="../src/core/taskjudger.cpp" line="48"/>
+        <location filename="../src/core/taskjudger.cpp" line="67"/>
         <source>Preparing...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/taskjudger.cpp" line="142"/>
+        <location filename="../src/core/taskjudger.cpp" line="115"/>
+        <source>Source file %1 is larger than the %2 KB limit.</source>
+        <translation>源程式檔案 %1 超過了 %2 KB 的上限。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/taskjudger.cpp" line="180"/>
         <source>The interactor %1 cannot be found in %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/taskjudger.cpp" line="151"/>
+        <location filename="../src/core/taskjudger.cpp" line="189"/>
         <source>The grader %1 cannot be found in %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/taskjudger.cpp" line="223"/>
+        <location filename="../src/core/taskjudger.cpp" line="261"/>
         <source>Compiling...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/taskjudger.cpp" line="259"/>
+        <location filename="../src/core/taskjudger.cpp" line="297"/>
         <source>Main grader (grader.*) cannot be found</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/core/taskjudger.cpp" line="343"/>
+        <location filename="../src/core/taskjudger.cpp" line="381"/>
         <source>Compiled Successfully</source>
         <translation></translation>
     </message>

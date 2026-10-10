@@ -30,7 +30,10 @@
 #include "core/contest.h"
 #include "core/dayproject.h"
 #include "core/packagebuilder.h"
+#include "core/processrunner.h"
 #include "core/statementbuilder.h"
+#include "core/taskjudger.h"
+#include "core/violation.h"
 #include "exportwidget.h"
 #include "pdfpreview.h"
 #include "resultviewer.h"
@@ -380,6 +383,32 @@ int main(int argc, char *argv[]) {
 			                 LOG("judge-day: skipped", name, "progress", progress);
 		                 });
 		contest.judge(lists, ignoreRules);
+
+		// 每道题的结果打一行日志：命令行跑评测时不用开界面就能看到判定（自检也靠它）。
+		for (auto *contestant : contest.getContestantList()) {
+			for (int i = 0; i < contest.getTaskList().size(); i++) {
+				if (! onlyTask.isEmpty() && contest.getTask(i)->getProblemTitle() != onlyTask)
+					continue;
+
+				const CompileState state = contestant->getCompileState(i);
+				QStringList verdicts;
+
+				for (const QList<ResultState> &perTest : contestant->getResult(i))
+					for (ResultState verdict : perTest) {
+						QString text;
+						QString fr;
+						QString bg;
+						Settings::setTextAndColor(verdict, text, fr, bg);
+						verdicts << text;
+					}
+
+				LOG("judge-day: result", contestant->getContestantName(),
+				    contest.getTask(i)->getProblemTitle(), "compile=", static_cast<int>(state),
+				    "score=", contestant->getTaskScore(i), "verdicts=", verdicts.join(QChar(',')),
+				    "message=", contestant->getCompileMessage(i));
+			}
+		}
+
 		LOG("judge-day: done");
 		return 0;
 	}
@@ -634,6 +663,274 @@ int main(int argc, char *argv[]) {
 		}
 
 		return 0;
+	}
+
+	// 隐藏入口：CCF 规范相关判定逻辑自检（不需要比赛数据）。
+	// 用法：lemon.exe --check-ccf <报告文件>
+	//   检查《关于NOI系列赛编程语言使用限制的规定》里评测系统能管的部分：
+	//   多源文件的后缀选取顺序（编程通则 1）、违规默认规则覆盖严禁清单（编程通则 4）、
+	//   程序必须返回 0（编程通则 3，真的跑一个进程验证）。
+	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--check-ccf")) {
+		QApplication app(argc, argv);
+		QStringList report;
+		int problems = 0;
+		const auto fail = [&](const QString &line) {
+			problems++;
+			report << (QStringLiteral("FAIL ") + line);
+		};
+
+		// 1) 通用设置：默认要求 return 0
+		{
+			Settings settings;
+			report << QStringLiteral("require return zero (default): %1")
+			              .arg(settings.getRequireReturnZero() ? 1 : 0);
+
+			if (! settings.getRequireReturnZero())
+				fail(QStringLiteral("the CCF rule 'main must return 0' is off by default"));
+		}
+
+		// 2) 编程通则 1：源文件的选取顺序来自**编译器自己声明的后缀列表**，
+		//    跨语言则是编译器列表的顺序（gcc 排在 g++ 前面 → .c 优先于 .cpp）。
+		{
+			// 一个编译器声明了多个后缀（g++ 默认就是 cpp;cc;cxx）时按声明顺序取
+			const QStringList gpp{QStringLiteral("cpp"), QStringLiteral("cc"), QStringLiteral("cxx")};
+			const QStringList files{QStringLiteral("cake.cxx"), QStringLiteral("cake.cc"),
+			                        QStringLiteral("cake.cpp")};
+			const QStringList ordered = TaskJudger::orderSourceFiles(gpp, files);
+			report << QStringLiteral("g++ suffixes %1 -> picked %2 (order: %3)")
+			              .arg(gpp.join(QStringLiteral(";")), ordered.value(0),
+			                   ordered.join(QStringLiteral(", ")));
+
+			if (ordered.value(0) != QStringLiteral("cake.cpp") ||
+			    ordered != QStringList{QStringLiteral("cake.cpp"), QStringLiteral("cake.cc"),
+			                           QStringLiteral("cake.cxx")})
+				fail(QStringLiteral("the compiler's own suffix order is not respected"));
+
+			// gcc 只认 .c、g++ 认 cpp;cc;cxx：编译器列表 [gcc, g++] 就是 .c → .cpp 的优先级
+			const QStringList cOnly{QStringLiteral("c")};
+			QString picked;
+			QString pickedBy;
+			const QList<QPair<QString, QStringList>> compilers{
+			    {QStringLiteral("gcc"), cOnly}, {QStringLiteral("g++"), gpp},
+			    {QStringLiteral("fpc"), {QStringLiteral("pas"), QStringLiteral("pp")}}};
+
+			for (const auto &compiler : compilers) {
+				// 只认这个编译器声明过的后缀：先看有没有能匹配的候选文件
+				const QString candidate =
+				    TaskJudger::orderSourceFiles(compiler.second, files + QStringList{QStringLiteral("cake.c"),
+				                                                                      QStringLiteral("cake.pas")})
+				        .value(0);
+
+				if (compiler.second.contains(QFileInfo(candidate).suffix().toLower())) {
+					picked = candidate;
+					pickedBy = compiler.first;
+					break;
+				}
+			}
+
+			report << QStringLiteral("first compiler that can take a source file: %1 -> %2")
+			              .arg(pickedBy, picked);
+
+			if (picked != QStringLiteral("cake.c"))
+				fail(QStringLiteral("the compiler list order does not give .c priority over .cpp"));
+
+			// 后缀不在任何编译器声明里就排最后
+			if (TaskJudger::suffixRank(gpp, QStringLiteral("cake.py")) != gpp.size())
+				fail(QStringLiteral("an unknown suffix must rank last"));
+		}
+
+		// 3) 编程通则 4：默认违规规则要覆盖严禁的操作（网络 / 进程 / 线程 / 汇编 / 编译选项）
+		{
+			const QVector<ViolationRule> rules = Violation::defaultRules();
+			QStringList names;
+
+			for (const ViolationRule &rule : rules)
+				names << rule.text;
+
+			report << QStringLiteral("default violation rules: %1").arg(names.join(QStringLiteral(", ")));
+
+			for (const QString &needed : {QStringLiteral("system"), QStringLiteral("popen"),
+			                              QStringLiteral("fork"), QStringLiteral("exec"),
+			                              QStringLiteral("CreateProcess"),
+			                              QStringLiteral("CreateThread"),
+			                              QStringLiteral("pthread_create"), QStringLiteral("socket"),
+			                              QStringLiteral("WSAStartup"), QStringLiteral("#pragma"),
+			                              QStringLiteral("__asm__")}) {
+				if (! names.contains(needed)) {
+					fail(QStringLiteral("the default rules do not cover ") + needed);
+					continue;
+				}
+			}
+
+			// 真命中：调用 system() / 起线程 / 访问网络
+			const QString code = QStringLiteral("int main() {\n"
+			                                    "  system(\"pause\");\n"
+			                                    "  pthread_create(0, 0, 0, 0);\n"
+			                                    "  socket(1, 2, 3);\n"
+			                                    "  return 0;\n"
+			                                    "}\n");
+			const QVector<Violation::Match> hits = Violation::checkSource(code, rules);
+			QStringList hitNames;
+
+			for (const Violation::Match &hit : hits)
+				hitNames << hit.rule.text;
+
+			report << QStringLiteral("violations in a sample: %1").arg(hitNames.join(QStringLiteral(", ")));
+
+			if (! hitNames.contains(QStringLiteral("system")) ||
+			    ! hitNames.contains(QStringLiteral("pthread_create")) ||
+			    ! hitNames.contains(QStringLiteral("socket")))
+				fail(QStringLiteral("the default rules did not catch the CCF forbidden calls"));
+
+			// 不误伤：注释里的名字不算；普通函数名（connect）不在清单里
+			const QString clean = QStringLiteral("// system(\n"
+			                                     "int connect(int a, int b) { return a + b; }\n"
+			                                     "int main() { return connect(1, 2) - 3; }\n");
+			const QVector<Violation::Match> cleanHits = Violation::checkSource(clean, rules);
+			report << QStringLiteral("violations in clean code: %1").arg(cleanHits.size());
+
+			if (! cleanHits.isEmpty())
+				fail(QStringLiteral("the default rules flag innocent code"));
+		}
+
+		// 4) 编程通则 3：程序必须以 0 退出（真的跑一个进程看结果）
+		{
+			const QString cmd = QStandardPaths::findExecutable(QStringLiteral("cmd"));
+
+			if (cmd.isEmpty()) {
+				report << QStringLiteral("exit code check: skipped (no cmd.exe)");
+			} else {
+				QTemporaryDir work;
+
+				if (! work.isValid()) {
+					report << QStringLiteral("exit code check: skipped (no temporary dir)");
+				} else {
+					const auto runnerConfig = [&](bool requireZero) {
+						ProcessRunnerConfig cfg;
+						cfg.executableFile = cmd;
+						cfg.arguments = QStringLiteral("/c exit 1");
+						cfg.workingDirectory = work.path() + QDir::separator();
+						cfg.timeLimit = 5000;
+						cfg.rawTimeLimit = 5000;
+						cfg.memoryLimit = 256;
+						cfg.rawMemoryLimit = 256;
+						cfg.extraTimeRatio = 0.0;
+						cfg.inputFileName = QStringLiteral("ccf.in");
+						cfg.outputFileName = QStringLiteral("ccf.out");
+						cfg.environment = QProcessEnvironment::systemEnvironment();
+						cfg.requireReturnZero = requireZero;
+						return cfg;
+					};
+					const ProcessRunnerResult strict = [&] {
+						std::atomic<bool> stop{false};
+						auto runner = ProcessRunner::create(runnerConfig(true), stop);
+						return runner->run();
+					}();
+					const ProcessRunnerResult relaxed = [&] {
+						std::atomic<bool> stop{false};
+						auto runner = ProcessRunner::create(runnerConfig(false), stop);
+						return runner->run();
+					}();
+					report << QStringLiteral("exit code 1: required=%1 relaxed=%2")
+					              .arg(static_cast<int>(strict.result))
+					              .arg(static_cast<int>(relaxed.result));
+
+					if (strict.result == CannotStartProgram || relaxed.result == CannotStartProgram) {
+						report << QStringLiteral("exit code check: skipped (the program could not be started)");
+					} else {
+						if (strict.result != RunTimeError)
+							fail(QStringLiteral("a non-zero exit code was not reported as a runtime error"));
+
+						if (relaxed.result != CorrectAnswer)
+							fail(QStringLiteral("the exit code was checked even though the rule is off"));
+					}
+				}
+			}
+		}
+
+		// 5) 解释型语言（Python）里的「返回 0」：看解释器进程的退出码。
+		//    脚本正常跑完 → 0；未捕获异常 / sys.exit(非 0) → 非 0 → 运行时错误。
+		{
+			QString python = QStandardPaths::findExecutable(QStringLiteral("python"));
+
+			if (python.isEmpty())
+				python = QStandardPaths::findExecutable(QStringLiteral("python3"));
+
+			QTemporaryDir work;
+
+			if (python.isEmpty() || ! work.isValid()) {
+				report << QStringLiteral("python check: skipped (no python / no temporary dir)");
+			} else {
+				const QString folder = work.path() + QDir::separator();
+				const QString good = folder + QStringLiteral("good.py");
+				const QString exception = folder + QStringLiteral("exception.py");
+				const QString exitTwo = folder + QStringLiteral("exit2.py");
+				const auto writeScript = [](const QString &path, const QString &body) {
+					QFile file(path);
+
+					if (! file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+						return false;
+
+					return file.write(body.toUtf8()) > 0;
+				};
+				// 正常跑完（Python 没写 return 0 也天生是 0）
+				writeScript(good, QStringLiteral("print(1 + 1)\n"));
+				// 未捕获异常（ZeroDivisionError）→ 解释器退出码 1
+				writeScript(exception, QStringLiteral("print(1 // 0)\n"));
+				// 显式退出：写 0 就是「返回 0」，非 0 就是没正常结束
+				writeScript(exitTwo, QStringLiteral("import sys\nsys.exit(2)\n"));
+
+				const auto runScript = [&](const QString &script) {
+					ProcessRunnerConfig cfg;
+					cfg.executableFile = python;
+					cfg.arguments = QStringLiteral("\"%1\"").arg(script);
+					cfg.workingDirectory = folder;
+					cfg.timeLimit = 10000;
+					cfg.rawTimeLimit = 10000;
+					cfg.memoryLimit = 1024;
+					cfg.rawMemoryLimit = 1024;
+					cfg.extraTimeRatio = 0.0;
+					cfg.inputFileName = QStringLiteral("ccf.in");
+					cfg.outputFileName = QStringLiteral("ccf.out");
+					cfg.environment = QProcessEnvironment::systemEnvironment();
+					cfg.requireReturnZero = true;
+					std::atomic<bool> stop{false};
+					auto runner = ProcessRunner::create(cfg, stop);
+					return runner->run();
+				};
+				const ProcessRunnerResult normal = runScript(good);
+				const ProcessRunnerResult raised = runScript(exception);
+				const ProcessRunnerResult exitCode = runScript(exitTwo);
+				report << QStringLiteral("python: normal=%1 uncaught=%2 sys.exit(2)=%3")
+				              .arg(static_cast<int>(normal.result))
+				              .arg(static_cast<int>(raised.result))
+				              .arg(static_cast<int>(exitCode.result));
+
+				if (normal.result == CannotStartProgram) {
+					report << QStringLiteral("python check: skipped (python could not be started)");
+				} else {
+					if (normal.result != CorrectAnswer)
+						fail(QStringLiteral("a python script that ends normally is not 'return 0'"));
+
+					if (raised.result != RunTimeError)
+						fail(QStringLiteral("an uncaught python exception is not a runtime error"));
+
+					if (exitCode.result != RunTimeError)
+						fail(QStringLiteral("sys.exit(2) is not a runtime error"));
+				}
+			}
+		}
+
+		report.prepend(QStringLiteral("problems=%1").arg(problems));
+		QFile out(QString::fromLocal8Bit(argv[2]));
+
+		if (out.open(QIODevice::WriteOnly | QIODevice::Text)) {
+			QTextStream stream(&out);
+			stream << report.join(QChar('\n')) << '\n';
+		}
+
+		LOG("check-ccf: problems", problems);
+		return problems == 0 ? 0 : 1;
 	}
 
 	// 隐藏入口：检查「题面」选项卡的两件事（不编译 PDF）。

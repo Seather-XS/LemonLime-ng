@@ -34,6 +34,15 @@ class TaskJudger : public QObject {
 	Contestant *getContestant() const;
 	CompileState getCompileState() const;
 	// const QList< std::pair<int, int> >& getNeedRejudge() const;
+	/// 源文件后缀在给定顺序里排第几（不在名单里的排最后）。
+	/// 顺序来自**编译器自己声明的后缀列表**（如 g++ 的 `cpp;cc;cxx`）：
+	/// 同一个语言声明多个后缀时，就按这个顺序取第一个存在的源文件。
+	static int suffixRank(const QStringList &extensionOrder, const QString &fileName);
+	/// 按 `extensionOrder` 给候选源文件排序（稳定排序，同后缀保持原顺序）。
+	/// **跨语言的优先级由编译器列表的顺序决定**：评测时按编译器列表逐个试，
+	/// 第一个能匹配到源文件并编译成功的编译器说了算（CCF 的 .c → .cpp → .pas
+	/// 就是靠「gcc 排在 g++ 前面」实现的）。
+	static QStringList orderSourceFiles(const QStringList &extensionOrder, const QStringList &files);
 
   private:
 	// bool checkRejudgeMode;

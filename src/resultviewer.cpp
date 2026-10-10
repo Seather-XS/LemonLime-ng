@@ -229,10 +229,6 @@ void ResultViewer::refreshViewer() {
 					bg = colors.getColorPer(score, fullScore[j]);
 
 				item(i, j + base)->setBackground(bg);
-
-				// 被判定取消测试的选手：得分仍按 0 显示，悬停可看到原因（详情见双击）。
-				if (contestantList[i]->isDisqualified())
-					item(i, j + base)->setToolTip(contestantList[i]->getDisqualifyMessage());
 			} else {
 				item(i, j + base)->setText(tr("Invalid"));
 			}
@@ -247,13 +243,12 @@ void ResultViewer::refreshViewer() {
 		if (totalScore != -1) {
 			item(i, scoreColumn)->setData(Qt::DisplayRole, totalScore);
 
-			// 违规 / 命名不合规都是 0 分，照常参与排名，只用颜色区分原因。
+			// 违规 / 命名不合规都是 0 分，照常参与排名，只用颜色区分原因
+			// （悬停不再弹原因，要看详情双击那一行）。
 			if (contestantList[i]->getDisqualifyState() == Contestant::ViolationDisqualified) {
 				item(i, scoreColumn)->setBackground(QColor(200, 60, 60));
-				item(i, scoreColumn)->setToolTip(contestantList[i]->getDisqualifyMessage());
 			} else if (contestantList[i]->getDisqualifyState() == Contestant::NamingDisqualified) {
 				item(i, scoreColumn)->setBackground(QColor(160, 90, 200));
-				item(i, scoreColumn)->setToolTip(contestantList[i]->getDisqualifyMessage());
 			} else
 				item(i, scoreColumn)->setBackground(colors.getColorGrand(totalScore, sfullScore));
 

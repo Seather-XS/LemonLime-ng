@@ -777,6 +777,31 @@
      </item>
     </layout>
    </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="label_19">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Require Return 0</string>
+     </property>
+     <property name="toolTip">
+      <string>CCF rule: the program must end normally and main() must return 0. A non-zero exit code is reported as a runtime error. For interpreted languages (Python, Java, …) the interpreter's exit code is what counts, so an uncaught exception is a runtime error too.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
+    <widget class="QCheckBox" name="requireReturnZero">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <tabstops>
@@ -790,6 +815,7 @@
   <tabstop>inputFileExtensions</tabstop>
   <tabstop>outputFileExtensions</tabstop>
   <tabstop>languageComboBox</tabstop>
+  <tabstop>requireReturnZero</tabstop>
  </tabstops>
  <resources/>
  <connections/>

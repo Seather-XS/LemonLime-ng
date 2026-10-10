@@ -41,7 +41,8 @@ class JudgingThread : public QThread {
 	void setRawTimeLimit(int);
 	void setMemoryLimit(int);
 	void setRawMemoryLimit(int);
-	void setInterpreterAsWatcher(bool);
+	/// CCF 编程通则 3：程序非 0 退出按运行时错误计（可在通用设置里关掉）。
+	void setRequireReturnZero(bool);	void setInterpreterAsWatcher(bool);
 	int getTimeUsed() const;
 	qint64 getMemoryUsed() const;
 	int getScore() const;
@@ -75,6 +76,7 @@ class JudgingThread : public QThread {
 	int rawTimeLimit{};
 	int memoryLimit{};
 	int rawMemoryLimit{};
+	bool requireReturnZero{true};
 	int timeUsed;
 	qint64 memoryUsed;
 	int score{};

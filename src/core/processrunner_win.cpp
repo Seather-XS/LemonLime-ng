@@ -339,7 +339,8 @@ ProcessRunnerResult WinProcessRunner::run() {
 	unsigned long exitCode;
 	GetExitCodeProcess(pi.hProcess, &exitCode);
 
-	if (exitCode != 0) {
+	// CCF 编程通则 3：程序应正常结束且 main() 返回 0（开关在通用设置里）。
+	if (config.requireReturnZero && exitCode != 0) {
 
 		res.score = 0;
 		res.result = RunTimeError;
