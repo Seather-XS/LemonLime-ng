@@ -9,7 +9,6 @@ aux_source_directory(${LEMON_BASEDIR_UI} LEMON_UI_SOURCES)
 list(APPEND LEMON_UI_SOURCES ${LEMON_BASEDIR_UI}/component/exportutil/exportutil.cpp)
 list(APPEND LEMON_UI_SOURCES ${LEMON_BASEDIR_UI}/component/exportutil/exportutil.h)
 
-# 准考证模块（数据模型 / 内置模板 / 生成器 / 编辑窗口 / 选项卡）
 foreach(LEMON_ADMISSION_FILE admissioncsv admissionnotes admissiontemplate admissionproject
         admissiongenerator admissionwidget csveditordialog columndialog notesdialog admissionnaming
         admissioncolumns admissionassign idruledialog seatdialog venuedialog)

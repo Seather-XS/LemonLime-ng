@@ -141,7 +141,6 @@
 }
 \newenvironment{tuacktable}[2][3]{%
     \def\tuacktablecolumns{#1}%
-    % 题目表由内容自然定宽，保留 c 列、居中和合并单元格样式。
     \statementtablestrut{0.32em+0.5pt}\setlength{\LTleft}{\fill}\setlength{\LTright}{\fill}%
     \begin{longtable}{@{}c*{\numexpr#1-1\relax}{|c}@{}}%
     \noalign{\global\arrayrulewidth=2pt}\cline{1-#1}\noalign{\global\arrayrulewidth=0.4pt}%

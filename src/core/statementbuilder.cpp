@@ -93,9 +93,6 @@ namespace {
   \noalign{\global\arrayrulewidth=2pt}\cline{1-\statementtablecols}\end{tabular}%
 }
 \newsavebox{\statementtablebox}
-% 中文（CJK）字形几乎全部落在基线以上：SimSun 12pt 的字身框是「上 9.84pt / 下 1.22pt」，
-% 而 LaTeX 的 \strutbox 上下是 0.7 / 0.3（上多下少），所以表格里的中文总是贴着上框。
-% 按默认 \strutbox 的总高度重分配上下空间，不额外增大表格行高。
 \newdimen\statementtableheight
 \newdimen\statementtabledepth
 \providecommand{\statementtablestrut}[1]{%
@@ -652,7 +649,7 @@ namespace {
 		       QStringLiteral("\\par\\addvspace{") + skip + QStringLiteral("}%\n");
 	}
 
-	/// longtable 表格重排：题目数据表按内容自然定宽；导览表固定首列并铺满版心。
+	/// longtable 表格重排：Tuack 风格（合并单元格）与固定首列两套模式。
 	QString convertLongtableBlock(const QString &block, const QString &tableMode, const QString &tableSkip) {
 		const QString beginToken = QStringLiteral("\\begin{longtable}");
 		const QString endToken = QStringLiteral("\\end{longtable}");
@@ -796,7 +793,6 @@ namespace {
 		for (int i = 1; i < renderedRows.size(); i++)
 			bodyText.append(renderedRows.at(i) + QStringLiteral(" \\\\ ") + separators.at(i));
 
-		// 指定宽度的导览表用 tabularx；题目表继续用内容自然定宽的 tabular。
 		const QString onePage = QStringLiteral("\\begingroup\\statementtablestrut{0.30em}%\n"
 		                                       "\\begin{tabularx}{\\textwidth}{%1}\n\\hline\n%2 \\\\ %3\n%4\n"
 		                                       "\\end{tabularx}\n\\endgroup")
@@ -1280,8 +1276,8 @@ namespace {
 		QMap<QString, QString> renderedSections;
 
 		for (auto it = userSectionMarkers().constBegin(); it != userSectionMarkers().constEnd(); ++it) {
-			// 导览区表格固定首列并铺满版心；其余题目表按内容自然定宽并居中。
-			// 导览区表格上下留白更紧凑；其余（如数据范围）用 tuacktable 模式。
+			// 导览区那三张表（概览表 / 提交源程序文件名 / 编译选项）用固定首列模式，
+			// 上下留白也单独用一个更紧凑的长度；其余（如数据范围）用 tuacktable 模式。
 			const bool overview = it.key() == QStringLiteral("overview_table") ||
 			                      it.key() == QStringLiteral("submission_filename") ||
 			                      it.key() == QStringLiteral("compile_options");
