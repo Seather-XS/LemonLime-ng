@@ -76,9 +76,15 @@ namespace {
 \usepackage{longtable}
 \providecommand{\passthrough}[1]{#1}
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\makeatletter
+\providecommand{\statementtableheaderstrut}{%
+  \rule[-\dimexpr\dp\@arstrutbox+1pt\relax]{0pt}%
+       {\dimexpr\ht\@arstrutbox+\dp\@arstrutbox+2pt\relax}%
+}
+\makeatother
 \newenvironment{statementtable}[2][3]{%
   \def\statementtablecols{#1}%
-  \renewcommand{\arraystretch}{1.1}%
+  \statementtablestrut{0.32em+0.5pt}%
   \setlength{\arrayrulewidth}{0.4pt}%
   \begin{tabular}{@{}c*{\numexpr#1-1\relax}{|c}@{}}%
   \noalign{\global\arrayrulewidth=2pt}\cline{1-#1}\noalign{\global\arrayrulewidth=0.4pt}%
@@ -87,6 +93,24 @@ namespace {
   \noalign{\global\arrayrulewidth=2pt}\cline{1-\statementtablecols}\end{tabular}%
 }
 \newsavebox{\statementtablebox}
+% 中文（CJK）字形几乎全部落在基线以上：SimSun 12pt 的字身框是「上 9.84pt / 下 1.22pt」，
+% 而 LaTeX 的 \strutbox 上下是 0.7 / 0.3（上多下少），所以表格里的中文总是贴着上框。
+% 按默认 \strutbox 的总高度重分配上下空间，不额外增大表格行高。
+\newdimen\statementtableheight
+\newdimen\statementtabledepth
+\providecommand{\statementtablestrut}[1]{%
+  \renewcommand{\arraystretch}{1}%
+  \statementtableheight=\ht\strutbox
+  \advance\statementtableheight by \dp\strutbox
+  \divide\statementtableheight by 2
+  \statementtabledepth=\statementtableheight
+  \advance\statementtableheight by \dimexpr#1\relax
+  \advance\statementtabledepth by -\dimexpr#1\relax
+  \setbox\strutbox\hbox{%
+    \vrule width 0pt
+      height \statementtableheight
+      depth  \statementtabledepth}%
+}
 % 表格上下留白：在模板里用 \renewcommand 就能调；导览区（概览表 / 提交源程序文件名 /
 % 编译选项）用后一个长度，通常要写得更紧凑一些。
 \providecommand{\statementtableskip}{\bigskipamount}
@@ -487,16 +511,6 @@ namespace {
 		return row.split(separator);
 	}
 
-	QString shiftRowCells(const QString &row, const QString &offset) {
-		const QStringList cells = splitLatexRow(row);
-		QStringList shifted;
-
-		for (const QString &cell : cells)
-			shifted.append(QStringLiteral("\\raisebox{%1\\baselineskip}{%2}").arg(offset, cell.trimmed()));
-
-		return shifted.join(QStringLiteral(" & "));
-	}
-
 	bool isMergeMarker(const QString &cell, const QString &marker) {
 		const QString normalized = cell.trimmed();
 
@@ -557,9 +571,7 @@ namespace {
 					rowSpan++;
 
 				if (rowSpan > 1) {
-					cell = QStringLiteral("\\multirow[c]{%1}{*}{\\raisebox{-0.12\\baselineskip}{%2}}")
-					           .arg(rowSpan)
-					           .arg(cell);
+					cell = QStringLiteral("\\multirow[c]{%1}{*}{%2}").arg(rowSpan).arg(cell);
 
 					for (int boundaryIndex = rowIndex; boundaryIndex < rowIndex + rowSpan - 1; boundaryIndex++)
 						for (int column = columnIndex; column < columnIndex + columnSpan; column++)
@@ -640,7 +652,7 @@ namespace {
 		       QStringLiteral("\\par\\addvspace{") + skip + QStringLiteral("}%\n");
 	}
 
-	/// longtable 表格重排：Tuack 风格（合并单元格）与固定首列两套模式。
+	/// longtable 表格重排：题目数据表按内容自然定宽；导览表固定首列并铺满版心。
 	QString convertLongtableBlock(const QString &block, const QString &tableMode, const QString &tableSkip) {
 		const QString beginToken = QStringLiteral("\\begin{longtable}");
 		const QString endToken = QStringLiteral("\\end{longtable}");
@@ -723,7 +735,7 @@ namespace {
 			for (QString &row : renderedRows)
 				row = stripMinipage(row);
 
-			const QString header = shiftRowCells(renderedRows.first(), QStringLiteral("-0.75"));
+			const QString header = QStringLiteral("\\statementtableheaderstrut ") + renderedRows.first();
 			QStringList bodyText;
 
 			for (int i = 1; i < renderedRows.size(); i++) {
@@ -743,28 +755,39 @@ namespace {
 		}
 
 		QString tableSpec;
+		QString overviewTableSpec;
 
 		if (columnCount == 1) {
 			tableSpec = QStringLiteral("|p{3.0cm}|");
+			overviewTableSpec = QStringLiteral("|X|");
 		} else {
 			const QString otherColumn =
 			    QStringLiteral("p{\\dimexpr(\\textwidth-3cm)/%1-2\\tabcolsep\\relax}").arg(columnCount - 1);
 			const QString alignments = QString(columnDefinition).remove(QStringLiteral("@{}"));
 			QStringList otherColumns;
+			QStringList overviewColumns;
 
 			for (int columnIndex = 1; columnIndex < columnCount; columnIndex++) {
 				const QChar alignment =
 				    columnIndex < alignments.length() ? alignments.at(columnIndex) : QChar('l');
+				QString overviewColumn = QStringLiteral("X");
+				QString multiPageColumn = otherColumn;
 
-				if (alignment == QChar('c'))
-					otherColumns.append(QStringLiteral(">{\\centering\\arraybackslash}") + otherColumn);
-				else if (alignment == QChar('r'))
-					otherColumns.append(QStringLiteral(">{\\raggedleft\\arraybackslash}") + otherColumn);
-				else
-					otherColumns.append(otherColumn);
+				if (alignment == QChar('c')) {
+					overviewColumn.prepend(QStringLiteral(">{\\centering\\arraybackslash}"));
+					multiPageColumn.prepend(QStringLiteral(">{\\centering\\arraybackslash}"));
+				} else if (alignment == QChar('r')) {
+					overviewColumn.prepend(QStringLiteral(">{\\raggedleft\\arraybackslash}"));
+					multiPageColumn.prepend(QStringLiteral(">{\\raggedleft\\arraybackslash}"));
+				}
+
+				overviewColumns.append(overviewColumn);
+				otherColumns.append(multiPageColumn);
 			}
 
 			tableSpec = QStringLiteral("|p{3.0cm}|") + otherColumns.join(QChar('|')) + QStringLiteral("|");
+			overviewTableSpec =
+			    QStringLiteral("|p{3.0cm}|") + overviewColumns.join(QStringLiteral("|")) + QStringLiteral("|");
 		}
 
 		const QString header = renderedRows.first();
@@ -773,12 +796,13 @@ namespace {
 		for (int i = 1; i < renderedRows.size(); i++)
 			bodyText.append(renderedRows.at(i) + QStringLiteral(" \\\\ ") + separators.at(i));
 
-		const QString onePage = QStringLiteral("\\begingroup\\renewcommand{\\arraystretch}{1.0}%\n"
-		                                       "\\begin{tabular}{%1}\n\\hline\n%2 \\\\ %3\n%4\n"
-		                                       "\\end{tabular}\n\\endgroup")
-		                            .arg(tableSpec, header, separators.first(), bodyText.join(QChar('\n')));
+		// 指定宽度的导览表用 tabularx；题目表继续用内容自然定宽的 tabular。
+		const QString onePage = QStringLiteral("\\begingroup\\statementtablestrut{0.30em}%\n"
+		                                       "\\begin{tabularx}{\\textwidth}{%1}\n\\hline\n%2 \\\\ %3\n%4\n"
+		                                       "\\end{tabularx}\n\\endgroup")
+		                            .arg(overviewTableSpec, header, separators.first(), bodyText.join(QChar('\n')));
 		const QString multiPage =
-		    QStringLiteral("\\begingroup\\renewcommand{\\arraystretch}{1.0}%\n"
+		    QStringLiteral("\\begingroup\\statementtablestrut{0.30em}%\n"
 		                   "\\setlength{\\LTleft}{\\fill}\\setlength{\\LTright}{\\fill}%\n"
 		                   "\\setlength{\\LTpre}{0pt}\\setlength{\\LTpost}{0pt}%\n"
 		                   "\\begin{longtable}{%1}\n\\hline\n%2 \\\\ %3\n\\endfirsthead\n\\hline\n%2 \\\\ %3\n"
@@ -1256,8 +1280,8 @@ namespace {
 		QMap<QString, QString> renderedSections;
 
 		for (auto it = userSectionMarkers().constBegin(); it != userSectionMarkers().constEnd(); ++it) {
-			// 导览区那三张表（概览表 / 提交源程序文件名 / 编译选项）用固定首列模式，
-			// 上下留白也单独用一个更紧凑的长度；其余（如数据范围）用 tuacktable 模式。
+			// 导览区表格固定首列并铺满版心；其余题目表按内容自然定宽并居中。
+			// 导览区表格上下留白更紧凑；其余（如数据范围）用 tuacktable 模式。
 			const bool overview = it.key() == QStringLiteral("overview_table") ||
 			                      it.key() == QStringLiteral("submission_filename") ||
 			                      it.key() == QStringLiteral("compile_options");
