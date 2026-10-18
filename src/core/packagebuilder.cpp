@@ -14,6 +14,7 @@
 #include "core/testcase.h"
 //
 #include <QBuffer>
+#include <QCryptographicHash>
 #include <QDateTime>
 #include <QDir>
 #include <QDirIterator>
@@ -110,6 +111,223 @@ namespace {
 	}
 
 	// ------------------------------------------------------------------
+	// AES-256 分组加密（FIPS-197，只做加密）与 WinZip AES / AE-2 需要的密钥派生
+	// ------------------------------------------------------------------
+	const unsigned char AES_SBOX[256] = {
+	    0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+	    0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+	    0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+	    0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a, 0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+	    0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0, 0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+	    0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b, 0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+	    0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85, 0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+	    0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5, 0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+	    0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17, 0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+	    0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88, 0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+	    0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c, 0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+	    0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9, 0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+	    0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6, 0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+	    0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+	    0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+	    0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16};
+
+	/// AES-256 只用于压缩包条目：只实现加密方向，CTR 模式也不需要解密。
+	class Aes256 {
+	  public:
+		explicit Aes256(const QByteArray &key) { expandKey(key); }
+
+		void encryptBlock(const unsigned char in[16], unsigned char out[16]) const {
+			unsigned char state[16];
+			std::copy(in, in + 16, state);
+			addRoundKey(state, 0);
+
+			for (int round = 1; round < 14; round++) {
+				subBytes(state);
+				shiftRows(state);
+				mixColumns(state);
+				addRoundKey(state, round);
+			}
+
+			subBytes(state);
+			shiftRows(state);
+			addRoundKey(state, 14);
+			std::copy(state, state + 16, out);
+		}
+
+	  private:
+		static unsigned char xtime(unsigned char value) {
+			return static_cast<unsigned char>((value << 1) ^ ((value & 0x80u) ? 0x1bu : 0x00u));
+		}
+
+		static unsigned char multiply(unsigned char left, unsigned char right) {
+			unsigned char result = 0;
+
+			while (right != 0) {
+				if (right & 1u)
+					result ^= left;
+
+				left = xtime(left);
+				right = static_cast<unsigned char>(right >> 1);
+			}
+
+			return result;
+		}
+
+		void expandKey(const QByteArray &key) {
+			std::fill(roundKeys, roundKeys + sizeof(roundKeys), 0);
+			const int keyBytes = qMin(key.size(), 32);
+
+			for (int i = 0; i < keyBytes; i++)
+				roundKeys[i] = static_cast<unsigned char>(key.at(i));
+
+			// AES-256：8 个 32 位字，共 60 个字（15 组轮密钥）。
+			const int totalWords = 60;
+			static const unsigned char rcon[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
+
+			for (int word = 8; word < totalWords; word++) {
+				unsigned char temp[4];
+				std::copy(roundKeys + (word - 1) * 4, roundKeys + word * 4, temp);
+
+				if (word % 8 == 0) {
+					const unsigned char first = temp[0];
+					temp[0] = AES_SBOX[temp[1]] ^ rcon[word / 8 - 1];
+					temp[1] = AES_SBOX[temp[2]];
+					temp[2] = AES_SBOX[temp[3]];
+					temp[3] = AES_SBOX[first];
+				} else if (word % 8 == 4) {
+					for (int i = 0; i < 4; i++)
+						temp[i] = AES_SBOX[temp[i]];
+				}
+
+				for (int i = 0; i < 4; i++)
+					roundKeys[word * 4 + i] = static_cast<unsigned char>(roundKeys[(word - 8) * 4 + i] ^ temp[i]);
+			}
+		}
+
+		static void subBytes(unsigned char state[16]) {
+			for (int i = 0; i < 16; i++)
+				state[i] = AES_SBOX[state[i]];
+		}
+
+		/// 状态按列存放：state[column * 4 + row]。
+		static void shiftRows(unsigned char state[16]) {
+			for (int row = 1; row < 4; row++) {
+				unsigned char tmp[4];
+
+				for (int column = 0; column < 4; column++)
+					tmp[column] = state[((column + row) % 4) * 4 + row];
+
+				for (int column = 0; column < 4; column++)
+					state[column * 4 + row] = tmp[column];
+			}
+		}
+
+		static void mixColumns(unsigned char state[16]) {
+			for (int column = 0; column < 4; column++) {
+				unsigned char *s = state + column * 4;
+				const unsigned char a0 = s[0];
+				const unsigned char a1 = s[1];
+				const unsigned char a2 = s[2];
+				const unsigned char a3 = s[3];
+				s[0] = static_cast<unsigned char>(multiply(a0, 2) ^ multiply(a1, 3) ^ a2 ^ a3);
+				s[1] = static_cast<unsigned char>(a0 ^ multiply(a1, 2) ^ multiply(a2, 3) ^ a3);
+				s[2] = static_cast<unsigned char>(a0 ^ a1 ^ multiply(a2, 2) ^ multiply(a3, 3));
+				s[3] = static_cast<unsigned char>(multiply(a0, 3) ^ a1 ^ a2 ^ multiply(a3, 2));
+			}
+		}
+
+		void addRoundKey(unsigned char state[16], int round) const {
+			for (int i = 0; i < 16; i++)
+				state[i] ^= roundKeys[round * 16 + i];
+		}
+
+		unsigned char roundKeys[240]{};
+	};
+
+	/// WinZip AES 的计数器：16 字节小端整数，第一块从 1 开始。
+	void advanceCounter(unsigned char counter[16]) {
+		for (int i = 0; i < 16; i++)
+			if (++counter[i] != 0)
+				break;
+	}
+
+	/// AES-CTR：WinZip AES 用「计数器块加密后异或明文」，加解密同一个函数。
+	QByteArray aesCtrCrypt(const QByteArray &key, const QByteArray &data) {
+		Aes256 aes(key);
+		unsigned char counter[16] = {0};
+		counter[0] = 1;
+		QByteArray out(data.size(), '\0');
+
+		for (int offset = 0; offset < data.size(); offset += 16) {
+			unsigned char stream[16];
+			aes.encryptBlock(counter, stream);
+			const int blockSize = qMin(16, data.size() - offset);
+
+			for (int i = 0; i < blockSize; i++)
+				out[offset + i] = char(static_cast<unsigned char>(data.at(offset + i)) ^ stream[i]);
+
+			advanceCounter(counter);
+		}
+
+		return out;
+	}
+
+	QByteArray hmacSha1(const QByteArray &key, const QByteArray &data) {
+		constexpr int blockSize = 64;
+		const QByteArray shortKey =
+		    key.size() > blockSize ? QCryptographicHash::hash(key, QCryptographicHash::Sha1) : key;
+		QByteArray innerPad(blockSize, '\0');
+		QByteArray outerPad(blockSize, '\0');
+
+		// 密钥不足一个分组时补 0；不能用 QByteArray::resize() 扩容，多出来的字节不保证是 0。
+		for (int i = 0; i < blockSize; i++) {
+			const char byte = i < shortKey.size() ? shortKey.at(i) : '\0';
+			innerPad[i] = char(static_cast<unsigned char>(byte) ^ 0x36);
+			outerPad[i] = char(static_cast<unsigned char>(byte) ^ 0x5c);
+		}
+
+		const QByteArray inner = QCryptographicHash::hash(innerPad + data, QCryptographicHash::Sha1);
+		return QCryptographicHash::hash(outerPad + inner, QCryptographicHash::Sha1);
+	}
+
+	/// PBKDF2-HMAC-SHA1（RFC 2898）：WinZip AES 规定 1000 轮。
+	QByteArray pbkdf2Sha1(const QByteArray &password, const QByteArray &salt, int iterations,
+	                      int keyLength) {
+		QByteArray result;
+		quint32 block = 1;
+
+		while (result.size() < keyLength) {
+			QByteArray index(4, '\0');
+			index[0] = char((block >> 24) & 0xFFu);
+			index[1] = char((block >> 16) & 0xFFu);
+			index[2] = char((block >> 8) & 0xFFu);
+			index[3] = char(block & 0xFFu);
+			QByteArray u = hmacSha1(password, salt + index);
+			QByteArray accumulated = u;
+
+			for (int round = 1; round < iterations; round++) {
+				u = hmacSha1(password, u);
+
+				for (int i = 0; i < accumulated.size(); i++)
+					accumulated[i] = char(accumulated.at(i) ^ u.at(i));
+			}
+
+			result.append(accumulated);
+			++block;
+		}
+
+		return result.left(keyLength);
+	}
+
+	/// 小端整数（zip 的 extra field 用）。
+	QByteArray littleEndian16(quint16 value) {
+		QByteArray bytes(2, '\0');
+		bytes[0] = char(value & 0xFFu);
+		bytes[1] = char((value >> 8) & 0xFFu);
+		return bytes;
+	}
+
+	// ------------------------------------------------------------------
 	// ZIP 写入器：不加密走 Qt 的 QZipWriter，加密自己写（QZipWriter 不支持加密）
 	// ------------------------------------------------------------------
 	class ArchiveWriter {
@@ -143,11 +361,16 @@ namespace {
 		QZipWriter writer;
 	};
 
-	/// 传统 PKWARE 加密（ZipCrypto）：文件名照旧，文件内容加密，压缩用 deflate。
-	class CryptoArchiveWriter : public ArchiveWriter {
+	/// 加密的 zip 写入器：AES-256（WinZip AES / AE-2，默认）或传统 ZipCrypto（仅兼容）。
+	/// 文件名照旧，文件内容先 deflate 再加密。
+	class EncryptedArchiveWriter : public ArchiveWriter {
 	  public:
+		enum class Method { Aes256, ZipCrypto };
+
 		struct Entry {
 			QByteArray name;
+			QByteArray extra;
+			quint16 versionNeeded{20};
 			quint32 crc{};
 			quint32 compressedSize{};
 			quint32 uncompressedSize{};
@@ -157,8 +380,9 @@ namespace {
 			bool isDirectory{false};
 		};
 
-		CryptoArchiveWriter(QIODevice *device, const QByteArray &password)
-		    : out(device), password(password), dosTime(dosTimeStamp()), dosDate(dosDateStamp()) {}
+		EncryptedArchiveWriter(QIODevice *device, const QByteArray &password, Method method)
+		    : out(device), password(password), method(method), dosTime(dosTimeStamp()),
+		      dosDate(dosDateStamp()) {}
 
 		void addDirectory(const QString &path) override {
 			QByteArray name = path.toUtf8();
@@ -167,7 +391,7 @@ namespace {
 				name.append('/');
 
 			// 目录条目不加密，只记一个以 / 结尾的空条目
-			writeLocalHeader(name, 0, 0, 0, {}, 0, 0x0800);
+			writeLocalHeader(name, 0, 0, 0, {}, 0, 0x0800, {}, 20);
 
 			Entry entry;
 			entry.name = name;
@@ -189,34 +413,72 @@ namespace {
 				method = 0;
 			}
 
-			// 12 字节加密头：前 11 字节随机，最后一字节是 CRC 高位，解压时用它校验密码
-			QByteArray header(12, '\0');
+			QByteArray body;
+			QByteArray extra;
+			quint32 storedCrc = crc;
+			quint16 version = 20;
 
-			for (int i = 0; i < 11; i++)
-				header[i] = char(QRandomGenerator::global()->bounded(256));
+			if (this->method == Method::Aes256) {
+				// WinZip AES / AE-2：salt + 2 字节校验值 + 密文 + 10 字节 HMAC-SHA1。
+				// CRC 在 AE-2 里固定写 0（完整性由 HMAC 保证）。
+				QByteArray salt(16, '\0');
 
-			header[11] = char((crc >> 24) & 0xFFu);
+				for (char &byte : salt)
+					byte = char(QRandomGenerator::global()->bounded(256));
 
-			ZipCrypto crypto(password);
-			// 注意：必须严格先加密 12 字节头、再加密内容（密钥流是连续的）。
-			// 不能写成 crypto.encrypt(header) + crypto.encrypt(payload)：两个操作数的求值顺序未定义，
-			// 一旦先算后面那个，头部就会用错密钥流，解压时会被判成「密码错误」。
-			QByteArray encrypted = crypto.encrypt(header);
-			encrypted.append(crypto.encrypt(payload));
+				// 66 = 32 字节 AES 密钥 + 32 字节 HMAC 密钥 + 2 字节密码校验值
+				const QByteArray derived = pbkdf2Sha1(password, salt, 1000, 66);
+				const QByteArray aesKey = derived.left(32);
+				const QByteArray macKey = derived.mid(32, 32);
+				const QByteArray verifier = derived.mid(64, 2);
+				const QByteArray encrypted = aesCtrCrypt(aesKey, payload);
+				const QByteArray auth = hmacSha1(macKey, encrypted).left(10);
 
-			// 自检：拿同一个密码把刚写出的 12 字节头解回来，最后一字节必须等于 CRC 高位。
-			// 这里曾经出过「头与正文用错密钥流」的 bug：包能正常生成，解压时却一律报
-			// 「密码错误」。就地验一下，宁可报错，也不要悄悄给出一个打不开的包。
-			if (ZipCrypto(password).decrypt(encrypted.left(12)).at(11) != char((crc >> 24) & 0xFFu))
-				headerCheckFailed = true;
+				// 自检：同一把密钥异或回去必须还原出压缩后的明文，HMAC 也要对得上。
+				// 宁可在这里报错，也不要悄悄写出一个打不开的包。
+				if (aesCtrCrypt(aesKey, encrypted) != payload || ! hmacSha1(macKey, encrypted).startsWith(auth))
+					selfCheckFailed = true;
 
-			writeLocalHeader(name, crc, quint32(encrypted.size()), quint32(data.size()), encrypted, method,
-			                 entryFlags());
+				body = salt + verifier + encrypted + auth;
+				// extra field 0x9901：版本 AE-2、厂商 "AE"、强度 3（AES-256）、真实压缩方式
+				extra = littleEndian16(0x9901) + littleEndian16(7) + littleEndian16(2) + QByteArray("AE", 2) +
+				        QByteArray(1, char(0x03)) + littleEndian16(method);
+				storedCrc = 0;
+				version = 51;
+				method = 99; // AES
+			} else {
+				// 12 字节加密头：前 11 字节随机，最后一字节是 CRC 高位，解压时用它校验密码
+				QByteArray header(12, '\0');
+
+				for (int i = 0; i < 11; i++)
+					header[i] = char(QRandomGenerator::global()->bounded(256));
+
+				header[11] = char((crc >> 24) & 0xFFu);
+
+				ZipCrypto crypto(password);
+				// 注意：必须严格先加密 12 字节头、再加密内容（密钥流是连续的）。
+				// 不能写成 crypto.encrypt(header) + crypto.encrypt(payload)：两个操作数的求值顺序未定义，
+				// 一旦先算后面那个，头部就会用错密钥流，解压时会被判成「密码错误」。
+				QByteArray encrypted = crypto.encrypt(header);
+				encrypted.append(crypto.encrypt(payload));
+				body = encrypted;
+
+				// 自检：拿同一个密码把刚写出的 12 字节头解回来，最后一字节必须等于 CRC 高位。
+				// 这里曾经出过「头与正文用错密钥流」的 bug：包能正常生成，解压时却一律报
+				// 「密码错误」。就地验一下，宁可报错，也不要悄悄给出一个打不开的包。
+				if (ZipCrypto(password).decrypt(encrypted.left(12)).at(11) != char((crc >> 24) & 0xFFu))
+					selfCheckFailed = true;
+			}
+
+			writeLocalHeader(name, storedCrc, quint32(body.size()), quint32(data.size()), body, method,
+			                 entryFlags(), extra, version);
 
 			Entry entry;
 			entry.name = name;
-			entry.crc = crc;
-			entry.compressedSize = quint32(encrypted.size());
+			entry.extra = extra;
+			entry.versionNeeded = version;
+			entry.crc = storedCrc;
+			entry.compressedSize = quint32(body.size());
 			entry.uncompressedSize = quint32(data.size());
 			entry.method = method;
 			entry.flags = entryFlags();
@@ -225,7 +487,7 @@ namespace {
 		}
 
 		bool finish(QString *error) override {
-			if (headerCheckFailed) {
+			if (selfCheckFailed) {
 				*error = QCoreApplication::translate(
 				    "PackageBuilder", "The encrypted archive failed its self-check. Please export again.");
 				return false;
@@ -235,8 +497,8 @@ namespace {
 
 			for (const Entry &entry : entries) {
 				writeU32(0x02014b50);
-				writeU16(20); // version made by
-				writeU16(20); // version needed
+				writeU16(entry.versionNeeded); // version made by
+				writeU16(entry.versionNeeded); // version needed
 				writeU16(entry.flags);
 				writeU16(entry.method);
 				writeU16(dosTime);
@@ -245,13 +507,14 @@ namespace {
 				writeU32(entry.compressedSize);
 				writeU32(entry.uncompressedSize);
 				writeU16(quint16(entry.name.size()));
-				writeU16(0); // extra
+				writeU16(quint16(entry.extra.size())); // extra
 				writeU16(0); // comment
 				writeU16(0); // disk
 				writeU16(0); // internal attributes
 				writeU32(entry.isDirectory ? 0x10u : 0x0u);
 				writeU32(entry.offset);
 				out->write(entry.name);
+				out->write(entry.extra);
 			}
 
 			const quint32 centralSize = quint32(out->pos()) - centralStart;
@@ -301,10 +564,10 @@ namespace {
 
 		void writeLocalHeader(const QByteArray &name, quint32 crc, quint32 compressedSize,
 		                      quint32 uncompressedSize, const QByteArray &body, quint16 method,
-		                      quint16 flags) {
+		                      quint16 flags, const QByteArray &extra, quint16 version) {
 			lastOffset = quint32(out->pos());
 			writeU32(0x04034b50);
-			writeU16(20); // version needed
+			writeU16(version); // version needed
 			writeU16(flags);
 			writeU16(method);
 			writeU16(dosTime);
@@ -313,8 +576,9 @@ namespace {
 			writeU32(compressedSize);
 			writeU32(uncompressedSize);
 			writeU16(quint16(name.size()));
-			writeU16(0); // extra
+			writeU16(quint16(extra.size()));
 			out->write(name);
+			out->write(extra);
 			out->write(body);
 		}
 
@@ -371,19 +635,25 @@ namespace {
 
 		QIODevice *out;
 		QByteArray password;
+		Method method;
 		quint16 dosTime;
 		quint16 dosDate;
 		quint32 lastOffset{};
 		QList<Entry> entries;
-		/// 加密头自检没过（见 addFile()），finish() 会直接报错。
-		bool headerCheckFailed{false};
+		/// 加密自检没过（见 addFile()），finish() 会直接报错。
+		bool selfCheckFailed{false};
 	};
 
-	std::unique_ptr<ArchiveWriter> makeWriter(QIODevice *device, const QByteArray &password) {
+	std::unique_ptr<ArchiveWriter> makeWriter(QIODevice *device, const QByteArray &password,
+	                                          PackageBuilder::EncryptionMethod method) {
 		if (password.isEmpty())
 			return std::make_unique<QtArchiveWriter>(device);
 
-		return std::make_unique<CryptoArchiveWriter>(device, password);
+		// 默认用 AES-256；只有明确选了兼容模式才用老式 ZipCrypto。
+		const auto writerMethod = method == PackageBuilder::ZipCryptoEncryption
+		                              ? EncryptedArchiveWriter::Method::ZipCrypto
+		                              : EncryptedArchiveWriter::Method::Aes256;
+		return std::make_unique<EncryptedArchiveWriter>(device, password, writerMethod);
 	}
 
 	/// 把一批条目写进压缩包（内容全靠 sourcePath 现读）。
@@ -469,14 +739,21 @@ void PackageBuilder::setIncludeSamples(bool value) {
 		structure = true;
 }
 
-void PackageBuilder::setStatementFile(const QString &value) { statement = value.trimmed(); }
+void PackageBuilder::setStatementFiles(const QStringList &values) {
+	statements.clear();
 
-// 选手目录包里的题面：用户没选就用默认的 statement.pdf；
-// 只取文件名部分，免得传进来的路径把题面放到 statement/ 外面去。
-auto PackageBuilder::statementFile() const -> QString {
-	const QString name = QFileInfo(statement.trimmed()).fileName();
-	return name.isEmpty() ? QStringLiteral("statement.pdf") : name;
+	for (const QString &value : values) {
+		// 只取文件名部分，免得传进来的路径把题面放到 statement/ 外面去。
+		const QString name = QFileInfo(value.trimmed()).fileName();
+
+		if (! name.isEmpty() && ! statements.contains(name))
+			statements.append(name);
+	}
 }
+
+auto PackageBuilder::statementFiles() const -> QStringList { return statements; }
+
+void PackageBuilder::setEncryptionMethod(EncryptionMethod value) { encryption = value; }
 
 void PackageBuilder::clearCache() {
 	planCache.clear();
@@ -495,7 +772,7 @@ auto PackageBuilder::inputKey() const -> QString {
 	    QString::number(perTask ? 1 : 0),
 	    QString::number(structure ? 1 : 0),
 	    QString::number(samples ? 1 : 0),
-	    statementFile(),
+	    statementFiles().join(QChar('\x1f')),
 	    dayRoot(),
 	    dayName(),
 	    QString::number(contest ? contest->getTaskList().size() : 0),
@@ -600,18 +877,19 @@ auto PackageBuilder::collectContestantPackage(QList<Item> &items) -> bool {
 		items.append(folder);
 	}
 
-	// 题面：整场只有一份，放压缩包根目录；名字就是 statement/ 下那个文件的名字。
-	const QString statementName = statementFile();
-	const QString pdf = QDir(dayRoot()).absoluteFilePath(Settings::statementPath() + statementName);
+	// 题面：放在压缩包根目录，可以是 0 个到任意多个，名字就是 statement/ 下的文件名。
+	for (const QString &statementName : statementFiles()) {
+		const QString pdf = QDir(dayRoot()).absoluteFilePath(Settings::statementPath() + statementName);
 
-	if (QFileInfo(pdf).isFile()) {
-		Item item;
-		item.archivePath = prefix + statementName;
-		item.sourcePath = pdf;
-		items.append(item);
-	} else {
-		// 缺题面照样能打包，只是提醒一句（界面会弹窗再确认一次）。
-		emit logMessage(tr("Statement file not found: %1").arg(QDir::toNativeSeparators(pdf)));
+		if (QFileInfo(pdf).isFile()) {
+			Item item;
+			item.archivePath = prefix + statementName;
+			item.sourcePath = pdf;
+			items.append(item);
+		} else {
+			// 缺题面照样能打包，只是提醒一句（界面会弹窗再确认一次）。
+			emit logMessage(tr("Statement file not found: %1").arg(QDir::toNativeSeparators(pdf)));
+		}
 	}
 
 	const QList<Task *> taskList = contest->getTaskList();
@@ -1207,7 +1485,7 @@ auto PackageBuilder::build() -> bool {
 		return false;
 	}
 
-	std::unique_ptr<ArchiveWriter> writer = makeWriter(&out, pass.toUtf8());
+	std::unique_ptr<ArchiveWriter> writer = makeWriter(&out, pass.toUtf8(), encryption);
 	int fileCount = 0;
 	int dirCount = 0;
 
@@ -1218,7 +1496,7 @@ auto PackageBuilder::build() -> bool {
 	for (const NestedArchive &archive : plan.archives) {
 		QBuffer buffer;
 		buffer.open(QIODevice::WriteOnly);
-		std::unique_ptr<ArchiveWriter> inner = makeWriter(&buffer, pass.toUtf8());
+		std::unique_ptr<ArchiveWriter> inner = makeWriter(&buffer, pass.toUtf8(), encryption);
 		int innerFiles = 0;
 		int innerDirs = 0;
 

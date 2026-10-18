@@ -91,7 +91,7 @@ namespace {
 } // namespace
 
 Contest::Contest(QObject *parent) : QObject(parent) {
-	violationRules = Violation::defaultRules();
+	legacyViolationRules = Violation::defaultRules();
 	namingPattern = Naming::defaultPattern();
 }
 
@@ -107,7 +107,17 @@ auto Contest::getRegionEnabled() const -> bool { return regionEnabled; }
 
 auto Contest::getViolationCheck() const -> bool { return violationCheck; }
 
-auto Contest::getViolationRules() const -> const QVector<ViolationRule> & { return violationRules; }
+auto Contest::isViolationCompilerSelected(const QString &compilerName) const -> bool {
+	// 老比赛日没有「按语言勾选」这一项，等价于所有语言都勾上。
+	if (! violationCompilersConfigured)
+		return true;
+
+	return violationCompilers.contains(compilerName);
+}
+
+auto Contest::isViolationCompilerEnabled(const QString &compilerName) const -> bool {
+	return violationCheck && isViolationCompilerSelected(compilerName);
+}
 
 auto Contest::getNamingCheck() const -> bool { return namingCheck; }
 
@@ -117,8 +127,16 @@ void Contest::setRegionEnabled(bool enabled) { regionEnabled = enabled; }
 
 void Contest::setViolationCheck(bool enabled) { violationCheck = enabled; }
 
-void Contest::setViolationRules(const QVector<ViolationRule> &rules) {
-	violationRules = Violation::normalizeRules(rules);
+void Contest::setViolationCompilers(const QStringList &compilerNames) {
+	violationCompilers.clear();
+
+	for (const QString &name : compilerNames)
+		if (! name.isEmpty() && ! violationCompilers.contains(name))
+			violationCompilers.append(name);
+
+	// 一旦保存过勾选，就按语言分开检查，不再使用旧版的全局规则。
+	violationCompilersConfigured = true;
+	legacyViolationRules.clear();
 }
 
 void Contest::setNamingCheck(bool enabled) { namingCheck = enabled; }
@@ -131,8 +149,21 @@ void Contest::setStatementPdfName(const QString &name) { statementPdfName = name
 
 void Contest::evaluateContestantRules() {
 	const bool namingActive = namingCheck && ! namingPattern.isEmpty();
-	const QVector<ViolationRule> rules = violationCheck ? Violation::normalizeRules(violationRules)
-	                                                    : QVector<ViolationRule>();
+
+	// 按语言检查时的候选：比赛日勾选了、而且这个语言确实配了规则。
+	QList<Compiler *> enabledCompilers;
+
+	if (violationCheck && violationCompilersConfigured && settings) {
+		for (auto *compiler : settings->getCompilerList())
+			if (isViolationCompilerEnabled(compiler->getCompilerName()) &&
+			    ! compiler->getViolationRules().isEmpty())
+				enabledCompilers.append(compiler);
+	}
+
+	// 旧版比赛日只有一份全局规则：没有按语言勾选过时继续按老办法统一检查。
+	const bool legacyMode = violationCheck && ! violationCompilersConfigured;
+	const QVector<ViolationRule> legacyRules =
+	    legacyMode ? Violation::normalizeRules(legacyViolationRules) : QVector<ViolationRule>();
 
 	for (auto *contestant : contestantList) {
 		// 「忽略限制重测」得到的成绩不被翻旧账（gengen-tuack 的语义）：这位选手一直算正常，
@@ -151,7 +182,7 @@ void Contest::evaluateContestantRules() {
 			continue;
 		}
 
-		if (! rules.isEmpty()) {
+		if (! legacyRules.isEmpty()) {
 			QStringList sources;
 
 			for (int i = 0; i < taskList.size(); i++)
@@ -160,11 +191,65 @@ void Contest::evaluateContestantRules() {
 			QString path;
 			QVector<Violation::Match> matches;
 
-			if (Violation::checkFiles(sources, rules, &path, &matches)) {
+			if (Violation::checkFiles(sources, legacyRules, &path, &matches)) {
 				contestant->setDisqualifyState(Contestant::ViolationDisqualified,
 				                               Violation::describe(path, matches));
 				continue;
 			}
+		} else if (! enabledCompilers.isEmpty()) {
+			bool violated = false;
+
+			for (auto *task : taskList) {
+				const QStringList sources = sourceFilesOf(contestant, task);
+
+				if (sources.isEmpty())
+					continue;
+
+				// 这份提交属于哪个语言：按编译器列表的顺序，第一个能接住源文件后缀的说了算
+				// （与 TaskJudger 挑源文件的顺序一致）。头文件之类也跟着所属语言一起检查。
+				Compiler *owner = nullptr;
+
+				for (auto *compiler : enabledCompilers) {
+					if (task->getCompilerConfiguration(compiler->getCompilerName()) ==
+					    QStringLiteral("disable"))
+						continue;
+
+					for (const QString &extension : compiler->getSourceExtensions()) {
+						const QString expected = task->getSourceFileName() + QLatin1Char('.') + extension;
+						bool found = false;
+
+						for (const QString &source : sources)
+							if (QFileInfo(source).fileName() == expected) {
+								found = true;
+								break;
+							}
+
+						if (found) {
+							owner = compiler;
+							break;
+						}
+					}
+
+					if (owner)
+						break;
+				}
+
+				if (! owner)
+					continue;
+
+				QString path;
+				QVector<Violation::Match> matches;
+
+				if (Violation::checkFiles(sources, owner->getViolationRules(), &path, &matches)) {
+					contestant->setDisqualifyState(Contestant::ViolationDisqualified,
+					                               Violation::describe(path, matches));
+					violated = true;
+					break;
+				}
+			}
+
+			if (violated)
+				continue;
 		}
 
 		contestant->setDisqualifyState(Contestant::NotDisqualified, QString());
@@ -471,12 +556,19 @@ void Contest::writeToJson(QJsonObject &out) {
 
 	WRITE_JSON(out, regionEnabled);
 	WRITE_JSON(out, violationCheck);
-	QJsonArray violationRulesJson;
 
-	for (const auto &rule : violationRules)
-		violationRulesJson.append(ruleToJson(rule));
+	if (violationCompilersConfigured) {
+		WRITE_JSON(out, violationCompilers);
+	} else {
+		// 还没按语言勾选过：继续写旧版的全局规则，读回去保持老行为。
+		QJsonArray violationRulesJson;
 
-	out.insert(QStringLiteral("violationRules"), violationRulesJson);
+		for (const auto &rule : legacyViolationRules)
+			violationRulesJson.append(ruleToJson(rule));
+
+		out.insert(QStringLiteral("violationRules"), violationRulesJson);
+	}
+
 	WRITE_JSON(out, namingCheck);
 	WRITE_JSON(out, namingPattern);
 	WRITE_JSON(out, statementPdfName);
@@ -516,8 +608,20 @@ int Contest::readFromJson(const QJsonObject &in) {
 	READ_JSON(in, regionEnabled);
 	READ_JSON(in, violationCheck);
 
-	if (in.contains(QStringLiteral("violationRules")))
-		violationRules = rulesFromJson(in.value(QStringLiteral("violationRules")).toArray());
+	// 新格式按语言勾选；旧格式只有一份全局规则，保留下来按老办法统一检查。
+	if (in.contains(QStringLiteral("violationCompilers"))) {
+		violationCompilersConfigured = true;
+		violationCompilers.clear();
+
+		for (const auto &item : in.value(QStringLiteral("violationCompilers")).toArray()) {
+			const QString name = item.toString();
+
+			if (! name.isEmpty() && ! violationCompilers.contains(name))
+				violationCompilers.append(name);
+		}
+	} else if (in.contains(QStringLiteral("violationRules"))) {
+		legacyViolationRules = rulesFromJson(in.value(QStringLiteral("violationRules")).toArray());
+	}
 
 	READ_JSON(in, namingCheck);
 	READ_JSON(in, namingPattern);

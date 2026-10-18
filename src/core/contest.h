@@ -11,7 +11,7 @@
 //
 
 #include "base/LemonType.hpp"
-#include "core/violation.h"
+#include "base/violation.h"
 
 #include <QJsonObject>
 #include <QObject>
@@ -37,12 +37,16 @@ class Contest : public QObject {
 	/// —— 比赛日设置（语义见 gengen-tuack）——
 	bool getRegionEnabled() const;
 	bool getViolationCheck() const;
-	const QVector<ViolationRule> &getViolationRules() const;
+	/// 比赛日是否启用这个编译器（语言）的违规检测——总开关关掉时一律 false。
+	bool isViolationCompilerEnabled(const QString &compilerName) const;
+	/// 只看「比赛日设置里有没有勾上这个语言」，与总开关无关（界面回显用）。
+	bool isViolationCompilerSelected(const QString &compilerName) const;
 	bool getNamingCheck() const;
 	const QString &getNamingPattern() const;
 	void setRegionEnabled(bool);
 	void setViolationCheck(bool);
-	void setViolationRules(const QVector<ViolationRule> &);
+	/// 勾选这次比赛日要启用哪些编译器（语言）的违规检测规则。
+	void setViolationCompilers(const QStringList &compilerNames);
 	void setNamingCheck(bool);
 	void setNamingPattern(const QString &);
 	/// 导出的题面 PDF 文件名（不带扩展名，可含 `<day>` / `<title-day>` / `<title>` 占位符），
@@ -71,7 +75,10 @@ class Contest : public QObject {
 	QString contestTitle;
 	bool regionEnabled{false};
 	bool violationCheck{false};
-	QVector<ViolationRule> violationRules;
+	QStringList violationCompilers;
+	bool violationCompilersConfigured{false};
+	/// 旧版比赛日只有一份全局规则；没有按语言分开时，仍然按老办法统一检查。
+	QVector<ViolationRule> legacyViolationRules;
 	bool namingCheck{false};
 	QString namingPattern;
 	QString statementPdfName;

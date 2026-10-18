@@ -627,8 +627,8 @@ namespace {
 	/// 表格前后留一点空白（\addvspace 会和前后已有的间距合并，不会叠出一个大空洞），
 	/// 并用「量高度 + 比较当前页面剩余空间」决定分页：
 	///   - 表格装得进整页时：若当前页剩余空间不够，就整张表换到下一页（不拆开）；
-	///   - 表格比整页还高时：只能交给 longtable 拆页，但先判断剩余空间，
-	///     剩下太少就从新一页开始，免得只放下一个表头。
+	///   - 表格比整页还高时：交给 multiPage 版（模板里的 tuacktable 环境）排版，
+	///     但先判断剩余空间，剩下太少就从新一页开始，免得只放下一个表头。
 	QString wrapTable(const QString &onePage, const QString &multiPage, const QString &skip) {
 		const QString height = QStringLiteral("\\dimexpr\\ht\\statementtablebox+\\dp\\statementtablebox\\relax");
 		const QString remaining = QStringLiteral("\\dimexpr\\pagegoal-\\pagetotal\\relax");
@@ -637,8 +637,8 @@ namespace {
 		       QStringLiteral("\\ifdim") + height + QStringLiteral(">\\textheight\n") +
 		       QStringLiteral("\\ifdim") + remaining + QStringLiteral("<.25\\textheight") +
 		       QStringLiteral("\\ifdim\\pagetotal>0pt\\newpage\\fi\\fi\n") +
-		       // longtable 自带 LTpre / LTpost 上下留白，会和上面的 \addvspace 叠加，
-		       // 统一清零，保证与一页表格的上下间距一致。
+		       // 模板若把 tuacktable 定义成长表格，longtable 自带的 LTpre / LTpost 上下留白
+		       // 会和上面的 \addvspace 叠加，统一清零，保证与一页表格的上下间距一致。
 		       QStringLiteral("\\setlength{\\LTpre}{0pt}\\setlength{\\LTpost}{0pt}%\n") + multiPage +
 		       QStringLiteral("\n\\else\n") +
 		       QStringLiteral("\\ifdim") + height + QStringLiteral(">") + remaining +
@@ -734,20 +734,51 @@ namespace {
 
 			const QString header = QStringLiteral("\\statementtableheaderstrut ") + renderedRows.first();
 			QStringList bodyText;
+			QStringList multiPageBodyText;
 
 			for (int i = 1; i < renderedRows.size(); i++) {
 				QString separator = separators.at(i);
 				separator.replace(QStringLiteral("\\hline"),
 				                  QStringLiteral("\\cline{1-%1}").arg(columnCount));
 				bodyText.append(renderedRows.at(i) + QStringLiteral(" \\\\ ") + separator);
+
+				// 多页版自己在结尾画 2pt 的收尾线，最后一行不能再带分隔线。
+				if (i + 1 == renderedRows.size())
+					multiPageBodyText.append(renderedRows.at(i));
+				else
+					multiPageBodyText.append(renderedRows.at(i) + QStringLiteral(" \\\\ ") + separator);
 			}
 
 			const QString onePage = QStringLiteral("\\begin{statementtable}[%1]{%2}\n%3\n\\end{statementtable}")
 			                            .arg(columnCount)
 			                            .arg(header, bodyText.join(QChar('\n')));
-			const QString multiPage = QStringLiteral("\\begin{tuacktable}[%1]{%2}\n%3\n\\end{tuacktable}")
-			                              .arg(columnCount)
-			                              .arg(header, bodyText.join(QChar('\n')));
+			// 模板里的 tuacktable 是普通 tabular，装不下整页时不拆页；比整页还高的表格
+			// 这里直接生成同样样式的 longtable，让长表格能跨页、表头也能重复。
+			// longtable 的宽度是整行，横线要用 \cline{1-N} 才不会画出整页宽。
+			const QString multiPage =
+			    QStringLiteral("\\par\\begingroup\n"
+			                   "\\linespread{1.0}\\selectfont\n"
+			                   "\\renewcommand{\\arraystretch}{1.3}%\n"
+			                   "\\setlength{\\LTleft}{\\fill}\\setlength{\\LTright}{\\fill}%\n"
+			                   "\\begin{longtable}{@{}c*{%1}{|c}@{}}\n"
+			                   "\\noalign{\\global\\arrayrulewidth=2pt}\\cline{1-%2}%\n"
+			                   "\\noalign{\\global\\arrayrulewidth=0.4pt}%\n"
+			                   "%3\\\\\n"
+			                   "\\noalign{\\global\\arrayrulewidth=1pt}\\cline{1-%2}%\n"
+			                   "\\noalign{\\global\\arrayrulewidth=0.4pt}\\endfirsthead\n"
+			                   "\\noalign{\\global\\arrayrulewidth=2pt}\\cline{1-%2}%\n"
+			                   "\\noalign{\\global\\arrayrulewidth=0.4pt}%\n"
+			                   "%3\\\\\n"
+			                   "\\noalign{\\global\\arrayrulewidth=1pt}\\cline{1-%2}%\n"
+			                   "\\noalign{\\global\\arrayrulewidth=0.4pt}\\endhead\n"
+			                   "%4\n"
+			                   "\\\\\n"
+			                   "\\noalign{\\global\\arrayrulewidth=2pt}\\cline{1-%2}\n"
+			                   "\\end{longtable}\n"
+			                   "\\endgroup\\par")
+			        .arg(columnCount - 1)
+			        .arg(columnCount)
+			        .arg(header, multiPageBodyText.join(QChar('\n')));
 			return wrapTable(onePage, multiPage, tableSkip);
 		}
 

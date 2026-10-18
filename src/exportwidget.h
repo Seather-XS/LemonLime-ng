@@ -20,6 +20,7 @@ class QComboBox;
 class QGroupBox;
 class QLabel;
 class QLineEdit;
+class QListWidget;
 class QPlainTextEdit;
 class QPushButton;
 class QTimer;
@@ -45,7 +46,7 @@ class ExportWidget : public QWidget {
 	/// 比赛日文件（.cdf）：用来命名套层目录与默认 zip。
 	void setDayFile(const QString &);
 	/// 题面选项卡里那个 PDF 名模板算出来的默认文件名（statement/ 下），
-	/// 用作下拉框的默认选中项。
+	/// 用作列表的默认勾选项。
 	void setDefaultStatementFile(const QString &);
 	/// 重新列出打包内容（点「刷新」/ 切到本选项卡时调用）。
 	void refresh();
@@ -57,7 +58,7 @@ class ExportWidget : public QWidget {
 	void samplesToggled();
 	void passwordChanged();
 	void exportClicked();
-	/// 换了题面文件：只需重新列一遍打包内容，不必重扫整个目录。
+	/// 改了勾选的题面文件：只需重新列一遍打包内容，不必重扫整个目录。
 	void statementChanged();
 	/// 预览树分批构建：每触发一次插一小批节点，插完再收尾。
 	void buildTreeStep();
@@ -86,10 +87,12 @@ class ExportWidget : public QWidget {
 	QTreeWidgetItem *archiveNode(const QString &path);
 	/// 收尾：写状态栏、决定导出按钮能不能点、把树折起来。
 	void finishTree();
-	/// 重新列出 `statement/` 下的文件，选中当前 / 默认题面。
+	/// 重新列出 `statement/` 下的文件，保留已经勾选的那些（第一次按默认题面勾）。
 	void reloadStatementFiles();
-	/// 下拉框当前项对应的真文件名（去掉「 (missing)」装饰）。
-	QString selectedStatementFile() const;
+	/// 列表里勾着的题面文件（去掉「 (missing)」装饰）；可以是空列表。
+	QStringList checkedStatementFiles() const;
+	/// 勾选了、但磁盘上还不存在的题面文件（导出前提醒用）。
+	QStringList missingStatementFiles() const;
 
 	Contest *curContest{nullptr};
 	PackageBuilder *builder{nullptr};
@@ -111,8 +114,15 @@ class ExportWidget : public QWidget {
 	QCheckBox *perTaskBox{nullptr};
 	QCheckBox *structureBox{nullptr};
 	QCheckBox *samplesBox{nullptr};
-	QComboBox *statementBox{nullptr};
+	QListWidget *statementList{nullptr};
+	QPushButton *statementAllButton{nullptr};
+	QPushButton *statementNoneButton{nullptr};
 	QLabel *statementLabel{nullptr};
+	/// 用户手动改过勾选后，默认题面变化时不再覆盖他的选择。
+	bool statementSelectionCustomized{false};
+	bool statementSelectionInitialized{false};
+	QComboBox *encryptionBox{nullptr};
+	QLabel *encryptionLabel{nullptr};
 	QCheckBox *encryptBox{nullptr};
 	QCheckBox *showPasswordBox{nullptr};
 	QLineEdit *passwordEdit{nullptr};

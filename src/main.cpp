@@ -26,6 +26,7 @@
 #include "base/LemonLog.hpp"
 #include "base/LemonUtils.hpp"
 #include "base/settings.h"
+#include "base/violation.h"
 #include "component/exportutil/exportutil.h"
 #include "core/contest.h"
 #include "core/dayproject.h"
@@ -33,7 +34,6 @@
 #include "core/processrunner.h"
 #include "core/statementbuilder.h"
 #include "core/taskjudger.h"
-#include "core/violation.h"
 #include "exportwidget.h"
 #include "pdfpreview.h"
 #include "resultviewer.h"
@@ -60,6 +60,7 @@
 #include <QPushButton>
 #include <QSplashScreen>
 #include <QStandardPaths>
+#include <QListWidget>
 #include <QTableWidget>
 #include <QTabWidget>
 #include <QTemporaryDir>
@@ -136,7 +137,7 @@ void initLogger() {
 
 int main(int argc, char *argv[]) {
 
-	QCoreApplication::setApplicationName("Lemonlime");
+	QCoreApplication::setApplicationName("LemonLime-ng");
 
 	initLogger();
 
@@ -532,10 +533,12 @@ int main(int argc, char *argv[]) {
 
 	// 隐藏入口：命令行把比赛日打包成 .zip（与界面「导出」选项卡同一段逻辑）。
 	// 用法：lemon.exe --export-package <比赛日.cdf> [--kind contestant|testdata] [--wrap] [--nested]
-	//        [--no-per-task] [--no-structure] [--samples] [--password <密码>]
-	//        [--statement <statement 下的文件名>]
+	//        [--no-per-task] [--no-structure] [--samples] [--password <密码>] [--zipcrypto]
+	//        [--statement <statement 下的文件名>] ...
 	//   生成 <比赛日目录>/dist/export/<比赛日名>.zip
-	//   --statement 只在选手目录包里有效；不给时用比赛日里存的模板算出来的文件名。
+	//   --statement 只在选手目录包里有效，可以重复写多个（一个都不给时用比赛日里存的模板
+	//   算出来的文件名）；不想要题面就加 --no-statement。
+	//   加密默认 AES-256（WinZip AES / AE-2）；--zipcrypto 才用老式 ZipCrypto。
 	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--export-package")) {
 		QApplication app(argc, argv);
 		const QString dayFile = QString::fromLocal8Bit(argv[2]);
@@ -551,8 +554,10 @@ int main(int argc, char *argv[]) {
 		bool perTask = true;
 		bool structure = true;
 		bool samples = false;
-		QString statement;
+		bool statementGiven = false;
+		QStringList statements;
 		QString password;
+		PackageBuilder::EncryptionMethod encryption = PackageBuilder::Aes256Encryption;
 		PackageBuilder::Kind kind = PackageBuilder::ContestantPackage;
 
 		for (int i = 3; i < argc; i++) {
@@ -579,8 +584,13 @@ int main(int argc, char *argv[]) {
 					kind = PackageBuilder::ContestantPackage;
 			} else if (option == QLatin1String("--password") && i + 1 < argc)
 				password = QString::fromLocal8Bit(argv[++i]);
-			else if (option == QLatin1String("--statement") && i + 1 < argc)
-				statement = QString::fromLocal8Bit(argv[++i]);
+			else if (option == QLatin1String("--statement") && i + 1 < argc) {
+				statementGiven = true;
+				statements << QString::fromLocal8Bit(argv[++i]);
+			} else if (option == QLatin1String("--no-statement"))
+				statementGiven = true;
+			else if (option == QLatin1String("--zipcrypto"))
+				encryption = PackageBuilder::ZipCryptoEncryption;
 		}
 
 		Settings settings;
@@ -604,8 +614,11 @@ int main(int argc, char *argv[]) {
 		builder.setKeepStructure(structure);
 		builder.setIncludeSamples(samples);
 		builder.setPassword(password);
-		// 没指定题面文件时用「比赛日文件里存的模板 + 比赛日上下文」算出来的名字。
-		builder.setStatementFile(statement.isEmpty() ? resolvedStatementFileName(dayFile, contest) : statement);
+		builder.setEncryptionMethod(encryption);
+		// 没指定题面文件时用「比赛日文件里存的模板 + 比赛日上下文」算出来的名字；
+		// --no-statement 或一个 --statement 都不给之外的写法都按原样传进去（可以给多个）。
+		builder.setStatementFiles(statementGiven ? statements
+		                                         : QStringList{resolvedStatementFileName(dayFile, contest)});
 		builder.setOutputFile(builder.defaultOutputFile());
 		QFile logFile(QDir(dayDirectory).absoluteFilePath(QStringLiteral("export-log.txt")));
 		logFile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -791,6 +804,75 @@ int main(int argc, char *argv[]) {
 
 			if (! cleanHits.isEmpty())
 				fail(QStringLiteral("the default rules flag innocent code"));
+
+			// 默认清单按编译器所属语言从内置命令表里读取：gcc/g++ → C/C++，fpc → Pascal，
+			// fbc → FreeBASIC，jdk → Java，python → Python。
+			{
+				const auto languageOf = [](const QString &name, const QStringList &extensions) {
+					return Violation::languageNameFor(name, extensions);
+				};
+				const auto rulesOf = [](const QString &name, const QStringList &extensions) {
+					QStringList texts;
+
+					for (const ViolationRule &rule : Violation::defaultRulesFor(name, extensions))
+						texts << rule.text;
+
+					return texts;
+				};
+
+				report << QStringLiteral("languages: %1")
+				              .arg(languageOf(QStringLiteral("g++"), {QStringLiteral("cpp")}) + QStringLiteral(", ") +
+				                   languageOf(QStringLiteral("fpc"), {QStringLiteral("pas")}) + QStringLiteral(", ") +
+				                   languageOf(QStringLiteral("fbc"), {QStringLiteral("bas")}) + QStringLiteral(", ") +
+				                   languageOf(QStringLiteral("jdk"), {QStringLiteral("java")}) + QStringLiteral(", ") +
+				                   languageOf(QStringLiteral("python"), {QStringLiteral("py")}));
+
+				if (languageOf(QStringLiteral("g++"), {}) != QStringLiteral("C/C++"))
+					fail(QStringLiteral("g++ is not mapped to the C/C++ command list"));
+
+				if (languageOf(QString(), {QStringLiteral("pas")}) != QStringLiteral("Free Pascal"))
+					fail(QStringLiteral("the .pas extension is not mapped to the Pascal command list"));
+
+				// 只给后缀（自定义编译器名）也要认得出语言
+				if (languageOf(QStringLiteral("my-own-cc"), {QStringLiteral("cpp")}) != QStringLiteral("C/C++"))
+					fail(QStringLiteral("a custom compiler with .cpp is not mapped to C/C++"));
+
+				const QStringList pascal = rulesOf(QStringLiteral("fpc"), {QStringLiteral("pas")});
+
+				if (! pascal.contains(QStringLiteral("ExecuteProcess")) ||
+				    ! pascal.contains(QStringLiteral("fpSystem")))
+					fail(QStringLiteral("the Pascal command list has no process-spawning entries"));
+
+				const QStringList java = rulesOf(QStringLiteral("jdk"), {QStringLiteral("java")});
+
+				if (! java.contains(QStringLiteral("ProcessBuilder")))
+					fail(QStringLiteral("the Java command list has no ProcessBuilder entry"));
+			}
+
+			// 按语言分开后，Python 用自己的默认清单（字符串规则为主）。
+			const QVector<ViolationRule> pythonRules =
+			    Violation::defaultRulesFor(QStringLiteral("python"), QStringList{QStringLiteral("py")});
+			const QString pythonCode = QStringLiteral("import subprocess\n"
+			                                          "subprocess.run([\"pause\"])\n"
+			                                          "import re\n"
+			                                          "re.compile(\"x\")\n");
+			QStringList pythonHits;
+
+			for (const Violation::Match &hit : Violation::checkSource(pythonCode, pythonRules))
+				pythonHits << hit.rule.text;
+
+			report << QStringLiteral("python violation hits: %1")
+			              .arg(pythonHits.join(QStringLiteral(", ")));
+
+			if (! pythonHits.contains(QStringLiteral("subprocess")))
+				fail(QStringLiteral("the python default rules do not cover subprocess"));
+
+			// re.compile( 是正常用法：成员访问不算命令，不能误伤。
+			if (pythonHits.contains(QStringLiteral("compile")))
+				fail(QStringLiteral("the python default rules flag re.compile()"));
+
+			if (Violation::defaultRulesFor(QStringList{QStringLiteral("cpp")}).size() != rules.size())
+				fail(QStringLiteral("non-python compilers did not get the C/C++ default rules"));
 		}
 
 		// 4) 编程通则 3：程序必须以 0 退出（真的跑一个进程看结果）
@@ -966,7 +1048,9 @@ int main(int argc, char *argv[]) {
 		readProjectContext(dayFile, projectTitle, dayTitle);
 
 		StatementEditWidget widget;
-		widget.setDayContext(&contest, QFileInfo(dayFile).completeBaseName(), dayTitle, projectTitle);
+		// 与 loadDay() 的口径一致：没有工程时，比赛标题就是比赛日里的 contestTitle。
+		widget.setDayContext(&contest, QFileInfo(dayFile).completeBaseName(), dayTitle,
+		                     projectTitle.isEmpty() ? contest.getContestTitle() : projectTitle);
 
 		QStringList report;
 		int problems = 0;
@@ -1143,7 +1227,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		// 3) 导出选项卡里的「题面文件」下拉框：列 statement/ 下的文件，默认选模板算出的那个。
+		// 3) 导出选项卡里的「题面文件」列表：列 statement/ 下的文件，默认勾选模板算出的那个。
 		{
 			ExportWidget exportWidget;
 			exportWidget.setDayFile(dayFile);
@@ -1151,31 +1235,45 @@ int main(int argc, char *argv[]) {
 			exportWidget.setDefaultStatementFile(widget.pdfFileName());
 			exportWidget.refresh();
 
-			QComboBox *statementBox = nullptr;
-
-			for (auto *combo : exportWidget.findChildren<QComboBox *>()) {
-				if (combo->toolTip().contains(QStringLiteral("statement/")))
-					statementBox = combo;
-			}
-
+			auto *statementList = exportWidget.findChild<QListWidget *>(QStringLiteral("statementList"));
 			QStringList items;
+			QStringList checked;
 
-			if (statementBox)
-				for (int i = 0; i < statementBox->count(); i++)
-					items << statementBox->itemText(i);
+			if (statementList)
+				for (int i = 0; i < statementList->count(); i++) {
+					const QListWidgetItem *item = statementList->item(i);
+					items << item->text();
 
-			report << QStringLiteral("statement combo: %1").arg(items.join(QStringLiteral(", ")));
+					if (item->checkState() == Qt::Checked)
+						checked << item->text();
+				}
 
-			// 默认题面还没导出时下拉框里会有个「… (missing)」的条目，也算提供了。
+			report << QStringLiteral("statement list: %1 (checked: %2)")
+			              .arg(items.join(QStringLiteral(", ")), checked.join(QStringLiteral(", ")));
+
+			// 默认勾选的就是题面选项卡算出来的那个名字（也就是这里传进去的名字）。
+			const QString expected = widget.pdfFileName();
+			// 默认题面还没导出时列表里会有个「… (missing)」的条目，也算提供了。
+			const auto matchesExpected = [&expected](const QString &text) {
+				return text == expected || text.startsWith(expected + QStringLiteral(" ("));
+			};
 			bool offered = false;
+			bool selected = false;
 
 			for (const QString &item : items)
-				if (item == expected || item.startsWith(expected + QStringLiteral(" (")))
+				if (matchesExpected(item))
 					offered = true;
 
-			if (! statementBox || ! offered) {
+			for (const QString &item : checked)
+				if (matchesExpected(item))
+					selected = true;
+
+			if (! statementList || ! offered) {
 				problems++;
-				report << QStringLiteral("statement combo does not offer %1").arg(expected);
+				report << QStringLiteral("the statement list does not offer %1").arg(expected);
+			} else if (! selected) {
+				problems++;
+				report << QStringLiteral("the statement list does not check %1 by default").arg(expected);
 			}
 		}
 
@@ -2158,6 +2256,7 @@ int main(int argc, char *argv[]) {
 		const QStringList icons{QStringLiteral(":/icon/icon.png"), QStringLiteral(":/icon/acrobat.svg"),
 		                        QStringLiteral(":/icon/document-save.svg"),
 		                        QStringLiteral(":/icon/view-refresh.svg"),
+		                        QStringLiteral(":/icon/problem-configure.svg"),
 		                        QStringLiteral(":/logo/splash2.png")};
 		int loaded = 0;
 

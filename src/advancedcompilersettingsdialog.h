@@ -50,4 +50,7 @@ class AdvancedCompilerSettingsDialog : public QDialog {
 	void compilerArgumentsChanged();
 	void interpreterArgumentsChanged();
 	void environmentVariablesButtonClicked();
+	void addViolationRule();
+	void removeViolationRule();
+	void restoreDefaultViolationRules();
 };

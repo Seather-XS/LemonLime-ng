@@ -1083,6 +1083,61 @@
         <translation>新建配置 %1</translation>
     </message>
     <message>
+        <location filename="../src/forms/advancedcompilersettingsdialog.ui" line="376"/>
+        <source>Violation Checking Rules</source>
+        <translation>違規檢測規則</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/advancedcompilersettingsdialog.ui" line="385"/>
+        <source>The contest day decides whether these rules are applied to this compiler.</source>
+        <translation>這些規則是否生效由比賽日設定決定。</translation>
+    </message>
+    <message>
+        <location filename="../src/advancedcompilersettingsdialog.cpp" line="168"/>
+        <source>These rules belong to this compiler; the contest day decides whether they are applied.</source>
+        <translation>這些規則屬於這個編譯器；是否啟用由比賽日設定決定。</translation>
+    </message>
+    <message>
+        <location filename="../src/advancedcompilersettingsdialog.cpp" line="170"/>
+        <source>Language: %1. These rules belong to this compiler; the contest day decides whether they are applied.</source>
+        <translation>語言：%1。這些規則屬於這個編譯器；是否啟用由比賽日設定決定。</translation>
+    </message>
+    <message>
+        <location filename="../src/advancedcompilersettingsdialog.cpp" line="84"/>
+        <source>Type</source>
+        <translation>類型</translation>
+    </message>
+    <message>
+        <location filename="../src/advancedcompilersettingsdialog.cpp" line="84"/>
+        <source>Content</source>
+        <translation>內容</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/advancedcompilersettingsdialog.ui" line="411"/>
+        <source>Add</source>
+        <translation>新增</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/advancedcompilersettingsdialog.ui" line="419"/>
+        <source>Remove</source>
+        <translation>移除</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/advancedcompilersettingsdialog.ui" line="427"/>
+        <source>Restore Defaults</source>
+        <translation>恢復預設</translation>
+    </message>
+    <message>
+        <location filename="../src/advancedcompilersettingsdialog.cpp" line="10"/>
+        <source>Command</source>
+        <translation>命令</translation>
+    </message>
+    <message>
+        <location filename="../src/advancedcompilersettingsdialog.cpp" line="10"/>
+        <source>String</source>
+        <translation>字串</translation>
+    </message>
+    <message>
         <location filename="../src/forms/advancedcompilersettingsdialog.ui" line="309"/>
         <source>Interpreter As Watcher</source>
         <translation>以解譯器作為監看器</translation>
@@ -1363,6 +1418,21 @@
         <location filename="../src/contestsettingsdialog.cpp" line="188"/>
         <source>Contestant folders must be named like %1 (region sample: %2).</source>
         <translation>選手資料夾必須命名為 %1（賽區範例：%2）。</translation>
+    </message>
+    <message>
+        <location filename="../src/contestsettingsdialog.cpp" line="43"/>
+        <source>Rules are configured per compiler in Options → Compiler → Advanced.</source>
+        <translation>規則在「設定 → 編譯器 → 進階」裡按編譯器分別設定。</translation>
+    </message>
+    <message>
+        <location filename="../src/contestsettingsdialog.cpp" line="117"/>
+        <source>%1 (%2 rules)</source>
+        <translation>%1（%2 條規則）</translation>
+    </message>
+    <message>
+        <location filename="../src/contestsettingsdialog.cpp" line="117"/>
+        <source>%1 (no rules)</source>
+        <translation>%1（沒有規則）</translation>
     </message>
 </context>
 <context>
@@ -2310,8 +2380,31 @@ This cannot be undone.</source>
     <message>
         <location filename="../src/exportwidget.cpp" line="136"/>
         <location filename="../src/exportwidget.cpp" line="221"/>
-        <source>Encrypt with a password (ZipCrypto)</source>
-        <translation>使用密碼加密（ZipCrypto）</translation>
+        <source>Encrypt with a password</source>
+        <translation>使用密碼加密</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="141"/>
+        <location filename="../src/exportwidget.cpp" line="262"/>
+        <source>Method:</source>
+        <translation>方式：</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="143"/>
+        <location filename="../src/exportwidget.cpp" line="264"/>
+        <source>AES-256 (recommended)</source>
+        <translation>AES-256（推薦）</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="144"/>
+        <location filename="../src/exportwidget.cpp" line="265"/>
+        <source>ZipCrypto (weak, for old tools)</source>
+        <translation>ZipCrypto（較弱，僅供舊工具使用）</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="266"/>
+        <source>AES-256 is the WinZip AES (AE-2) standard and works with 7-Zip / WinRAR. ZipCrypto only exists for very old tools and is easy to break.</source>
+        <translation>AES-256 是 WinZip AES（AE-2）標準，7-Zip / WinRAR 都能開啟；ZipCrypto 只是為了相容很舊的工具，很容易被破解。</translation>
     </message>
     <message>
         <location filename="../src/exportwidget.cpp" line="140"/>
@@ -2422,20 +2515,30 @@ This cannot be undone.</source>
         <translation>正在列出...%1 個檔案</translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="618"/>
-        <source>The statement file is missing; export it in the Statement tab first if you need it.</source>
-        <translation>題面檔案不存在；如果需要，請先在「題面」索引標籤裡導出。</translation>
+        <location filename="../src/exportwidget.cpp" line="711"/>
+        <source>These statement files are missing; export them in the Statement tab first if you need them: %1</source>
+        <translation>這些題面檔案不存在；如果需要，請先在「題面」索引標籤裡導出：%1</translation>
     </message>
     <message>
         <location filename="../src/exportwidget.cpp" line="129"/>
-        <location filename="../src/exportwidget.cpp" line="218"/>
-        <source>Statement file:</source>
+        <location filename="../src/exportwidget.cpp" line="255"/>
+        <source>Statement files:</source>
         <translation>題面檔案：</translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="219"/>
-        <source>Which file under statement/ goes into the package (the PDF name is set in the Statement tab).</source>
-        <translation>打包用 statement/ 下的哪個檔案（PDF 檔名在「題面」索引標籤裡設定）。</translation>
+        <location filename="../src/exportwidget.cpp" line="258"/>
+        <source>Which files under statement/ go into the package. Check none to leave the statement out (the PDF name is set in the Statement tab).</source>
+        <translation>打包用 statement/ 下的哪些檔案；一個都不勾就不放題面（PDF 檔名在「題面」索引標籤裡設定）。</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="260"/>
+        <source>Select all</source>
+        <translation>全選</translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="261"/>
+        <source>Clear</source>
+        <translation>清空</translation>
     </message>
     <message>
         <location filename="../src/exportwidget.cpp" line="357"/>
@@ -2443,10 +2546,13 @@ This cannot be undone.</source>
         <translation>找不到</translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="642"/>
-        <source>The statement file (%1) does not exist yet, so the package will not contain the statement.
+        <location filename="../src/exportwidget.cpp" line="739"/>
+        <source>These statement files do not exist yet, so the package will not contain them:
+%1
 Export anyway?</source>
-        <translation>題面檔案（%1）還不存在，壓縮檔裡將不含題面。仍要導出嗎？</translation>
+        <translation>這些題面檔案還不存在，壓縮檔裡將不含它們：
+%1
+仍要導出嗎？</translation>
     </message>
 </context>
 <context>
@@ -3296,8 +3402,8 @@ Depends: </source>
         <location filename="../src/forms/lemon.ui" line="20"/>
         <location filename="../src/lemon.cpp" line="1117"/>
         <location filename="../src/lemon.cpp" line="1302"/>
-        <source>LemonLime</source>
-        <translation>LemonLime</translation>
+        <source>LemonLime-ng</source>
+        <translation>LemonLime-ng</translation>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="68"/>
@@ -3496,8 +3602,8 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="644"/>
-        <source>Exit LemonLime...</source>
-        <translation>退出 LemonLime…</translation>
+        <source>Exit LemonLime-ng...</source>
+        <translation>退出 LemonLime-ng…</translation>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="653"/>
@@ -3506,8 +3612,8 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="656"/>
-        <source>LemonLime Settings...</source>
-        <translation>LemonLime 設定…</translation>
+        <source>LemonLime-ng Settings...</source>
+        <translation>LemonLime-ng 設定…</translation>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="665"/>
@@ -3516,8 +3622,8 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="668"/>
-        <source>About LemonLime...</source>
-        <translation>關於 LemonLime…</translation>
+        <source>About LemonLime-ng...</source>
+        <translation>關於 LemonLime-ng…</translation>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="680"/>
@@ -3548,6 +3654,16 @@ Depends: </source>
         <location filename="../src/forms/lemon.ui" line="730"/>
         <source>Read the import folder (Lemon data layout) and add tasks automatically...</source>
         <translation>讀取 import 資料夾（Lemon 資料配置）並自動新增題目…</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/lemon.ui" line="743"/>
+        <source>Add Tasks from &amp;problem/</source>
+        <translation>從 problem/ 自動設定試題(&amp;P)</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/lemon.ui" line="746"/>
+        <source>Scan problem/ and configure the tasks and data files that are not added yet...</source>
+        <translation>掃描 problem/ 資料夾，自動設定尚未加入的試題與 data/ 下的資料檔案…</translation>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="738"/>
@@ -3899,15 +4015,15 @@ Depends: </source>
     <message>
         <location filename="../src/lemon.cpp" line="1021"/>
         <location filename="../src/lemon.cpp" line="1424"/>
-        <source>LemonLime - %1</source>
-        <translation>LemonLime - %1</translation>
+        <source>LemonLime-ng - %1</source>
+        <translation>LemonLime-ng - %1</translation>
     </message>
     <message>
         <location filename="../src/lemon.cpp" line="1023"/>
         <location filename="../src/lemon.cpp" line="1426"/>
         <location filename="../src/lemon.cpp" line="1664"/>
-        <source>LemonLime - %1 / %2</source>
-        <translation>LemonLime - %1 / %2</translation>
+        <source>LemonLime-ng - %1 / %2</source>
+        <translation>LemonLime-ng - %1 / %2</translation>
     </message>
     <message>
         <location filename="../src/lemon.cpp" line="1052"/>
@@ -3919,6 +4035,27 @@ Depends: </source>
         <location filename="../src/lemon.cpp" line="1302"/>
         <source>No task found</source>
         <translation>找不到任何試題</translation>
+    </message>
+    <message>
+        <location filename="../src/lemon.cpp" line="1555"/>
+        <location filename="../src/lemon.cpp" line="1568"/>
+        <source>Configure Tasks from problem/</source>
+        <translation>從 problem/ 設定試題</translation>
+    </message>
+    <message>
+        <location filename="../src/lemon.cpp" line="1556"/>
+        <source>No task or data file needs to be added.</source>
+        <translation>problem/ 下沒有需要新增的試題或資料檔案。</translation>
+    </message>
+    <message>
+        <location filename="../src/lemon.cpp" line="1563"/>
+        <source>Added tasks: %1</source>
+        <translation>已新增試題：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/lemon.cpp" line="1566"/>
+        <source>Added %1 test case(s) to %2</source>
+        <translation>為 %2 新增了 %1 個測試點</translation>
     </message>
     <message>
         <location filename="../src/lemon.cpp" line="1401"/>
@@ -4034,8 +4171,8 @@ No: remove it from the contest only.</source>
     </message>
     <message>
         <location filename="../src/lemon.cpp" line="1690"/>
-        <source>About LemonLime</source>
-        <translation>關於 LemonLime</translation>
+        <source>About LemonLime-ng</source>
+        <translation>關於 LemonLime-ng</translation>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="463"/>

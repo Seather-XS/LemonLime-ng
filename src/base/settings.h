@@ -157,6 +157,11 @@ class Settings {
 	static QString admissionOutputPath();
 	/// 建好 dist/reports/、dist/export/ 与 dist/admission/，并清掉早期版本留在比赛日根目录的 reports/、export/。
 	static void ensureDistDirs();
+	/// 让资源管理器把比赛日目录按 problem / import / answers / statement / admission / dist 排列。
+	/// 做法是在该目录写一个隐藏 + 系统的 desktop.ini，用 [LocalizedFileNames] 给这几个文件夹
+	/// 加上不可见的零宽空格前缀——只改「显示名」，真实路径完全不变；换台机器或系统不支持时
+	/// 最多退回原来的字母序，不会破坏任何东西。
+	static void ensureDayFolderOrdering(const QString &dayRoot);
 	/// 交互库 / 校验器只允许放在 <题>/graders/ 下，返回相对 dataPath() 的该目录（带结尾分隔符）。
 	static QString gradersPath(const QString &taskName);
 	/// <题>/graders/<文件>（相对 dataPath()），与工程中保存交互库路径的格式一致。

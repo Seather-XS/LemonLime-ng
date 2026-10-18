@@ -582,5 +582,11 @@ void AddCompilerWizard::accept() {
 		}
 	}
 
+	// 新编译器从所属语言（编译器名 / 源文件后缀）的命令清单里读一份默认限制，
+	// 之后可以在「高级编译器设置」里逐条改。
+	for (auto *compiler : compilerList)
+		compiler->setViolationRules(
+		    Violation::defaultRulesFor(compiler->getCompilerName(), compiler->getSourceExtensions()));
+
 	QWizard::accept();
 }

@@ -22,6 +22,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QListWidget>
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
@@ -124,19 +125,46 @@ void ExportWidget::buildUi() {
 	optionsLayout->addWidget(structureBox);
 	samplesBox = new QCheckBox(tr("Also export the sample data (down/)"), optionsBox);
 	optionsLayout->addWidget(samplesBox);
-	// 题面文件：只在「选手目录」包里才有意义（题面文件名不一定叫 statement.pdf）。
+	// 题面文件：只在「选手目录」包里才有意义，可以勾 0 个到任意多个。
 	auto *statementRow = new QHBoxLayout();
-	statementLabel = new QLabel(tr("Statement file:"), optionsBox);
-	statementRow->addWidget(statementLabel);
-	statementBox = new QComboBox(optionsBox);
-	statementBox->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
-	statementBox->setMinimumContentsLength(24);
-	statementRow->addWidget(statementBox, 1);
+	statementLabel = new QLabel(tr("Statement files:"), optionsBox);
+	statementRow->addWidget(statementLabel, 0, Qt::AlignTop);
+	auto *statementColumn = new QVBoxLayout();
+	statementList = new QListWidget(optionsBox);
+	statementList->setObjectName(QStringLiteral("statementList"));
+	statementList->setMaximumHeight(96);
+	// 只用勾选框，不要选中态
+	statementList->setSelectionMode(QAbstractItemView::NoSelection);
+	statementColumn->addWidget(statementList);
+	auto *statementButtons = new QHBoxLayout();
+	statementAllButton = new QPushButton(tr("Select all"), optionsBox);
+	statementAllButton->setObjectName(QStringLiteral("statementAllButton"));
+	statementNoneButton = new QPushButton(tr("Clear"), optionsBox);
+	statementNoneButton->setObjectName(QStringLiteral("statementNoneButton"));
+	for (auto *button : {statementAllButton, statementNoneButton}) {
+		button->setFlat(true);
+		button->setAutoDefault(false);
+		statementButtons->addWidget(button);
+	}
+
+	statementButtons->addStretch();
+	statementColumn->addLayout(statementButtons);
+	statementRow->addLayout(statementColumn, 1);
 	optionsLayout->addLayout(statementRow);
-	encryptBox = new QCheckBox(tr("Encrypt with a password (ZipCrypto)"), optionsBox);
+	encryptBox = new QCheckBox(tr("Encrypt with a password"), optionsBox);
 	optionsLayout->addWidget(encryptBox);
 	auto *passwordRow = new QHBoxLayout();
 	passwordRow->addSpacing(24);
+	encryptionLabel = new QLabel(tr("Method:"), optionsBox);
+	passwordRow->addWidget(encryptionLabel);
+	encryptionBox = new QComboBox(optionsBox);
+	encryptionBox->setObjectName(QStringLiteral("encryptionBox"));
+	encryptionBox->addItem(tr("AES-256 (recommended)"), int(PackageBuilder::Aes256Encryption));
+	encryptionBox->addItem(tr("ZipCrypto (weak, for old tools)"), int(PackageBuilder::ZipCryptoEncryption));
+	// 只有勾了「加密」才可选方式
+	encryptionBox->setEnabled(false);
+	encryptionLabel->setEnabled(false);
+	passwordRow->addWidget(encryptionBox);
 	passwordRow->addWidget(new QLabel(tr("Password:"), optionsBox));
 	passwordEdit = new QLineEdit(optionsBox);
 	passwordEdit->setEchoMode(QLineEdit::Password);
@@ -192,7 +220,21 @@ void ExportWidget::buildUi() {
 	connect(perTaskBox, &QCheckBox::toggled, this, &ExportWidget::perTaskToggled);
 	connect(structureBox, &QCheckBox::toggled, this, [this] { optionsChanged(); });
 	connect(samplesBox, &QCheckBox::toggled, this, &ExportWidget::samplesToggled);
-	connect(statementBox, &QComboBox::currentTextChanged, this, &ExportWidget::statementChanged);
+	connect(statementList, &QListWidget::itemChanged, this, &ExportWidget::statementChanged);
+	connect(statementAllButton, &QPushButton::clicked, this, [this] {
+		statementSelectionCustomized = true;
+
+		for (int i = 0; i < statementList->count(); i++)
+			statementList->item(i)->setCheckState(Qt::Checked);
+	});
+	connect(statementNoneButton, &QPushButton::clicked, this, [this] {
+		statementSelectionCustomized = true;
+
+		for (int i = 0; i < statementList->count(); i++)
+			statementList->item(i)->setCheckState(Qt::Unchecked);
+	});
+	connect(encryptionBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+	        [this] { optionsChanged(); });
 	connect(encryptBox, &QCheckBox::toggled, this, [this] { optionsChanged(); });
 	// 密码不影响打包内容，只是存在 builder 里，不必重建树（否则每敲一个字符都重算一遍）。
 	connect(passwordEdit, &QLineEdit::textChanged, this, &ExportWidget::passwordChanged);
@@ -215,10 +257,17 @@ void ExportWidget::retranslate() {
 	structureBox->setText(tr("Keep the original folder structure (data/, graders/, ...)"));
 	samplesBox->setText(tr("Also export the sample data (down/)"));
 	samplesBox->setToolTip(tr("The sample data is taken from each task's down/ folder, keeping the structure."));
-	statementLabel->setText(tr("Statement file:"));
-	statementBox->setToolTip(tr("Which file under statement/ goes into the package (the PDF name is set in the "
-	                           "Statement tab)."));
-	encryptBox->setText(tr("Encrypt with a password (ZipCrypto)"));
+	statementLabel->setText(tr("Statement files:"));
+	statementList->setToolTip(tr("Which files under statement/ go into the package. Check none to leave the "
+	                             "statement out (the PDF name is set in the Statement tab)."));
+	statementAllButton->setText(tr("Select all"));
+	statementNoneButton->setText(tr("Clear"));
+	encryptBox->setText(tr("Encrypt with a password"));
+	encryptionLabel->setText(tr("Method:"));
+	encryptionBox->setItemText(0, tr("AES-256 (recommended)"));
+	encryptionBox->setItemText(1, tr("ZipCrypto (weak, for old tools)"));
+	encryptionBox->setToolTip(tr("AES-256 is the WinZip AES (AE-2) standard and works with 7-Zip / WinRAR. "
+	                             "ZipCrypto only exists for very old tools and is easy to break."));
 	showPasswordBox->setText(tr("Show"));
 	contentsBox->setTitle(tr("Package contents"));
 	logBox->setTitle(tr("Export log"));
@@ -238,8 +287,11 @@ void ExportWidget::syncOptionWidgets() {
 	perTaskBox->setVisible(testData);
 	structureBox->setVisible(testData);
 	samplesBox->setVisible(testData);
-	statementLabel->setVisible(! testData && ! answers);
-	statementBox->setVisible(! testData && ! answers);
+	const bool showStatement = ! testData && ! answers;
+	statementLabel->setVisible(showStatement);
+	statementList->setVisible(showStatement);
+	statementAllButton->setVisible(showStatement);
+	statementNoneButton->setVisible(showStatement);
 
 	// 名字随包类型变。
 	if (answers) {
@@ -312,7 +364,7 @@ void ExportWidget::setDayFile(const QString &filePath) {
 	scheduleRefresh();
 }
 
-// 题面选项卡算出来的默认题面文件名：下拉框里没有就补一项，并选上它。
+// 题面选项卡算出来的默认题面文件名：列表里没有就补一项，并（在用户没改过勾选时）勾上它。
 void ExportWidget::setDefaultStatementFile(const QString &fileName) {
 	const QString name = QFileInfo(fileName).fileName();
 
@@ -320,14 +372,25 @@ void ExportWidget::setDefaultStatementFile(const QString &fileName) {
 		return;
 
 	defaultStatementFile = name;
+
+	// 用户还没自己挑过题面时跟着默认名走；挑过就只刷新列表，别覆盖他的选择。
+	if (! statementSelectionCustomized)
+		statementSelectionInitialized = false;
+
 	reloadStatementFiles();
 	syncOptions();
 	scheduleRefresh();
 }
 
-// 列出 statement/ 下的文件：选中的保持选中，否则选默认题面（即使它还没被导出）。
+// 列表项文字 → 真文件名（去掉「 (missing)」这种装饰）。
+static QString statementNameOf(const QString &text, const QString &missingSuffix) {
+	const int marker = text.indexOf(missingSuffix);
+	return marker < 0 ? text : text.left(marker).trimmed();
+}
+
+// 列出 statement/ 下的文件：已经勾选的保持不变；第一次打开时按默认题面勾选。
 void ExportWidget::reloadStatementFiles() {
-	const QString current = statementBox->currentText();
+	const QStringList previous = statementSelectionInitialized ? checkedStatementFiles() : QStringList();
 	const QDir statementDir(QDir(builder->dayRoot()).absoluteFilePath(Settings::statementPath()));
 	QStringList names;
 
@@ -338,8 +401,6 @@ void ExportWidget::reloadStatementFiles() {
 		for (const QFileInfo &info : found)
 			names << info.fileName();
 	}
-
-	const QString fallback = defaultStatementFile.isEmpty() ? builder->statementFile() : defaultStatementFile;
 
 	// PDF 排前面（题面通常就是 PDF），同类按名字排。
 	std::sort(names.begin(), names.end(), [](const QString &left, const QString &right) {
@@ -353,31 +414,62 @@ void ExportWidget::reloadStatementFiles() {
 	});
 
 	// 默认题面可能还没导出：补一项（标上「未找到」）让用户看得见。
+	const QString fallback = defaultStatementFile;
+	const QString missingSuffix = QStringLiteral(" (") + tr("missing") + QChar(')');
+
 	if (! fallback.isEmpty() && ! names.contains(fallback))
-		names.prepend(fallback + QStringLiteral(" (") + tr("missing") + QStringLiteral(")"));
+		names.prepend(fallback + missingSuffix);
 
-	QSignalBlocker blocker(statementBox);
-	statementBox->clear();
-	statementBox->addItems(names);
+	QSignalBlocker blocker(statementList);
+	statementList->clear();
 
-	if (names.contains(current))
-		statementBox->setCurrentText(current);
-	else if (! names.isEmpty())
-		statementBox->setCurrentIndex(0);
+	for (const QString &name : names) {
+		auto *item = new QListWidgetItem(name, statementList);
+		item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+		const QString real = statementNameOf(name, missingSuffix);
+		const bool checked = statementSelectionInitialized ? previous.contains(real)
+		                                                   : real == fallback;
+		item->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
+	}
 
-	// 建 builder 里存的是真文件名，「(missing)」这种标记不能带进去。
-	builder->setStatementFile(selectedStatementFile());
+	statementSelectionInitialized = true;
+	// builder 里存的是真文件名，「(missing)」这种标记不能带进去。
+	builder->setStatementFiles(checkedStatementFiles());
 }
 
-// 下拉框当前项对应的真文件名（去掉「 (missing)」这种装饰）。
-QString ExportWidget::selectedStatementFile() const {
-	const QString text = statementBox->currentText();
-	const int marker = text.indexOf(QStringLiteral(" ("));
-	return marker < 0 ? text : text.left(marker);
+auto ExportWidget::checkedStatementFiles() const -> QStringList {
+	const QString missingSuffix = QStringLiteral(" (") + tr("missing") + QChar(')');
+	QStringList files;
+
+	for (int row = 0; row < statementList->count(); row++) {
+		const QListWidgetItem *item = statementList->item(row);
+
+		if (item->checkState() != Qt::Checked)
+			continue;
+
+		const QString name = statementNameOf(item->text(), missingSuffix);
+
+		if (! name.isEmpty() && ! files.contains(name))
+			files.append(name);
+	}
+
+	return files;
+}
+
+auto ExportWidget::missingStatementFiles() const -> QStringList {
+	const QDir statementDir(QDir(builder->dayRoot()).absoluteFilePath(Settings::statementPath()));
+	QStringList missing;
+
+	for (const QString &name : checkedStatementFiles())
+		if (! QFileInfo(statementDir.absoluteFilePath(name)).isFile())
+			missing.append(name);
+
+	return missing;
 }
 
 void ExportWidget::statementChanged() {
-	builder->setStatementFile(selectedStatementFile());
+	statementSelectionCustomized = true;
+	builder->setStatementFiles(checkedStatementFiles());
 	scheduleRefresh();
 }
 
@@ -414,6 +506,8 @@ void ExportWidget::optionsChanged() {
 	const bool encrypt = encryptBox->isChecked();
 	passwordEdit->setEnabled(encrypt);
 	showPasswordBox->setEnabled(encrypt);
+	encryptionBox->setEnabled(encrypt);
+	encryptionLabel->setEnabled(encrypt);
 	syncOptions();
 	scheduleRefresh();
 }
@@ -443,7 +537,9 @@ void ExportWidget::syncOptions() {
 	builder->setOneFolderPerTask(perTaskBox->isChecked());
 	builder->setKeepStructure(structureBox->isChecked());
 	builder->setIncludeSamples(samplesBox->isChecked());
-	builder->setStatementFile(statementBox->currentText());
+	builder->setStatementFiles(checkedStatementFiles());
+	builder->setEncryptionMethod(
+	    static_cast<PackageBuilder::EncryptionMethod>(encryptionBox->currentData().toInt()));
 	builder->setPassword(encryptBox->isChecked() ? passwordEdit->text() : QString());
 }
 
@@ -573,7 +669,6 @@ void ExportWidget::refresh() {
 	reloadStatementFiles();
 	syncOptions();
 
-	const QString dayDirectory = builder->dayRoot();
 	builder->setOutputFile(builder->defaultOutputFile());
 	outputLabel->setText(QDir::toNativeSeparators(builder->defaultOutputFile()));
 
@@ -612,10 +707,14 @@ void ExportWidget::refresh() {
 
 	buildTreeStep();
 
-	if (builder->kind() == PackageBuilder::ContestantPackage &&
-	    ! QFileInfo::exists(QDir(dayDirectory).absoluteFilePath(
-	        Settings::statementPath() + builder->statementFile())))
-		appendLog(tr("The statement file is missing; export it in the Statement tab first if you need it."));
+	if (builder->kind() == PackageBuilder::ContestantPackage) {
+		const QStringList missing = missingStatementFiles();
+
+		if (! missing.isEmpty())
+			appendLog(tr("These statement files are missing; export them in the Statement tab first if "
+			             "you need them: %1")
+			              .arg(missing.join(QStringLiteral(", "))));
+	}
 }
 
 void ExportWidget::exportClicked() {
@@ -633,15 +732,16 @@ void ExportWidget::exportClicked() {
 	refresh();
 
 	const QString target = builder->defaultOutputFile();
-	const QString pdf = QDir(builder->dayRoot()).absoluteFilePath(Settings::statementPath() +
-	                                                             builder->statementFile());
+	const QStringList missing = builder->kind() == PackageBuilder::ContestantPackage
+	                                ? missingStatementFiles()
+	                                : QStringList();
 
-	if (builder->kind() == PackageBuilder::ContestantPackage && ! QFileInfo::exists(pdf)) {
+	if (! missing.isEmpty()) {
 		const auto answer = QMessageBox::question(
 		    this, tr("Export"),
-		    tr("The statement file (%1) does not exist yet, so the package will not contain the statement.\n"
+		    tr("These statement files do not exist yet, so the package will not contain them:\n%1\n"
 		       "Export anyway?")
-		        .arg(QDir::toNativeSeparators(pdf)),
+		        .arg(missing.join(QChar('\n'))),
 		    QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
 		if (answer != QMessageBox::Yes)

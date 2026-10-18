@@ -15,8 +15,12 @@
 #include <cmath>
 //
 #include <QDir>
+#include <QFileInfo>
 #include <QLocale>
 #include <QSettings>
+#ifdef Q_OS_WIN32
+#include <windows.h>
+#endif
 
 #define LEMON_MODULE_NAME "Setting"
 
@@ -507,6 +511,13 @@ void Settings::saveSettings() {
 
 		settings.setValue("EnvironmentVariables", compilerList[i]->getEnvironment().toStringList());
 		settings.endArray();
+
+		QStringList violationRules;
+
+		for (const ViolationRule &rule : compilerList[i]->getViolationRules())
+			violationRules.append(rule.kind + QChar('\t') + rule.text);
+
+		settings.setValue("ViolationRules", violationRules);
 	}
 
 	settings.endArray();
@@ -597,6 +608,24 @@ void Settings::loadSettings() {
 
 		compiler->setEnvironment(environment);
 		settings.endArray();
+
+		// 老版本没有这一项：按源文件后缀补一份默认限制；存过空列表就是用户真的清空了。
+		if (settings.contains("ViolationRules")) {
+			QVector<ViolationRule> rules;
+
+			for (const QString &item : settings.value("ViolationRules").toStringList()) {
+				const int tab = item.indexOf(QChar('\t'));
+
+				if (tab >= 0)
+					rules.append({item.left(tab), item.mid(tab + 1)});
+			}
+
+			compiler->setViolationRules(rules);
+		} else {
+			compiler->setViolationRules(Violation::defaultRulesFor(compiler->getCompilerName(),
+			                                                      compiler->getSourceExtensions()));
+		}
+
 		addCompiler(compiler);
 	}
 
@@ -718,4 +747,80 @@ void Settings::ensureDistDirs() {
 		if (entries > 0)
 			LOG("Removed the legacy", legacy + QDir::separator(), "folder with", entries, "entries");
 	}
+}
+
+void Settings::ensureDayFolderOrdering(const QString &dayRoot) {
+#ifdef Q_OS_WIN32
+	// Windows 资源管理器只按文件名排序，没有「自定义顺序」这种东西。唯一不动真实路径的
+	// 办法是 desktop.ini 的 [LocalizedFileNames]：只改「显示名」，而排序跟显示名走。
+	// 显示名前面加上不可见的零宽空格（U+200B），个数决定先后——用户看到的名字仍然是
+	// problem / import / ...，排序却按我们给的顺序来。
+	const QStringList order = {QStringLiteral("problem"),  QStringLiteral("import"),
+	                           QStringLiteral("answers"),  QStringLiteral("statement"),
+	                           QStringLiteral("admission"), QStringLiteral("dist")};
+	const QDir root(dayRoot.isEmpty() ? QDir::currentPath() : dayRoot);
+
+	if (! root.exists())
+		return;
+
+	const QString iniPath = root.absoluteFilePath(QStringLiteral("desktop.ini"));
+	// 已经有用户自己的 desktop.ini（不是我们写的）就完全不碰，免得覆盖他的设置。
+	if (QFileInfo::exists(iniPath)) {
+		QFile existing(iniPath);
+
+		if (existing.open(QIODevice::ReadOnly) && ! existing.readAll().contains("LemonLime folder order"))
+			return;
+	}
+
+	QString text = QStringLiteral("; LemonLime folder order\r\n"
+	                              "[.ShellClassInfo]\r\n"
+	                              "ConfirmFileOp=0\r\n"
+	                              "[LocalizedFileNames]\r\n");
+
+	for (int i = 0; i < order.size(); i++) {
+		if (! root.exists(order.at(i)))
+			continue;
+
+		// 资源管理器的排序把「零宽空格更多」的排在前面，所以前缀要倒着给：
+		// problem 拿最多、dist 拿最少，排出来才是 problem → import → … → dist。
+		const QString prefix(order.size() - i, QChar(0x200B));
+		text += order.at(i) + QChar('=') + prefix + order.at(i) + QStringLiteral("\r\n");
+	}
+
+	// desktop.ini 必须用带 BOM 的 UTF-16LE（GetPrivateProfileString 才认得出非 ANSI 字符）。
+	QByteArray data;
+	data.append(char(0xFF));
+	data.append(char(0xFE));
+
+	for (const QChar ch : text) {
+		data.append(char(ch.unicode() & 0xFF));
+		data.append(char((ch.unicode() >> 8) & 0xFF));
+	}
+
+	if (QFile file(iniPath); file.open(QIODevice::ReadOnly) && file.readAll() == data)
+		return; // 内容没变就别动它（免得每次打开比赛日都刷新时间戳）
+
+	{
+		QFile file(iniPath);
+
+		if (! file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+			return;
+
+		file.write(data);
+	}
+
+	// 隐藏 + 系统：资源管理器默认不显示，看起来就像目录里本来就没有这个文件。
+	const std::wstring native = QDir::toNativeSeparators(iniPath).toStdWString();
+	SetFileAttributesW(native.c_str(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
+
+	// 光有 desktop.ini 还不够：资源管理器只认带 ReadOnly 标记的目录里的 desktop.ini。
+	// 目录的 ReadOnly 只是个标记（不影响在里面写文件），改的是我们自己的比赛日目录。
+	const std::wstring rootNative = QDir::toNativeSeparators(root.absolutePath()).toStdWString();
+	const DWORD attributes = GetFileAttributesW(rootNative.c_str());
+
+	if (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_READONLY) == 0)
+		SetFileAttributesW(rootNative.c_str(), attributes | FILE_ATTRIBUTE_READONLY);
+#else
+	Q_UNUSED(dayRoot);
+#endif
 }

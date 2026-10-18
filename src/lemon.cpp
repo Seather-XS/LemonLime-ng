@@ -105,6 +105,7 @@ LemonLime::LemonLime(QWidget *parent) : QMainWindow(parent), ui(new Ui::LemonLim
 	connect(ui->openFolderAction, &QAction::triggered, this, &LemonLime::openFolderAction);
 	connect(ui->closeAction, &QAction::triggered, this, &LemonLime::closeAction);
 	connect(ui->addTasksAction, &QAction::triggered, this, &LemonLime::addTasksAction);
+	connect(ui->addProblemTasksAction, &QAction::triggered, this, &LemonLime::addProblemTasksAction);
 	connect(ui->exportAction, &QAction::triggered, this, &LemonLime::exportResult);
 	connect(ui->actionExportStatistics, &QAction::triggered, this, &LemonLime::exportStatistics);
 	connect(ui->aboutAction, &QAction::triggered, this, &LemonLime::aboutLemon);
@@ -300,6 +301,7 @@ void LemonLime::showContestSettingsDialog() {
 		return;
 
 	auto *dialog = new ContestSettingsDialog(this);
+	dialog->setSettings(settings);
 	dialog->resetEditContest(curContest);
 
 	if (dialog->exec() == QDialog::Accepted) {
@@ -755,6 +757,7 @@ void LemonLime::loadContest(const QString &filePath) {
 	// 单个 .cdf / .conf 当作「只有一个比赛日」的工程载入，保持向后兼容。
 	curProject = DayProject();
 	projectFile.clear();
+	projectFileNewlyCreated = false;
 	curDayIndex = 0;
 	loadDay(QFileInfo(filePath).absoluteFilePath());
 }
@@ -779,6 +782,7 @@ void LemonLime::loadProject(const QString &path) {
 
 	curProject = DayProject::fromJson(obj);
 	projectFile = QFileInfo(path).absoluteFilePath();
+	projectFileNewlyCreated = false;
 	curDayIndex = -1;
 
 	// 与 gengen-tuack 一致：打开比赛后弹窗选择 / 新建比赛日。
@@ -981,6 +985,9 @@ void LemonLime::loadDay(const QString &filePath) {
 	// 导出物统一放 dist/ 下（dist/reports 成绩单与统计、dist/export 压缩包）；
 	// 顺便清掉老工程根目录里残留的 reports/、export/。
 	Settings::ensureDistDirs();
+	// 让资源管理器按 problem / import / answers / statement / admission / dist 显示这些目录
+	// （隐藏的 desktop.ini，只改显示名，真实路径不变）。
+	Settings::ensureDayFolderOrdering(QDir::currentPath());
 
 	// 补齐每个试题的标准子目录（data / down / graders / gen），顺便清掉老的 tests/
 	for (auto *task : curContest->getTaskList()) {
@@ -1006,6 +1013,7 @@ void LemonLime::loadDay(const QString &filePath) {
 	ui->openFolderAction->setEnabled(true);
 	ui->saveAction->setEnabled(true);
 	ui->addTasksAction->setEnabled(true);
+	ui->addProblemTasksAction->setEnabled(true);
 	ui->exportAction->setEnabled(true);
 	ui->actionExportStatistics->setEnabled(true);
 	ui->actionChangeContestName->setEnabled(true);
@@ -1018,9 +1026,10 @@ void LemonLime::loadDay(const QString &filePath) {
 	refreshDayMenu();
 
 	if (projectFile.isEmpty())
-		setWindowTitle(tr("LemonLime - %1").arg(curContest->getContestTitle()));
+		setWindowTitle(tr("LemonLime-ng - %1").arg(curContest->getContestTitle()));
 	else
-		setWindowTitle(tr("LemonLime - %1 / %2").arg(curProject.title, curContest->getContestTitle()));
+		setWindowTitle(
+		    tr("LemonLime-ng - %1 / %2").arg(curProject.title, curContest->getContestTitle()));
 
 	ui->tabWidget->setCurrentIndex(0);
 	// 题面：加载当前比赛日的 statement/statement.md，并把占位符要用的上下文交给它
@@ -1060,6 +1069,7 @@ void LemonLime::newContest(const QString &title, const QString &savingName, cons
 	curProject = DayProject();
 	curProject.title = title;
 	projectFile = QDir(path).absoluteFilePath(QStringLiteral("contest.conf"));
+	projectFileNewlyCreated = true;
 	curDayIndex = -1;
 	saveProjectFile();
 
@@ -1104,6 +1114,7 @@ void LemonLime::closeAction() {
 	ui->openFolderAction->setEnabled(false);
 	ui->saveAction->setEnabled(false);
 	ui->addTasksAction->setEnabled(false);
+	ui->addProblemTasksAction->setEnabled(false);
 	ui->exportAction->setEnabled(false);
 	ui->actionExportStatistics->setEnabled(false);
 	ui->actionChangeContestName->setEnabled(false);
@@ -1114,7 +1125,7 @@ void LemonLime::closeAction() {
 	ui->menuDays->setEnabled(false);
 	ui->cleanupAction->setEnabled(false);
 	ui->refreshAction->setEnabled(false);
-	setWindowTitle(tr("LemonLime"));
+	setWindowTitle(tr("LemonLime-ng"));
 }
 
 void LemonLime::saveAction() { saveContest(curFile); }
@@ -1392,6 +1403,178 @@ void LemonLime::addTasksAction() {
 	ui->summary->setContest(curContest);
 }
 
+// problem/ 已经是 gengen 布局，题目和数据都不需要再搬：直接登记还没配置的试题与测试点。
+void LemonLime::addProblemTasksAction() {
+	if (! curContest)
+		return;
+
+	// 扩展名沿用设置里的配置；没配就用 Lemon 的默认值。
+	QStringList inputFilters = settings->getInputFileExtensions();
+
+	if (inputFilters.isEmpty())
+		inputFilters << QStringLiteral("in");
+
+	QStringList outputFilters = settings->getOutputFileExtensions();
+
+	if (outputFilters.isEmpty())
+		outputFilters << QStringLiteral("out") << QStringLiteral("ans");
+
+	for (QString &filter : inputFilters)
+		filter.prepend(QStringLiteral("*."));
+
+	for (QString &filter : outputFilters)
+		filter.prepend(QStringLiteral("*."));
+
+	QMap<QString, Task *> tasksByDir;
+
+	for (auto *task : curContest->getTaskList())
+		tasksByDir.insert(task->getDirectoryName().toLower(), task);
+
+	QStringList addedTasks;
+	QMap<QString, int> addedCases;
+	const QStringList taskDirs =
+	    QDir(Settings::dataPath()).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+
+	for (const QString &taskName : taskDirs) {
+		const QString dataDir =
+		    Settings::dataPath() + taskName + QDir::separator() + QStringLiteral("data");
+
+		if (! QDir(dataDir).exists())
+			continue;
+
+		// getFiles() 只列 QDir::Files，data/ 下的子目录不会被读进来。
+		QMap<QString, QString> inputFiles;
+		QMap<QString, QString> outputFiles;
+		getFiles(dataDir, inputFilters, inputFiles);
+		getFiles(dataDir, outputFilters, outputFiles);
+
+		QList<std::pair<QString, QString>> cases;
+
+		for (const QString &baseName : inputFiles.keys())
+			if (outputFiles.contains(baseName))
+				cases.append(std::make_pair(inputFiles.value(baseName), outputFiles.value(baseName)));
+
+		std::sort(cases.begin(), cases.end(), compareFileName);
+
+		if (cases.isEmpty())
+			continue;
+
+		Task *task = tasksByDir.value(taskName.toLower(), nullptr);
+
+		if (! task) {
+			// 新题：目录名就是文件名，题目标题也先按目录名填，后面能在「试题」里改。
+			task = new Task;
+			task->setProblemTitle(taskName);
+			task->setSourceFileName(taskName);
+			task->setInputFileName(taskName + QStringLiteral(".in"));
+			task->setOutputFileName(taskName + QStringLiteral(".out"));
+			task->setAnswerFileExtension(settings->getDefaultOutputFileExtension());
+			task->setDefaultTimeLimit(settings->getDefaultTimeLimit());
+			task->setDefaultMemoryLimit(settings->getDefaultMemoryLimit());
+			task->refreshCompilerConfiguration(settings);
+			curContest->addTask(task);
+			Settings::ensureTaskDirs(taskName);
+			tasksByDir.insert(taskName.toLower(), task);
+			addedTasks.append(taskName);
+
+			// graders/<题>.h + <题>_grader.cpp 是交互题的固定命名，存在就顺手配置上。
+			const QString interactor = Settings::graderFilePath(taskName, taskName + QStringLiteral(".h"));
+			const QString grader =
+			    Settings::graderFilePath(taskName, taskName + QStringLiteral("_grader.cpp"));
+
+			if (QFileInfo::exists(Settings::dataPath() + interactor) &&
+			    QFileInfo::exists(Settings::dataPath() + grader)) {
+				task->setTaskType(Task::Interaction);
+				task->setInteractor(interactor);
+				task->setInteractorName(taskName + QStringLiteral(".h"));
+				task->setGrader(grader);
+			}
+
+			// 与 import/ 的导入保持一致：总分 100 均摊到各测试点（超过 100 个点时 1 分一个）。
+			const int sumScore = qMax(100, cases.size());
+			const int scorePer = sumScore / cases.size();
+			const int scoreLos = sumScore - scorePer * cases.size();
+
+			for (int i = 0; i < cases.size(); i++) {
+				auto *testCase = new TestCase;
+				testCase->setFullScore(scorePer + (i < scoreLos ? 1 : 0));
+				testCase->setTimeLimit(settings->getDefaultTimeLimit());
+				testCase->setMemoryLimit(settings->getDefaultMemoryLimit());
+				testCase->addSingleCase(taskName + QDir::separator() + QStringLiteral("data") +
+				                            QDir::separator() + cases[i].first,
+				                        taskName + QDir::separator() + QStringLiteral("data") +
+				                            QDir::separator() + cases[i].second);
+				task->addTestCase(testCase);
+			}
+
+			continue;
+		}
+
+		// 已有试题：记下配过的输入文件，只补 data/ 里新出现的那些。
+		QSet<QString> configured;
+
+		for (auto *testCase : task->getTestCaseList())
+			for (const QString &input : testCase->getInputFiles())
+				configured.insert(QDir::cleanPath(QDir::fromNativeSeparators(input)));
+
+		// 新测试点沿用最后一个测试点的分数与限制，保证同一道题内规格一致。
+		int score = settings->getDefaultFullScore();
+		int timeLimit = task->getDefaultTimeLimit() > 0 ? task->getDefaultTimeLimit()
+		                                                : settings->getDefaultTimeLimit();
+		int memoryLimit = task->getDefaultMemoryLimit() > 0 ? task->getDefaultMemoryLimit()
+		                                                   : settings->getDefaultMemoryLimit();
+
+		if (! task->getTestCaseList().isEmpty()) {
+			const TestCase *last = task->getTestCaseList().last();
+			score = last->getFullScore();
+			timeLimit = last->getTimeLimit();
+			memoryLimit = last->getMemoryLimit();
+		}
+
+		int added = 0;
+
+		for (const auto &item : cases) {
+			const QString input = taskName + QDir::separator() + QStringLiteral("data") +
+			                      QDir::separator() + item.first;
+			const QString output = taskName + QDir::separator() + QStringLiteral("data") +
+			                       QDir::separator() + item.second;
+
+			if (configured.contains(QDir::cleanPath(QDir::fromNativeSeparators(input))))
+				continue;
+
+			auto *testCase = new TestCase;
+			testCase->setFullScore(score);
+			testCase->setTimeLimit(timeLimit);
+			testCase->setMemoryLimit(memoryLimit);
+			testCase->addSingleCase(input, output);
+			task->addTestCase(testCase);
+			configured.insert(QDir::cleanPath(QDir::fromNativeSeparators(input)));
+			added++;
+		}
+
+		if (added > 0)
+			addedCases.insert(taskName, added);
+	}
+
+	ui->summary->setContest(curContest);
+
+	if (addedTasks.isEmpty() && addedCases.isEmpty()) {
+		QMessageBox::information(this, tr("Configure Tasks from problem/"),
+		                         tr("No task or data file needs to be added."));
+		return;
+	}
+
+	QStringList lines;
+
+	if (! addedTasks.isEmpty())
+		lines.append(tr("Added tasks: %1").arg(addedTasks.join(QStringLiteral(", "))));
+
+	for (auto it = addedCases.constBegin(); it != addedCases.constEnd(); ++it)
+		lines.append(tr("Added %1 test case(s) to %2").arg(it.value()).arg(it.key()));
+
+	QMessageBox::information(this, tr("Configure Tasks from problem/"), lines.join(QChar('\n')));
+}
+
 void LemonLime::exportResult() { ExportUtil::exportResult(this, curContest); }
 
 void LemonLime::exportStatistics() { StatisticsBrowser::exportStatistics(this, curContest); }
@@ -1421,9 +1604,10 @@ void LemonLime::changeContestName() {
 	}
 
 	if (projectFile.isEmpty())
-		setWindowTitle(tr("LemonLime - %1").arg(curContest->getContestTitle()));
+		setWindowTitle(tr("LemonLime-ng - %1").arg(curContest->getContestTitle()));
 	else
-		setWindowTitle(tr("LemonLime - %1 / %2").arg(curProject.title, curContest->getContestTitle()));
+		setWindowTitle(
+		    tr("LemonLime-ng - %1 / %2").arg(curProject.title, curContest->getContestTitle()));
 
 	ui->resultViewer->refreshViewer();
 	ui->statisticsBrowser->refresh();
@@ -1435,7 +1619,8 @@ void LemonLime::saveProjectFile() {
 		return;
 
 	// 覆盖前留一份上一次的内容：误写 / 写坏时还能救回来。
-	if (QFile::exists(projectFile)) {
+	// 新建比赛时不留：那时文件里只有刚写进去的内容，留 .bak 只会在比赛目录里多一个垃圾文件。
+	if (! projectFileNewlyCreated && QFile::exists(projectFile)) {
 		const QString backup = projectFile + QStringLiteral(".bak");
 		QFile::remove(backup);
 		QFile::copy(projectFile, backup);
@@ -1661,7 +1846,8 @@ void LemonLime::renameProject() {
 	saveProjectFile();
 
 	if (curContest)
-		setWindowTitle(tr("LemonLime - %1 / %2").arg(curProject.title, curContest->getContestTitle()));
+		setWindowTitle(
+		    tr("LemonLime-ng - %1 / %2").arg(curProject.title, curContest->getContestTitle()));
 
 	refreshDayMenu();
 }
@@ -1672,7 +1858,7 @@ void LemonLime::renameProjectAction() { renameProject(); }
 
 void LemonLime::aboutLemon() {
 	QString text;
-	text += "<h2>Project LemonLime</h2>";
+	text += "<h2>Project LemonLime-ng</h2>";
 	text +=
 	    "<h3>" +
 	    tr("Version: %1").arg(QString(LEMON_VERSION_STRING) + QString(":") + QString(LEMON_VERSION_BUILD)) +
@@ -1687,7 +1873,7 @@ void LemonLime::aboutLemon() {
 	text += tr("This program is under the <a href=\"http://www.gnu.org/licenses/gpl-3.0.html\">GPLv3</a> "
 	           "license") +
 	        "<br>";
-	QMessageBox::about(this, tr("About LemonLime"), text);
+	QMessageBox::about(this, tr("About LemonLime-ng"), text);
 }
 
 void LemonLime::actionManual() {

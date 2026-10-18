@@ -7,22 +7,19 @@
 
 #include "contestsettingsdialog.h"
 
+#include "base/compiler.h"
+#include "base/settings.h"
 #include "core/contest.h"
 #include "core/contestant.h"
 #include "core/naming.h"
-#include "core/violation.h"
 
 #include <QCheckBox>
-#include <QComboBox>
 #include <QDialogButtonBox>
 #include <QGroupBox>
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include <QPushButton>
-#include <QTableWidget>
+#include <QListWidget>
 #include <QVBoxLayout>
-#include <QHeaderView>
 
 ContestSettingsDialog::ContestSettingsDialog(QWidget *parent) : QDialog(parent) {
 	setWindowTitle(tr("Contest Day Settings"));
@@ -38,27 +35,17 @@ ContestSettingsDialog::ContestSettingsDialog(QWidget *parent) : QDialog(parent) 
 	regionLayout->addWidget(regionCheck);
 	mainLayout->addWidget(regionGroup);
 
-	// —— 违规检测 ——
+	// —— 违规检测：规则跟着编译器（语言）走，这里只勾选用哪些语言 ——
 	auto *violationGroup = new QGroupBox(tr("Violation checking"), this);
 	auto *violationLayout = new QVBoxLayout(violationGroup);
 	violationCheck = new QCheckBox(tr("Enable violation checking"), violationGroup);
 	violationLayout->addWidget(violationCheck);
-
-	rulesTable = new QTableWidget(0, 2, violationGroup);
-	rulesTable->setHorizontalHeaderLabels({tr("Type"), tr("Content")});
-	rulesTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-	rulesTable->verticalHeader()->setVisible(false);
-	violationLayout->addWidget(rulesTable);
-
-	auto *buttonLayout = new QHBoxLayout();
-	auto *addButton = new QPushButton(tr("Add"), violationGroup);
-	auto *removeButton = new QPushButton(tr("Remove"), violationGroup);
-	auto *restoreButton = new QPushButton(tr("Restore Defaults"), violationGroup);
-	buttonLayout->addWidget(addButton);
-	buttonLayout->addWidget(removeButton);
-	buttonLayout->addWidget(restoreButton);
-	buttonLayout->addStretch();
-	violationLayout->addLayout(buttonLayout);
+	violationHint = new QLabel(tr("Rules are configured per compiler in Options → Compiler → Advanced."),
+	                           violationGroup);
+	violationHint->setWordWrap(true);
+	violationLayout->addWidget(violationHint);
+	compilerList = new QListWidget(violationGroup);
+	violationLayout->addWidget(compilerList, 1);
 	mainLayout->addWidget(violationGroup, 1);
 
 	// —— 选手文件夹命名限制 ——
@@ -78,12 +65,12 @@ ContestSettingsDialog::ContestSettingsDialog(QWidget *parent) : QDialog(parent) 
 
 	connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
 	connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
-	connect(addButton, &QPushButton::clicked, this, &ContestSettingsDialog::addRule);
-	connect(removeButton, &QPushButton::clicked, this, &ContestSettingsDialog::removeRule);
-	connect(restoreButton, &QPushButton::clicked, this, &ContestSettingsDialog::restoreDefaults);
+	connect(violationCheck, &QCheckBox::toggled, this, &ContestSettingsDialog::updateViolationState);
 	connect(namingPatternEdit, &QLineEdit::textChanged, this, &ContestSettingsDialog::updateNamingHint);
 	connect(namingCheck, &QCheckBox::toggled, this, &ContestSettingsDialog::updateNamingHint);
 }
+
+void ContestSettingsDialog::setSettings(Settings *_settings) { settings = _settings; }
 
 void ContestSettingsDialog::resetEditContest(Contest *contest) {
 	if (! contest)
@@ -103,19 +90,22 @@ void ContestSettingsDialog::resetEditContest(Contest *contest) {
 	namingCheck->setChecked(contest->getNamingCheck());
 	namingPatternEdit->setText(contest->getNamingPattern());
 
-	rulesTable->setRowCount(0);
+	compilerList->clear();
 
-	for (const ViolationRule &rule : contest->getViolationRules()) {
-		const int row = rulesTable->rowCount();
-		rulesTable->insertRow(row);
-		auto *combo = new QComboBox(rulesTable);
-		combo->addItem(tr("Command"), Violation::kindCommand());
-		combo->addItem(tr("String"), Violation::kindString());
-		combo->setCurrentIndex(rule.isCommand() ? 0 : 1);
-		rulesTable->setCellWidget(row, 0, combo);
-		rulesTable->setItem(row, 1, new QTableWidgetItem(rule.text));
+	if (settings) {
+		for (auto *compiler : settings->getCompilerList()) {
+			const QString name = compiler->getCompilerName();
+			const int rules = compiler->getViolationRules().size();
+			auto *item = new QListWidgetItem(
+			    rules > 0 ? tr("%1 (%2 rules)").arg(name).arg(rules) : tr("%1 (no rules)").arg(name),
+			    compilerList);
+			item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+			item->setCheckState(contest->isViolationCompilerSelected(name) ? Qt::Checked : Qt::Unchecked);
+			item->setData(Qt::UserRole, name);
+		}
 	}
 
+	updateViolationState();
 	updateNamingHint();
 }
 
@@ -126,54 +116,24 @@ void ContestSettingsDialog::applyTo(Contest *contest) const {
 	contest->setRegionEnabled(regionCheck->isChecked());
 	contest->setViolationCheck(violationCheck->isChecked());
 
-	QVector<ViolationRule> rules;
+	QStringList compilers;
 
-	for (int row = 0; row < rulesTable->rowCount(); row++) {
-		auto *combo = qobject_cast<QComboBox *>(rulesTable->cellWidget(row, 0));
-		const QString kind = combo ? combo->currentData().toString() : Violation::kindCommand();
-		const QTableWidgetItem *item = rulesTable->item(row, 1);
-		const QString text = item ? item->text().trimmed() : QString();
+	for (int row = 0; row < compilerList->count(); row++) {
+		const QListWidgetItem *item = compilerList->item(row);
 
-		if (! text.isEmpty())
-			rules.append({kind, text});
+		if (item->checkState() == Qt::Checked)
+			compilers.append(item->data(Qt::UserRole).toString());
 	}
 
-	contest->setViolationRules(rules);
+	contest->setViolationCompilers(compilers);
 	contest->setNamingCheck(namingCheck->isChecked());
 	contest->setNamingPattern(namingPatternEdit->text());
 }
 
-void ContestSettingsDialog::addRule() {
-	const int row = rulesTable->rowCount();
-	rulesTable->insertRow(row);
-	auto *combo = new QComboBox(rulesTable);
-	combo->addItem(tr("Command"), Violation::kindCommand());
-	combo->addItem(tr("String"), Violation::kindString());
-	rulesTable->setCellWidget(row, 0, combo);
-	rulesTable->setItem(row, 1, new QTableWidgetItem(QString()));
-	rulesTable->editItem(rulesTable->item(row, 1));
-}
-
-void ContestSettingsDialog::removeRule() {
-	const int row = rulesTable->currentRow();
-
-	if (row >= 0)
-		rulesTable->removeRow(row);
-}
-
-void ContestSettingsDialog::restoreDefaults() {
-	rulesTable->setRowCount(0);
-
-	for (const ViolationRule &rule : Violation::defaultRules()) {
-		const int row = rulesTable->rowCount();
-		rulesTable->insertRow(row);
-		auto *combo = new QComboBox(rulesTable);
-		combo->addItem(tr("Command"), Violation::kindCommand());
-		combo->addItem(tr("String"), Violation::kindString());
-		combo->setCurrentIndex(rule.isCommand() ? 0 : 1);
-		rulesTable->setCellWidget(row, 0, combo);
-		rulesTable->setItem(row, 1, new QTableWidgetItem(rule.text));
-	}
+void ContestSettingsDialog::updateViolationState() {
+	const bool enabled = violationCheck->isChecked();
+	compilerList->setEnabled(enabled);
+	violationHint->setEnabled(enabled);
 }
 
 void ContestSettingsDialog::updateNamingHint() {

@@ -37,6 +37,7 @@
         <file alias="go-parent-folder.svg">assets/pics/go-parent-folder.svg</file>
         <file alias="help-about.svg">assets/pics/help-about.svg</file>
         <file alias="layer-new.svg">assets/pics/layer-new.svg</file>
+        <file alias="problem-configure.svg">assets/pics/problem-configure.svg</file>
         <file alias="paint-unknown.svg">assets/pics/paint-unknown.svg</file>
         <file alias="quickopen-file.svg">assets/pics/quickopen-file.svg</file>
         <file alias="system-help.svg">assets/pics/system-help.svg</file>

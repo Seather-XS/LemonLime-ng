@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>LemonLime</string>
+   <string>LemonLime-ng</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -557,6 +557,7 @@
     <addaction name="refreshAction"/>
     <addaction name="separator"/>
     <addaction name="addTasksAction"/>
+    <addaction name="addProblemTasksAction"/>
     <addaction name="exportAction"/>
     <addaction name="separator"/>
     <addaction name="actionExportStatistics"/>
@@ -641,7 +642,7 @@
     <string>E&amp;xit</string>
    </property>
    <property name="statusTip">
-    <string>Exit LemonLime...</string>
+    <string>Exit LemonLime-ng...</string>
    </property>
   </action>
   <action name="optionsAction">
@@ -653,7 +654,7 @@
     <string>&amp;Settings</string>
    </property>
    <property name="statusTip">
-    <string>LemonLime Settings...</string>
+    <string>LemonLime-ng Settings...</string>
    </property>
   </action>
   <action name="aboutAction">
@@ -665,7 +666,7 @@
     <string>&amp;About</string>
    </property>
    <property name="statusTip">
-    <string>About LemonLime...</string>
+    <string>About LemonLime-ng...</string>
    </property>
   </action>
   <action name="judgeAction">
@@ -728,6 +729,21 @@
    </property>
    <property name="statusTip">
     <string>Read the import folder (Lemon data layout) and add tasks automatically...</string>
+   </property>
+  </action>
+  <action name="addProblemTasksAction">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../resource.qrc">
+     <normaloff>:/icon/problem-configure.svg</normaloff>:/icon/problem-configure.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Add Tasks from &amp;problem/</string>
+   </property>
+   <property name="statusTip">
+    <string>Scan problem/ and configure the tasks and data files that are not added yet...</string>
    </property>
   </action>
   <action name="makeSelfTestAction">

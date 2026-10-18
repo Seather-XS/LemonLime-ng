@@ -11,10 +11,49 @@
 #include "ui_advancedcompilersettingsdialog.h"
 //
 #include "base/compiler.h"
+#include "base/violation.h"
 #include "environmentvariablesdialog.h"
 //
+#include <QComboBox>
 #include <QFileDialog>
+#include <QHeaderView>
 #include <QMessageBox>
+#include <QTableWidget>
+
+namespace {
+	void fillViolationTable(QTableWidget *table, const QVector<ViolationRule> &rules) {
+		table->setRowCount(0);
+
+		for (const ViolationRule &rule : rules) {
+			const int row = table->rowCount();
+			table->insertRow(row);
+			auto *combo = new QComboBox(table);
+			combo->addItem(QCoreApplication::translate("AdvancedCompilerSettingsDialog", "Command"),
+			               Violation::kindCommand());
+			combo->addItem(QCoreApplication::translate("AdvancedCompilerSettingsDialog", "String"),
+			               Violation::kindString());
+			combo->setCurrentIndex(rule.isCommand() ? 0 : 1);
+			table->setCellWidget(row, 0, combo);
+			table->setItem(row, 1, new QTableWidgetItem(rule.text));
+		}
+	}
+
+	QVector<ViolationRule> rulesFromTable(const QTableWidget *table) {
+		QVector<ViolationRule> rules;
+
+		for (int row = 0; row < table->rowCount(); row++) {
+			const auto *combo = qobject_cast<const QComboBox *>(table->cellWidget(row, 0));
+			const QString kind = combo ? combo->currentData().toString() : Violation::kindCommand();
+			const QTableWidgetItem *item = table->item(row, 1);
+			const QString text = item ? item->text().trimmed() : QString();
+
+			if (! text.isEmpty())
+				rules.append({kind, text});
+		}
+
+		return Violation::normalizeRules(rules);
+	}
+} // namespace
 
 AdvancedCompilerSettingsDialog::AdvancedCompilerSettingsDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::AdvancedCompilerSettingsDialog) {
@@ -23,6 +62,9 @@ AdvancedCompilerSettingsDialog::AdvancedCompilerSettingsDialog(QWidget *parent)
 	ui->bytecodeExtension->setValidator(
 	    new QRegularExpressionValidator(QRegularExpression("(\\w+;)*\\w+"), this));
 	ui->configurationSelect->setLineEdit(new QLineEdit(this));
+	ui->violationTable->setColumnCount(2);
+	ui->violationTable->setHorizontalHeaderLabels({tr("Type"), tr("Content")});
+	ui->violationTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 	connect(ui->buttonBox->button(QDialogButtonBox::Ok), &QPushButton::clicked, this,
 	        &AdvancedCompilerSettingsDialog::okayButtonClicked);
 	connect(ui->typeSelect, qOverload<int>(&QComboBox::currentIndexChanged), this,
@@ -57,6 +99,12 @@ AdvancedCompilerSettingsDialog::AdvancedCompilerSettingsDialog(QWidget *parent)
 	        &AdvancedCompilerSettingsDialog::interpreterArgumentsChanged);
 	connect(ui->environmentVariablesButton, &QPushButton::clicked, this,
 	        &AdvancedCompilerSettingsDialog::environmentVariablesButtonClicked);
+	connect(ui->addViolationRuleButton, &QPushButton::clicked, this,
+	        &AdvancedCompilerSettingsDialog::addViolationRule);
+	connect(ui->removeViolationRuleButton, &QPushButton::clicked, this,
+	        &AdvancedCompilerSettingsDialog::removeViolationRule);
+	connect(ui->defaultViolationRulesButton, &QPushButton::clicked, this,
+	        &AdvancedCompilerSettingsDialog::restoreDefaultViolationRules);
 }
 
 AdvancedCompilerSettingsDialog::~AdvancedCompilerSettingsDialog() { delete ui; }
@@ -85,6 +133,17 @@ void AdvancedCompilerSettingsDialog::resetEditCompiler(Compiler *compiler) {
 	ui->configurationSelect->setEnabled(true);
 	ui->configurationSelect->setCurrentIndex(0);
 	configurationIndexChanged();
+	fillViolationTable(ui->violationTable, editCompiler->getViolationRules());
+
+	// 提示里写清这个编译器属于哪门语言：默认清单就是从这门语言的命令表里读的。
+	const QString language =
+	    Violation::languageNameFor(editCompiler->getCompilerName(), editCompiler->getSourceExtensions());
+	ui->violationHint->setText(
+	    language.isEmpty()
+	        ? tr("These rules belong to this compiler; the contest day decides whether they are applied.")
+	        : tr("Language: %1. These rules belong to this compiler; the contest day decides whether they "
+	             "are applied.")
+	              .arg(language));
 }
 
 auto AdvancedCompilerSettingsDialog::getEditCompiler() const -> Compiler * { return editCompiler; }
@@ -136,6 +195,7 @@ void AdvancedCompilerSettingsDialog::okayButtonClicked() {
 		}
 	}
 
+	editCompiler->setViolationRules(rulesFromTable(ui->violationTable));
 	accept();
 }
 
@@ -322,4 +382,29 @@ void AdvancedCompilerSettingsDialog::environmentVariablesButtonClicked() {
 	}
 
 	delete dialog;
+}
+
+void AdvancedCompilerSettingsDialog::addViolationRule() {
+	const int row = ui->violationTable->rowCount();
+	ui->violationTable->insertRow(row);
+	auto *combo = new QComboBox(ui->violationTable);
+	combo->addItem(tr("Command"), Violation::kindCommand());
+	combo->addItem(tr("String"), Violation::kindString());
+	ui->violationTable->setCellWidget(row, 0, combo);
+	ui->violationTable->setItem(row, 1, new QTableWidgetItem(QString()));
+	ui->violationTable->editItem(ui->violationTable->item(row, 1));
+}
+
+void AdvancedCompilerSettingsDialog::removeViolationRule() {
+	const int row = ui->violationTable->currentRow();
+
+	if (row >= 0)
+		ui->violationTable->removeRow(row);
+}
+
+void AdvancedCompilerSettingsDialog::restoreDefaultViolationRules() {
+	// 默认清单从编译器所属语言的命令表里读取（gcc/g++ 用 C/C++，fpc 用 Pascal，……）。
+	fillViolationTable(ui->violationTable,
+	                   Violation::defaultRulesFor(editCompiler->getCompilerName(),
+	                                              editCompiler->getSourceExtensions()));
 }

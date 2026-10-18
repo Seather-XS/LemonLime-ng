@@ -12,9 +12,11 @@
 评测本身与上游一致，这个分支主要在比赛的组织方式上做了补齐：
 
 -   **比赛日布局**：试题数据放在 `problem/<题>/{data,down,graders,gen}`，选手代码放在 `answers/<赛区>/<选手>/`；打开旧布局的比赛日时会自动迁移。
+-   **目录显示顺序**：打开比赛日时会在目录里写一个隐藏的 `desktop.ini`（并给该目录加上 ReadOnly 标记），让资源管理器按 `problem` → `import` → `answers` → `statement` → `admission` → `dist` 排列。它只改「显示名」（前缀是不可见的零宽空格），真实路径一个字符都不变；换机器、换系统或删掉 `desktop.ini` 时只是回到原来的字母序。
+-   **从 problem/ 配置试题**：把数据按 `problem/<题>/data/` 放好后，用「从 problem 自动配置试题」一键登记还没加入的试题与测试点（只看 `data/` 这一层，不读子目录；`graders/<题>.h` + `<题>_grader.cpp` 会自动识别成交互题）。
 -   **赛区**：可以按赛区组织选手，成绩表、统计和导出都会带上赛区，也能按赛区拆开。
 -   **题面**：内置题面编辑器，写 Markdown，用 pandoc + LaTeX 编译成 PDF，自带 ccpc / noi / noi new 模板，右侧即时预览；导出的 PDF 名字可以自己写模板。
--   **导出**：新增「导出」选项卡，把比赛日一键打成 zip —— 选手目录、测试数据、选手代码三类包；选手目录里可以自选 `statement/` 下的题面文件，还能额外套一层目录、压缩包内再套压缩包、密码加密。
+-   **导出**：新增「导出」选项卡，把比赛日一键打成 zip —— 选手目录、测试数据、选手代码三类包；选手目录里可以勾选 `statement/` 下的题面文件（0 个到任意多个），还能额外套一层目录、压缩包内再套压缩包、密码加密（默认 WinZip AES-256 / AE-2，也可选老式 ZipCrypto 兼容模式）。
 -   **准考证**：新增「准考证」选项卡，按赛区把名单编译成准考证 PDF（每人一份，不是一份大 PDF）。数据全在 `<比赛日>/admission/` 下：`config.json`（标题、测试时间与生成策略，含准考证号规则 `idRule` 与输出文件名规则 `generatePolicy.naming`）、`contest-notes.md`（比赛注意）；赛区是 `regions/<赛区>/`，里面有 `notes.md`（注意事项）、`contestants.csv`（名单）、`columns.json`（列生成规则）、`rooms.json`（考点 / 考场与容量）——未启用赛区时 `regions/` 自己就是唯一一组。**名单里的考点、考场、座位号、照片是选手级列**，赛区则存一份考点 / 考场方案；锁定行之外的自定义列会自动印成额外行。名单用内置表格改（`Ctrl+Z` / `Ctrl+Y` 撤销重做、拖选区右下角的填充柄、右键增行增列 / 删选定行列、整列填固定值 / 序列 / 行号、批量排座位、一键生成准考证号（生成前先让你定策略，见下）、列统计；读 `contestants.csv` 时自动识别 UTF-8 与 GBK/GB18030）；标题与两段通告都有专门的编辑框（通告是纯文本，只认 `[文字](链接)` 超链接）；自定义列可以按占位符模板生成（`<section> <number> <char> <row> <col> <name> <id> <seat> <room>` 以及其它列名），也可以是随机串（长度、字符集、排除易混字符，可选用行号 / 准考证号 / 姓名做种子做「重算也不变」）。版式是**程序内置、不开放编辑**的模板（表格前 6 行锁定，自带思源宋体，缺字体时回退系统字体）。产物在 `<比赛日>/dist/admission/` 下，可按赛区 / 按考场分层，并按赛区打包成 `admission-<赛区>.zip`。赛区可以在这里新建 / 删除，名字可以与比赛的赛区不同（两边互不相干，不会互相导）。
 -   **成绩与统计**：固定导出到 `<比赛日>/dist/reports/`；启用赛区时每个赛区各出一份。
 
@@ -83,8 +85,8 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 -   **源程序不得大于 100 KB**（编程通则 2）：超限的文件不会被编译，编译消息里会写清楚是哪个文件、超过了多少 —— 默认值是 CCF 的 100 KB，可在「通用设置 → Source File Size Limit」改。
 -   **同时提交多个源程序时的选取顺序**（编程通则 1）由**编译器列表的顺序**决定：评测按编译器列表逐个试，第一个能匹配到源文件并编译成功的编译器说了算。所以把 `gcc`（后缀 `c`）排在 `g++`（后缀 `cpp;cc;cxx`）前面，就得到 CCF 要求的 `.c → .cpp → .pas`；同一个语言声明多个后缀（`cpp;cc;cxx`、`pas;pp;inc`）时，也按声明的先后顺序取第一个存在的文件。要调整顺序就在「选项 → 编译器」里拖动 / 增删编译器。
 -   **静态与动态内存总和默认 128 MB**（编程通则 5）：「通用设置 → Default Memory Limit」的默认值已对齐 CCF，逐题还可以在试题设置里再改。
--   **严禁的操作**（编程通则 4：访问网络、`fork` / `exec` / `system` 或其它进程 / 线程生成函数、运行其它程序……）：比赛日的「违规检测」里默认就带了一份 CCF 清单（`system`、`popen`、`fork`、`exec` / `execl` / `execv` / `execve`、`CreateProcess`、`WinExec`、`ShellExecute`、`CreateThread`、`_beginthread`、`pthread_create`、`socket`、`WSAStartup`、`gethostbyname`、`#pragma`、`__asm__`/`asm`，以及 `windows.h` / `unistd.h` / `sys/socket.h` / `winsock2.h` 这些头文件），逐条可增删；命中即整位选手判 0 分。检测时会先屏蔽注释与字符串，所以「注释里写了 system(」不算违规。
--   源程序文件名与后缀要求全小写（编程通则 1）没有强制：国内很多比赛日的题目就叫 `T1` / `A+B`，强制小写会误伤；需要的话用违规检测的「字符串」规则自己加。
+-   **严禁的操作**（编程通则 4：访问网络、`fork` / `exec` / `system` 或其它进程 / 线程生成函数、运行其它程序……）：限制清单按**编译器（语言）**保存，在「选项 → 编译器 → 高级」里逐条增删；比赛日的「违规检测」只勾选启用哪些语言的限制。默认清单由程序按**编译器名 / 源文件后缀**从内置的语言命令表里读取（新建编译器、读取旧设置、点「恢复默认」都走这条路径），目前内置五份：C/C++（CCF 清单：`system`、`popen`、`fork`、`exec` / `execl` / `execv` / `execve`、`CreateProcess`、`WinExec`、`ShellExecute`、`CreateThread`、`_beginthread`、`pthread_create`、`socket`、`WSAStartup`、`gethostbyname`、`#pragma`、`__asm__`/`asm`，以及 `windows.h` / `unistd.h` / `sys/socket.h` / `winsock2.h`）、Free Pascal（`ExecuteProcess`、`fpSystem`、`fpFork`、`BeginThread` 及 `process` / `BaseUnix` / `Sockets` 单元）、FreeBASIC（`Exec`、`Chain`、`Open Pipe`、`windows.bi`）、Java（`exec`、`ProcessBuilder`、`Runtime.getRuntime`、`java.net`、`java.lang.Thread`）、Python（`os.system` / `subprocess` / `socket` / `threading` 等）；认不出语言的自定义编译器回退到 C/C++ 清单。命中即整位选手判 0 分。检测时会先屏蔽注释与字符串，所以「注释里写了 system(」不算违规。老比赛日文件里那份全局清单仍按原样生效，在比赛日设置里保存一次后改为按语言勾选。
+-   源程序文件名与后缀要求全小写（编程通则 1）没有强制：国内很多比赛日的题目就叫 `T1` / `A+B`，强制小写会误伤；需要的话在对应编译器的限制里加一条「字符串」规则。
 
 ### 准考证：细节
 

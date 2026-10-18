@@ -23,7 +23,7 @@ class Contestant;
  *
  * - **选手目录**（ContestantPackage）：每道题一个子目录（子目录名 = 题目目录名），
  *   里面放该题 `problem/<题>/down/` 下的文件（**不含 down 子目录里的文件**）；
- *   整场的题面文件（`statement/` 下用户选定的那一个）放在压缩包根目录。
+ *   整场的题面文件（`statement/` 下用户勾选的那些，可以一个都不选）放在压缩包根目录。
  * - **测试数据**（TestDataPackage）：把每题的 `data/`（**只含测试点真正引用到的
  *   输入 / 输出文件**，路径来自 .cdf）、`graders/`（可选 `down/`）
  *   按开关决定是保留原来的目录结构还是铺平，也可以决定要不要每道题单独一个目录。
@@ -102,9 +102,17 @@ class PackageBuilder : public QObject {
 	void setIncludeSamples(bool);
 	bool includeSamples() const { return samples; }
 	/// 选手目录包：要放进包里的题面文件（`statement/` 下的文件名，如 `statement.pdf`）。
-	/// 空表示用默认的 statement.pdf。
-	void setStatementFile(const QString &);
-	QString statementFile() const;
+	/// 可以是 0 个（不打包题面），也可以任意多个；只取文件名部分，重复的自动去掉。
+	void setStatementFiles(const QStringList &);
+	QStringList statementFiles() const;
+
+	/// 压缩包的加密方式。
+	enum EncryptionMethod {
+		Aes256Encryption, ///< WinZip AES-256（AE-2），推荐。
+		ZipCryptoEncryption, ///< 传统 PKWARE 加密，只为兼容老工具保留，强度很弱。
+	};
+	void setEncryptionMethod(EncryptionMethod);
+	EncryptionMethod encryptionMethod() const { return encryption; }
 	/// 内层压缩包的名字：选手目录固定 down.zip，测试数据与比赛日文件同名。
 	QString innerArchiveName() const;
 	/// 测试数据包：各题的文件是否重名（重名就不能关掉「每道题单独一个目录」）。
@@ -159,7 +167,8 @@ class PackageBuilder : public QObject {
 	bool perTask{true};
 	bool structure{true};
 	bool samples{false};
-	QString statement;
+	QStringList statements;
+	EncryptionMethod encryption{Aes256Encryption};
 	QString pass;
 	QString error;
 

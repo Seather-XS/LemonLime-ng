@@ -1079,6 +1079,61 @@
         <source>New configuration %1</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../src/forms/advancedcompilersettingsdialog.ui" line="376"/>
+        <source>Violation Checking Rules</source>
+        <translation>Violation Checking Rules</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/advancedcompilersettingsdialog.ui" line="385"/>
+        <source>The contest day decides whether these rules are applied to this compiler.</source>
+        <translation>The contest day decides whether these rules are applied to this compiler.</translation>
+    </message>
+    <message>
+        <location filename="../src/advancedcompilersettingsdialog.cpp" line="168"/>
+        <source>These rules belong to this compiler; the contest day decides whether they are applied.</source>
+        <translation>These rules belong to this compiler; the contest day decides whether they are applied.</translation>
+    </message>
+    <message>
+        <location filename="../src/advancedcompilersettingsdialog.cpp" line="170"/>
+        <source>Language: %1. These rules belong to this compiler; the contest day decides whether they are applied.</source>
+        <translation>Language: %1. These rules belong to this compiler; the contest day decides whether they are applied.</translation>
+    </message>
+    <message>
+        <location filename="../src/advancedcompilersettingsdialog.cpp" line="84"/>
+        <source>Type</source>
+        <translation>Type</translation>
+    </message>
+    <message>
+        <location filename="../src/advancedcompilersettingsdialog.cpp" line="84"/>
+        <source>Content</source>
+        <translation>Content</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/advancedcompilersettingsdialog.ui" line="411"/>
+        <source>Add</source>
+        <translation>Add</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/advancedcompilersettingsdialog.ui" line="419"/>
+        <source>Remove</source>
+        <translation>Remove</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/advancedcompilersettingsdialog.ui" line="427"/>
+        <source>Restore Defaults</source>
+        <translation>Restore Defaults</translation>
+    </message>
+    <message>
+        <location filename="../src/advancedcompilersettingsdialog.cpp" line="10"/>
+        <source>Command</source>
+        <translation>Command</translation>
+    </message>
+    <message>
+        <location filename="../src/advancedcompilersettingsdialog.cpp" line="10"/>
+        <source>String</source>
+        <translation>String</translation>
+    </message>
 </context>
 <context>
     <name>ColumnDialog</name>
@@ -1353,6 +1408,21 @@
         <location filename="../src/contestsettingsdialog.cpp" line="188"/>
         <source>Contestant folders must be named like %1 (region sample: %2).</source>
         <translation>Contestant folders must be named like %1 (region sample: %2).</translation>
+    </message>
+    <message>
+        <location filename="../src/contestsettingsdialog.cpp" line="43"/>
+        <source>Rules are configured per compiler in Options → Compiler → Advanced.</source>
+        <translation>Rules are configured per compiler in Options → Compiler → Advanced.</translation>
+    </message>
+    <message>
+        <location filename="../src/contestsettingsdialog.cpp" line="117"/>
+        <source>%1 (%2 rules)</source>
+        <translation>%1 (%2 rules)</translation>
+    </message>
+    <message>
+        <location filename="../src/contestsettingsdialog.cpp" line="117"/>
+        <source>%1 (no rules)</source>
+        <translation>%1 (no rules)</translation>
     </message>
 </context>
 <context>
@@ -2295,7 +2365,30 @@ This cannot be undone.</translation>
     <message>
         <location filename="../src/exportwidget.cpp" line="136"/>
         <location filename="../src/exportwidget.cpp" line="221"/>
-        <source>Encrypt with a password (ZipCrypto)</source>
+        <source>Encrypt with a password</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="141"/>
+        <location filename="../src/exportwidget.cpp" line="262"/>
+        <source>Method:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="143"/>
+        <location filename="../src/exportwidget.cpp" line="264"/>
+        <source>AES-256 (recommended)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="144"/>
+        <location filename="../src/exportwidget.cpp" line="265"/>
+        <source>ZipCrypto (weak, for old tools)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="266"/>
+        <source>AES-256 is the WinZip AES (AE-2) standard and works with 7-Zip / WinRAR. ZipCrypto only exists for very old tools and is easy to break.</source>
         <translation></translation>
     </message>
     <message>
@@ -2407,19 +2500,29 @@ This cannot be undone.</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="618"/>
-        <source>The statement file is missing; export it in the Statement tab first if you need it.</source>
+        <location filename="../src/exportwidget.cpp" line="711"/>
+        <source>These statement files are missing; export them in the Statement tab first if you need them: %1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/exportwidget.cpp" line="129"/>
-        <location filename="../src/exportwidget.cpp" line="218"/>
-        <source>Statement file:</source>
+        <location filename="../src/exportwidget.cpp" line="255"/>
+        <source>Statement files:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="219"/>
-        <source>Which file under statement/ goes into the package (the PDF name is set in the Statement tab).</source>
+        <location filename="../src/exportwidget.cpp" line="258"/>
+        <source>Which files under statement/ go into the package. Check none to leave the statement out (the PDF name is set in the Statement tab).</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="260"/>
+        <source>Select all</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/exportwidget.cpp" line="261"/>
+        <source>Clear</source>
         <translation></translation>
     </message>
     <message>
@@ -2428,8 +2531,9 @@ This cannot be undone.</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/exportwidget.cpp" line="642"/>
-        <source>The statement file (%1) does not exist yet, so the package will not contain the statement.
+        <location filename="../src/exportwidget.cpp" line="739"/>
+        <source>These statement files do not exist yet, so the package will not contain them:
+%1
 Export anyway?</source>
         <translation></translation>
     </message>
@@ -3271,7 +3375,7 @@ Depends: </source>
         <location filename="../src/forms/lemon.ui" line="20"/>
         <location filename="../src/lemon.cpp" line="1117"/>
         <location filename="../src/lemon.cpp" line="1302"/>
-        <source>LemonLime</source>
+        <source>LemonLime-ng</source>
         <translation></translation>
     </message>
     <message>
@@ -3471,7 +3575,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="644"/>
-        <source>Exit LemonLime...</source>
+        <source>Exit LemonLime-ng...</source>
         <translation></translation>
     </message>
     <message>
@@ -3481,7 +3585,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="656"/>
-        <source>LemonLime Settings...</source>
+        <source>LemonLime-ng Settings...</source>
         <translation></translation>
     </message>
     <message>
@@ -3491,7 +3595,7 @@ Depends: </source>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="668"/>
-        <source>About LemonLime...</source>
+        <source>About LemonLime-ng...</source>
         <translation></translation>
     </message>
     <message>
@@ -3523,6 +3627,16 @@ Depends: </source>
         <location filename="../src/forms/lemon.ui" line="730"/>
         <source>Read the import folder (Lemon data layout) and add tasks automatically...</source>
         <translation>Read the import folder (Lemon data layout) and add tasks automatically...</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/lemon.ui" line="743"/>
+        <source>Add Tasks from &amp;problem/</source>
+        <translation>Add Tasks from &amp;problem/</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/lemon.ui" line="746"/>
+        <source>Scan problem/ and configure the tasks and data files that are not added yet...</source>
+        <translation>Scan problem/ and configure the tasks and data files that are not added yet...</translation>
     </message>
     <message>
         <location filename="../src/forms/lemon.ui" line="738"/>
@@ -3874,14 +3988,14 @@ Depends: </source>
     <message>
         <location filename="../src/lemon.cpp" line="1021"/>
         <location filename="../src/lemon.cpp" line="1424"/>
-        <source>LemonLime - %1</source>
+        <source>LemonLime-ng - %1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/lemon.cpp" line="1023"/>
         <location filename="../src/lemon.cpp" line="1426"/>
         <location filename="../src/lemon.cpp" line="1664"/>
-        <source>LemonLime - %1 / %2</source>
+        <source>LemonLime-ng - %1 / %2</source>
         <translation>LemonLime - %1 / %2</translation>
     </message>
     <message>
@@ -3893,6 +4007,27 @@ Depends: </source>
     <message>
         <location filename="../src/lemon.cpp" line="1302"/>
         <source>No task found</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/lemon.cpp" line="1555"/>
+        <location filename="../src/lemon.cpp" line="1568"/>
+        <source>Configure Tasks from problem/</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/lemon.cpp" line="1556"/>
+        <source>No task or data file needs to be added.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/lemon.cpp" line="1563"/>
+        <source>Added tasks: %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/lemon.cpp" line="1566"/>
+        <source>Added %1 test case(s) to %2</source>
         <translation></translation>
     </message>
     <message>
@@ -4009,7 +4144,7 @@ No: remove it from the contest only.</translation>
     </message>
     <message>
         <location filename="../src/lemon.cpp" line="1690"/>
-        <source>About LemonLime</source>
+        <source>About LemonLime-ng</source>
         <translation></translation>
     </message>
     <message>

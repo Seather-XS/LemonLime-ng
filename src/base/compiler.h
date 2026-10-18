@@ -10,8 +10,11 @@
 #pragma once
 //
 
+#include "base/violation.h"
+
 #include <QObject>
 #include <QProcessEnvironment>
+#include <QVector>
 
 class Compiler : public QObject {
 	Q_OBJECT
@@ -35,6 +38,8 @@ class Compiler : public QObject {
 	double getMemoryLimitRatio() const;
 	bool getDisableMemoryLimitCheck() const;
 	bool getInterpreterAsWatcher() const;
+	/// 这个语言的违规检测限制；比赛日只决定用不用，不看这里有没有内容。
+	const QVector<ViolationRule> &getViolationRules() const;
 
 	void setCompilerType(CompilerType);
 	void setCompilerName(const QString &);
@@ -47,6 +52,7 @@ class Compiler : public QObject {
 	void setMemoryLimitRatio(double);
 	void setDisableMemoryLimitCheck(bool);
 	void setInterpreterAsWatcher(bool);
+	void setViolationRules(const QVector<ViolationRule> &);
 
 	void addConfiguration(const QString &, const QString &, const QString &);
 	void setConfigName(int, const QString &);
@@ -74,4 +80,5 @@ class Compiler : public QObject {
 	double memoryLimitRatio;
 	bool disableMemoryLimitCheck;
 	bool interpreterAsWatcher;
+	QVector<ViolationRule> violationRules;
 };

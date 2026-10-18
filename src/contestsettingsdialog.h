@@ -11,10 +11,11 @@
 #include <QDialog>
 
 class Contest;
+class Settings;
 class QCheckBox;
 class QLabel;
 class QLineEdit;
-class QTableWidget;
+class QListWidget;
 
 /**
  * 比赛日设置：赛区、违规检测与选手文件夹命名限制。
@@ -26,23 +27,25 @@ class ContestSettingsDialog : public QDialog {
   public:
 	explicit ContestSettingsDialog(QWidget *parent = nullptr);
 
+	/// 违规检测按语言分开：这里要从全局设置里取编译器列表。
+	void setSettings(Settings *);
 	/// 把比赛对象当前的设置读进界面。
 	void resetEditContest(Contest *contest);
 	/// 把界面上的设置写回比赛对象。
 	void applyTo(Contest *contest) const;
 
   private slots:
-	void addRule();
-	void removeRule();
-	void restoreDefaults();
 	void updateNamingHint();
+	void updateViolationState();
 
   private:
 	QCheckBox *regionCheck{};
 	QCheckBox *violationCheck{};
-	QTableWidget *rulesTable{};
+	QListWidget *compilerList{};
+	QLabel *violationHint{};
 	QCheckBox *namingCheck{};
 	QLineEdit *namingPatternEdit{};
 	QLabel *namingHint{};
 	QString sampleRegion;
+	Settings *settings{};
 };

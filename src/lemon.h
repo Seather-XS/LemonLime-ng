@@ -49,6 +49,8 @@ class LemonLime : public QMainWindow {
 	// projectFile 为工程根目录下 contest.conf 的绝对路径；以单个 .cdf 打开时为空。
 	DayProject curProject;
 	QString projectFile;
+	/// 工程文件是本次新建的（不是从磁盘打开的）：保存时不必再留 .bak —— 它里面只有我们自己刚写的内容。
+	bool projectFileNewlyCreated{false};
 	int curDayIndex{0};
 	QList<QAction *> dayActions;
 	QSignalMapper *signalMapper;
@@ -108,6 +110,8 @@ class LemonLime : public QMainWindow {
 	void closeAction();
 	void loadAction();
 	void addTasksAction();
+	/// 扫描 problem/<题>/data/，把还没加入的试题和测试点自动配置好（不读 data/ 的子目录）。
+	void addProblemTasksAction();
 	void exportResult();
 	void exportStatistics();
 	void changeContestName();

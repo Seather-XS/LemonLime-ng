@@ -47,6 +47,8 @@ auto Compiler::getDisableMemoryLimitCheck() const -> bool { return disableMemory
 
 auto Compiler::getInterpreterAsWatcher() const -> bool { return interpreterAsWatcher; }
 
+auto Compiler::getViolationRules() const -> const QVector<ViolationRule> & { return violationRules; }
+
 void Compiler::setCompilerType(Compiler::CompilerType type) { compilerType = type; }
 
 void Compiler::setCompilerName(const QString &name) { compilerName = name; }
@@ -72,6 +74,10 @@ void Compiler::setMemoryLimitRatio(double ratio) { memoryLimitRatio = ratio; }
 void Compiler::setDisableMemoryLimitCheck(bool check) { disableMemoryLimitCheck = check; }
 
 void Compiler::setInterpreterAsWatcher(bool use) { interpreterAsWatcher = use; }
+
+void Compiler::setViolationRules(const QVector<ViolationRule> &rules) {
+	violationRules = Violation::normalizeRules(rules);
+}
 
 void Compiler::addConfiguration(const QString &name, const QString &arguments1, const QString &arguments2) {
 	configurationNames.append(name);
@@ -120,6 +126,7 @@ void Compiler::copyFrom(Compiler *other) {
 	memoryLimitRatio = other->getMemoryLimitRatio();
 	disableMemoryLimitCheck = other->getDisableMemoryLimitCheck();
 	interpreterAsWatcher = other->getInterpreterAsWatcher();
+	violationRules = other->getViolationRules();
 }
 
 int Compiler::read(const QJsonObject &json) {
@@ -151,6 +158,21 @@ int Compiler::read(const QJsonObject &json) {
 	READ_JSON(json, memoryLimitRatio);
 	READ_JSON(json, disableMemoryLimitCheck);
 	READ_JSON(json, interpreterAsWatcher);
+
+	// 老配置里没有按语言分开的规则：按源文件后缀补一份默认清单。
+	if (json.contains("violationRules") && json["violationRules"].isArray()) {
+		QVector<ViolationRule> rules;
+
+		for (const auto &item : json["violationRules"].toArray()) {
+			const QJsonObject rule = item.toObject();
+			rules.append({rule.value("kind").toString(), rule.value("text").toString()});
+		}
+
+		setViolationRules(rules);
+	} else {
+		setViolationRules(Violation::defaultRulesFor(compilerName, sourceExtensions));
+	}
+
 	return 0;
 }
 
@@ -172,4 +194,15 @@ void Compiler::write(QJsonObject &json) const {
 	WRITE_JSON(json, memoryLimitRatio);        // double
 	WRITE_JSON(json, disableMemoryLimitCheck); // bool
 	WRITE_JSON(json, interpreterAsWatcher);    // bool
+
+	QJsonArray rules;
+
+	for (const ViolationRule &rule : violationRules) {
+		QJsonObject obj;
+		obj.insert("kind", rule.kind);
+		obj.insert("text", rule.text);
+		rules.append(obj);
+	}
+
+	json.insert("violationRules", rules);
 }

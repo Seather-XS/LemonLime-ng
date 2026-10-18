@@ -1,5 +1,5 @@
 # Packaging
-set(CPACK_PACKAGE_NAME "LemonLime")
+set(CPACK_PACKAGE_NAME "LemonLime-ng")
 set(CPACK_PACKAGE_VENDOR "Project LemonLime Developers")
 set(CPACK_PACKAGE_DESCRIPTION "A tiny judging environment for OI contest based on Lemon + LemonPlus.")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/Project-LemonLime/Project_LemonLime")
