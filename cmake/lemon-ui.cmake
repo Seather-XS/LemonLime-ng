@@ -9,12 +9,14 @@ aux_source_directory(${LEMON_BASEDIR_UI} LEMON_UI_SOURCES)
 list(APPEND LEMON_UI_SOURCES ${LEMON_BASEDIR_UI}/component/exportutil/exportutil.cpp)
 list(APPEND LEMON_UI_SOURCES ${LEMON_BASEDIR_UI}/component/exportutil/exportutil.h)
 
-foreach(LEMON_ADMISSION_FILE admissioncsv admissionnotes admissiontemplate admissionproject
-        admissiongenerator admissionwidget csveditordialog columndialog notesdialog admissionnaming
-        admissioncolumns admissionassign idruledialog seatdialog venuedialog)
-    list(APPEND LEMON_UI_SOURCES ${LEMON_BASEDIR_UI}/admission/${LEMON_ADMISSION_FILE}.cpp)
-    list(APPEND LEMON_UI_SOURCES ${LEMON_BASEDIR_UI}/admission/${LEMON_ADMISSION_FILE}.h)
-endforeach()
+# 准考证（${LEMON_BASEDIR_UI}/admission/）暂时不编进 lemon.exe：源码与模板都留在仓库里，
+# 需要时把下面这段加回来，并恢复 lemon.ui 的 Admission 选项卡、lemon.cpp 里的接线。
+# foreach(LEMON_ADMISSION_FILE admissioncsv admissionnotes admissiontemplate admissionproject
+#         admissiongenerator admissionwidget csveditordialog columndialog notesdialog admissionnaming
+#         admissioncolumns admissionassign idruledialog seatdialog venuedialog)
+#     list(APPEND LEMON_UI_SOURCES ${LEMON_BASEDIR_UI}/admission/${LEMON_ADMISSION_FILE}.cpp)
+#     list(APPEND LEMON_UI_SOURCES ${LEMON_BASEDIR_UI}/admission/${LEMON_ADMISSION_FILE}.h)
+# endforeach()
 
 set(LEMON_UI_FORMS
     ${LEMON_BASEDIR_UI}/forms/lemon.ui

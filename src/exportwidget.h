@@ -13,10 +13,13 @@
 #include <QString>
 #include <QWidget>
 
+#include <memory>
+
 class Contest;
 class PackageBuilder;
 class QCheckBox;
 class QComboBox;
+class QFileIconProvider;
 class QGroupBox;
 class QLabel;
 class QLineEdit;
@@ -85,6 +88,8 @@ class ExportWidget : public QWidget {
 	QTreeWidgetItem *folderNode(QTreeWidgetItem *root, const QString &path);
 	/// 内层压缩包在外层里的节点（路径可能带目录，如 day1/HN.zip）。
 	QTreeWidgetItem *archiveNode(const QString &path);
+	/// 按扩展名取系统图标（同一后缀只查一次）；系统没登记该类型时退回内置图标。
+	QIcon fileIconFor(const QString &fileName);
 	/// 收尾：写状态栏、决定导出按钮能不能点、把树折起来。
 	void finishTree();
 	/// 重新列出 `statement/` 下的文件，保留已经勾选的那些（第一次按默认题面勾）。
@@ -121,8 +126,6 @@ class ExportWidget : public QWidget {
 	/// 用户手动改过勾选后，默认题面变化时不再覆盖他的选择。
 	bool statementSelectionCustomized{false};
 	bool statementSelectionInitialized{false};
-	QComboBox *encryptionBox{nullptr};
-	QLabel *encryptionLabel{nullptr};
 	QCheckBox *encryptBox{nullptr};
 	QCheckBox *showPasswordBox{nullptr};
 	QLineEdit *passwordEdit{nullptr};
@@ -141,8 +144,13 @@ class ExportWidget : public QWidget {
 	int pendingIndex{0};
 	/// 目录路径 → 节点。外层与每个内层包各有一套，所以按根节点分开存。
 	QHash<QTreeWidgetItem *, QHash<QString, QTreeWidgetItem *>> folderNodes;
-	/// 图标只取一次：style()->standardIcon() 每次要十几毫秒，每个节点都调会卡死。
-	QIcon fileIcon;
+	/// 系统文件图标：按后缀缓存，几万个节点也只查几十次。
+	std::unique_ptr<QFileIconProvider> iconProvider;
+	QHash<QString, QIcon> fileTypeIcons;
+	/// 系统对「没有专属图标」的文件给的通用图标，用来判断某种后缀有没有专属图标。
+	QIcon unknownFileIcon;
+	/// 系统没有专属图标时用的彩色文档图标（比通用空白页看得清）。
+	QIcon fallbackFileIcon;
 	QIcon folderIcon;
 	int fileTotal{0};
 	int folderTotal{0};

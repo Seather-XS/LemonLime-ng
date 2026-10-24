@@ -15,6 +15,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDir>
+#include <QFileIconProvider>
 #include <QFileInfo>
 #include <QFontDatabase>
 #include <QGroupBox>
@@ -56,10 +57,21 @@ namespace {
 
 	/// 按包内路径逐级建目录节点，把条目挂进树里（像文件资源管理器那样嵌套）。
 	/// 具体插入由 ExportWidget 分批驱动（见 buildTreeStep()），这里只提供节点类型。
+
+	/// 两个图标渲染出来是不是同一张：系统给「没登记的类型」都是同一张通用空白页。
+	bool sameIcon(const QIcon &left, const QIcon &right) {
+		if (left.isNull() || right.isNull())
+			return false;
+
+		const QImage leftImage = left.pixmap(32).toImage();
+		const QImage rightImage = right.pixmap(32).toImage();
+		return ! leftImage.isNull() && leftImage == rightImage;
+	}
 } // namespace
 
 ExportWidget::ExportWidget(QWidget *parent) : QWidget(parent) {
 	builder = new PackageBuilder(this);
+	iconProvider = std::make_unique<QFileIconProvider>();
 	buildUi();
 	connect(builder, &PackageBuilder::logMessage, this, &ExportWidget::appendLog);
 
@@ -155,16 +167,6 @@ void ExportWidget::buildUi() {
 	optionsLayout->addWidget(encryptBox);
 	auto *passwordRow = new QHBoxLayout();
 	passwordRow->addSpacing(24);
-	encryptionLabel = new QLabel(tr("Method:"), optionsBox);
-	passwordRow->addWidget(encryptionLabel);
-	encryptionBox = new QComboBox(optionsBox);
-	encryptionBox->setObjectName(QStringLiteral("encryptionBox"));
-	encryptionBox->addItem(tr("AES-256 (recommended)"), int(PackageBuilder::Aes256Encryption));
-	encryptionBox->addItem(tr("ZipCrypto (weak, for old tools)"), int(PackageBuilder::ZipCryptoEncryption));
-	// 只有勾了「加密」才可选方式
-	encryptionBox->setEnabled(false);
-	encryptionLabel->setEnabled(false);
-	passwordRow->addWidget(encryptionBox);
 	passwordRow->addWidget(new QLabel(tr("Password:"), optionsBox));
 	passwordEdit = new QLineEdit(optionsBox);
 	passwordEdit->setEchoMode(QLineEdit::Password);
@@ -233,8 +235,6 @@ void ExportWidget::buildUi() {
 		for (int i = 0; i < statementList->count(); i++)
 			statementList->item(i)->setCheckState(Qt::Unchecked);
 	});
-	connect(encryptionBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
-	        [this] { optionsChanged(); });
 	connect(encryptBox, &QCheckBox::toggled, this, [this] { optionsChanged(); });
 	// 密码不影响打包内容，只是存在 builder 里，不必重建树（否则每敲一个字符都重算一遍）。
 	connect(passwordEdit, &QLineEdit::textChanged, this, &ExportWidget::passwordChanged);
@@ -263,11 +263,6 @@ void ExportWidget::retranslate() {
 	statementAllButton->setText(tr("Select all"));
 	statementNoneButton->setText(tr("Clear"));
 	encryptBox->setText(tr("Encrypt with a password"));
-	encryptionLabel->setText(tr("Method:"));
-	encryptionBox->setItemText(0, tr("AES-256 (recommended)"));
-	encryptionBox->setItemText(1, tr("ZipCrypto (weak, for old tools)"));
-	encryptionBox->setToolTip(tr("AES-256 is the WinZip AES (AE-2) standard and works with 7-Zip / WinRAR. "
-	                             "ZipCrypto only exists for very old tools and is easy to break."));
 	showPasswordBox->setText(tr("Show"));
 	contentsBox->setTitle(tr("Package contents"));
 	logBox->setTitle(tr("Export log"));
@@ -506,8 +501,6 @@ void ExportWidget::optionsChanged() {
 	const bool encrypt = encryptBox->isChecked();
 	passwordEdit->setEnabled(encrypt);
 	showPasswordBox->setEnabled(encrypt);
-	encryptionBox->setEnabled(encrypt);
-	encryptionLabel->setEnabled(encrypt);
 	syncOptions();
 	scheduleRefresh();
 }
@@ -538,8 +531,8 @@ void ExportWidget::syncOptions() {
 	builder->setKeepStructure(structureBox->isChecked());
 	builder->setIncludeSamples(samplesBox->isChecked());
 	builder->setStatementFiles(checkedStatementFiles());
-	builder->setEncryptionMethod(
-	    static_cast<PackageBuilder::EncryptionMethod>(encryptionBox->currentData().toInt()));
+	// 加密方式固定用推荐的 WinZip AES-256（AE-2），不给用户选。
+	builder->setEncryptionMethod(PackageBuilder::Aes256Encryption);
 	builder->setPassword(encryptBox->isChecked() ? passwordEdit->text() : QString());
 }
 
@@ -576,8 +569,28 @@ auto ExportWidget::archiveNode(const QString &path) -> QTreeWidgetItem * {
 	auto *node = parent ? new PackageItem(parent, {name, QString()})
 	                    : new PackageItem(contentTree, {name, QString()});
 	node->setFolder(false);
-	node->setIcon(0, fileIcon);
+	node->setIcon(0, fileIconFor(name));
 	return node;
+}
+
+// 系统按扩展名登记的图标（.pdf、.zip、.txt …… 各不相同）；没登记的用内置文档图标。
+auto ExportWidget::fileIconFor(const QString &fileName) -> QIcon {
+	const QString suffix = QFileInfo(fileName).suffix().toLower();
+	auto cached = fileTypeIcons.find(suffix);
+
+	if (cached != fileTypeIcons.end())
+		return cached.value();
+
+	QIcon icon;
+
+	if (! suffix.isEmpty() && iconProvider)
+		icon = iconProvider->icon(QFileInfo(QStringLiteral("lemon.") + suffix));
+
+	if (icon.isNull() || sameIcon(icon, unknownFileIcon))
+		icon = fallbackFileIcon;
+
+	fileTypeIcons.insert(suffix, icon);
+	return icon;
 }
 
 // 分批插入：每轮只建一小批节点，建完就返回事件循环，界面始终能响应。
@@ -599,7 +612,7 @@ void ExportWidget::buildTreeStep() {
 			auto *node = parent ? new PackageItem(parent, {name, QString()})
 			                    : new PackageItem(contentTree, {name, QString()});
 			node->setFolder(false);
-			node->setIcon(0, fileIcon);
+			node->setIcon(0, fileIconFor(name));
 			node->setText(1, QDir::toNativeSeparators(pending.source));
 			++fileTotal;
 		}
@@ -652,8 +665,15 @@ void ExportWidget::refresh() {
 		return;
 	}
 
-	// 图标取一次就够：style()->standardIcon() 每次要十几毫秒，几万个节点就完蛋了。
-	fileIcon = contentTree->style()->standardIcon(QStyle::SP_FileIcon);
+	// 文件图标按后缀查系统、按后缀缓存（见 fileIconFor()）：每种类型只查一次。
+	unknownFileIcon = iconProvider->icon(QFileIconProvider::File);
+	// 系统没登记的类型会给一张几乎空白的页：换成自带的彩色图标，免得看起来像没有图标。
+	fallbackFileIcon = QIcon(QStringLiteral(":/icon/file.svg"));
+
+	if (fallbackFileIcon.pixmap(16).isNull())
+		fallbackFileIcon = contentTree->style()->standardIcon(QStyle::SP_FileIcon);
+
+	fileTypeIcons.clear();
 	folderIcon = contentTree->style()->standardIcon(QStyle::SP_DirIcon);
 	// 建树期间先关掉排序，插完再打开（finishTree()），省得每插一个节点都去排一次。
 	contentTree->setSortingEnabled(false);

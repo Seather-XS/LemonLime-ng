@@ -19,6 +19,7 @@
 
 #include <QFile>
 #include <QElapsedTimer>
+#include <QHash>
 #include <QSysInfo>
 #include <QTimer>
 #include <QtMath>
@@ -42,11 +43,37 @@ auto TaskJudger::suffixRank(const QStringList &extensionOrder, const QString &fi
 }
 
 auto TaskJudger::orderSourceFiles(const QStringList &extensionOrder, const QStringList &files) -> QStringList {
-	QStringList ordered = files;
-	std::stable_sort(ordered.begin(), ordered.end(),
-	                 [&extensionOrder](const QString &left, const QString &right) {
-		                 return suffixRank(extensionOrder, left) < suffixRank(extensionOrder, right);
-	                 });
+	QHash<QString, int> extensionRanks;
+
+	for (int index = 0; index < extensionOrder.size(); ++index) {
+		const QString extension = extensionOrder.at(index).trimmed().toLower();
+
+		if (! extensionRanks.contains(extension))
+			extensionRanks.insert(extension, index);
+	}
+
+	struct RankedFile {
+		int rank;
+		QString file;
+	};
+
+	QVector<RankedFile> rankedFiles;
+	rankedFiles.reserve(files.size());
+
+	for (const QString &file : files) {
+		const int rank = extensionRanks.value(QFileInfo(file).suffix().toLower(), extensionOrder.size());
+		rankedFiles.append({rank, file});
+	}
+
+	std::stable_sort(rankedFiles.begin(), rankedFiles.end(),
+	                 [](const RankedFile &left, const RankedFile &right) { return left.rank < right.rank; });
+
+	QStringList ordered;
+	ordered.reserve(rankedFiles.size());
+
+	for (const RankedFile &ranked : rankedFiles)
+		ordered.append(ranked.file);
+
 	return ordered;
 }
 

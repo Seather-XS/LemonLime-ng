@@ -18,7 +18,6 @@
 #include "base/compiler.h"
 #include "base/settings.h"
 #include "component/exportutil/exportutil.h"
-#include "admission/admissionwidget.h"
 #include "contestsettingsdialog.h"
 #include "core/contest.h"
 #include "core/contestant.h"
@@ -138,13 +137,6 @@ LemonLime::~LemonLime() {
 	delete ui;
 }
 
-bool LemonLime::openContestForCheck(const QString &fileName) {
-	LOG("check-close: opening", fileName, "exists", QFileInfo::exists(fileName) ? 1 : 0);
-	loadContest(fileName);
-	LOG("check-close: opened", curContest ? "ok" : "failed", "cwd", QDir::currentPath().toStdString());
-	return curContest != nullptr;
-}
-
 void LemonLime::changeEvent(QEvent *event) {
 	if (event->type() == QEvent::LanguageChange) {
 		ui->retranslateUi(this);
@@ -155,8 +147,6 @@ void LemonLime::changeEvent(QEvent *event) {
 
 void LemonLime::closeEvent(QCloseEvent * /*event*/) {
 	ui->statementEdit->saveIfNeeded();
-	// 准考证页也要：标题 / 测试时间可能刚好还在输入框里没落盘
-	ui->admissionWidget->saveIfNeeded();
 
 	if (curContest)
 		saveContest(curFile);
@@ -985,7 +975,7 @@ void LemonLime::loadDay(const QString &filePath) {
 	// 导出物统一放 dist/ 下（dist/reports 成绩单与统计、dist/export 压缩包）；
 	// 顺便清掉老工程根目录里残留的 reports/、export/。
 	Settings::ensureDistDirs();
-	// 让资源管理器按 problem / import / answers / statement / admission / dist 显示这些目录
+	// 让资源管理器按 problem / import / answers / statement / dist 显示这些目录
 	// （隐藏的 desktop.ini，只改显示名，真实路径不变）。
 	Settings::ensureDayFolderOrdering(QDir::currentPath());
 
@@ -1047,9 +1037,6 @@ void LemonLime::loadDay(const QString &filePath) {
 	ui->exportWidget->setDayFile(curFile);
 	ui->exportWidget->setContest(curContest);
 	ui->exportWidget->setDefaultStatementFile(ui->statementEdit->pdfFileName());
-	// 准考证：列出 admission/ 下已有的名单（占位符用的上下文与题面完全一致）
-	ui->admissionWidget->setContest(curContest);
-	ui->admissionWidget->setDayContext(QFileInfo(curFile).completeBaseName(), dayTitle, projectTitle);
 	QApplication::restoreOverrideCursor();
 	LOG("Contest -", curContest->getContestTitle(), "loaded successfully");
 }
@@ -1095,8 +1082,6 @@ void LemonLime::newAction() {
 void LemonLime::closeAction() {
 	// 还处于当前比赛日的工作目录，先把题面写回去。
 	ui->statementEdit->saveIfNeeded();
-	// 准考证页也一样：换比赛日 / 关比赛日之前先把标题、测试时间落盘
-	ui->admissionWidget->saveIfNeeded();
 	saveContest(curFile);
 	// 关掉比赛日后可能整个比赛日目录都要被删（deleteDayAt），先把监听器拆掉。
 	releaseDataWatcher();
@@ -1105,7 +1090,6 @@ void LemonLime::closeAction() {
 	ui->resultViewer->setContest(nullptr);
 	ui->statisticsBrowser->setContest(nullptr);
 	ui->exportWidget->setContest(nullptr);
-	ui->admissionWidget->setContest(nullptr);
 	delete curContest;
 	curContest = nullptr;
 	ui->tabWidget->setCurrentIndex(0);

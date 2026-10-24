@@ -13,7 +13,6 @@
 #include "admissiontemplate.h"
 #include "base/LemonLog.hpp"
 #include "base/ProcessUtil.hpp"
-#include "base/settings.h"
 //
 #include <QDir>
 #include <QElapsedTimer>
@@ -177,7 +176,9 @@ namespace {
 AdmissionGenerator::AdmissionGenerator(QObject *parent) : QObject(parent) {}
 
 auto AdmissionGenerator::outputRoot() -> QString {
-	return native(QFileInfo(Settings::admissionOutputPath()).absoluteFilePath());
+	const QString relative = QStringLiteral("dist") + QDir::separator() + QStringLiteral("admission") +
+	                         QDir::separator();
+	return native(QFileInfo(relative).absoluteFilePath());
 }
 
 auto AdmissionGenerator::toolsReport() -> QString {

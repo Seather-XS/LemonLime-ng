@@ -35,7 +35,7 @@ class Contestant;
  * - wrapInFolder：多一层分组目录（选手目录/测试数据是 <比赛日>；选手代码是赛区名）；
  * - nestedZip：内容先打成内层压缩包（见下）；
  * - oneFolderPerTask / keepStructure / includeSamples：测试数据包用；
- * - password：非空时用 ZipCrypto（传统 zip 加密）加密，内外层用同一个密码。
+ * - password：非空时用 WinZip AES-256（AE-2）加密，内外层用同一个密码。
  *
  * 两个通用开关都打开时：`<比赛日>.zip` 里只有一个内层压缩包，内层里是内容
  * （套层打开时再包一层 `<比赛日>/` 目录）。

@@ -720,18 +720,9 @@ auto Settings::exportPath() -> QString {
 	return QString("dist") + QDir::separator() + QStringLiteral("export") + QDir::separator();
 }
 
-// 准考证：admission/ 放名单（CSV）、注意事项（Markdown）与模板（.tex），
-// 生成的 PDF 固定写到 dist/admission/ 下。
-auto Settings::admissionPath() -> QString { return QString("admission") + QDir::separator(); }
-
-auto Settings::admissionOutputPath() -> QString {
-	return QString("dist") + QDir::separator() + QStringLiteral("admission") + QDir::separator();
-}
-
 void Settings::ensureDistDirs() {
 	QDir().mkpath(reportsPath());
 	QDir().mkpath(exportPath());
-	QDir().mkpath(admissionOutputPath());
 
 	// 早期版本把导出物直接放在比赛日根目录下（reports/、export/）：老工程里残留的这两个
 	// 目录清掉（里面是上一次的导出结果，重新导出会在 dist/ 下生成）。有东西的话记一条日志。
@@ -755,9 +746,9 @@ void Settings::ensureDayFolderOrdering(const QString &dayRoot) {
 	// 办法是 desktop.ini 的 [LocalizedFileNames]：只改「显示名」，而排序跟显示名走。
 	// 显示名前面加上不可见的零宽空格（U+200B），个数决定先后——用户看到的名字仍然是
 	// problem / import / ...，排序却按我们给的顺序来。
-	const QStringList order = {QStringLiteral("problem"),  QStringLiteral("import"),
-	                           QStringLiteral("answers"),  QStringLiteral("statement"),
-	                           QStringLiteral("admission"), QStringLiteral("dist")};
+	const QStringList order = {QStringLiteral("problem"), QStringLiteral("import"),
+	                           QStringLiteral("answers"), QStringLiteral("statement"),
+	                           QStringLiteral("dist")};
 	const QDir root(dayRoot.isEmpty() ? QDir::currentPath() : dayRoot);
 
 	if (! root.exists())

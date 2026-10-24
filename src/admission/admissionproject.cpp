@@ -7,7 +7,6 @@
 #include "admissionproject.h"
 //
 #include "base/LemonLog.hpp"
-#include "base/settings.h"
 //
 #include <QDir>
 #include <QFile>
@@ -21,7 +20,7 @@
 #define LEMON_MODULE_NAME "Admission"
 
 namespace {
-	/// 钉定的 admission/ 根目录（绝对路径）。空的 = 用 Settings::admissionPath()（相对工作目录）。
+	/// 钉定的 admission/ 根目录（绝对路径）。空的 = 工作目录下的 `admission/`。
 	QString admissionRootOverride;
 
 	QString sep() { return QString(QDir::separator()); }
@@ -150,7 +149,7 @@ namespace {
 } // namespace
 
 auto AdmissionProject::root() -> QString {
-	return admissionRootOverride.isEmpty() ? Settings::admissionPath() : admissionRootOverride;
+	return admissionRootOverride.isEmpty() ? QStringLiteral("admission") + sep() : admissionRootOverride;
 }
 
 void AdmissionProject::useRoot(const QString &path) {

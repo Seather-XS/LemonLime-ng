@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QEventLoop>
 #include <QFileInfo>
+#include <QHash>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QMessageBox>
@@ -55,7 +56,8 @@ namespace {
 	}
 
 	/// 这位选手在某一题下的源文件（口径与引擎会编译的尽量一致）。
-	QStringList sourceFilesOf(Contestant *contestant, Task *task) {
+	QStringList sourceFilesOf(Contestant *contestant, Task *task,
+	                          QHash<QString, QFileInfoList> &directoryEntries) {
 		QStringList result;
 
 		// 提交答案题不编译选手源程序，不参与违规检测。
@@ -63,14 +65,19 @@ namespace {
 			return result;
 
 		const QString base = contestant->getSourceFolder();
-		QDir dir(task->getSubFolderCheck() ? base + QDir::separator() + task->getSourceFileName() : base);
+		const QString directoryPath =
+		    task->getSubFolderCheck() ? base + QDir::separator() + task->getSourceFileName() : base;
+		auto entries = directoryEntries.find(directoryPath);
 
-		if (! dir.exists())
-			return result;
+		if (entries == directoryEntries.end()) {
+			QDir dir(directoryPath);
+			entries = directoryEntries.insert(directoryPath,
+			                                  dir.exists() ? dir.entryInfoList(QDir::Files) : QFileInfoList{});
+		}
 
 		const QString sourceName = task->getSourceFileName();
 
-		for (const auto &fi : dir.entryInfoList(QDir::Files)) {
+		for (const auto &fi : entries.value()) {
 			const QString name = fi.fileName();
 
 			if (name == sourceName || name.startsWith(sourceName + QLatin1Char('.')))
@@ -182,11 +189,13 @@ void Contest::evaluateContestantRules() {
 			continue;
 		}
 
+		QHash<QString, QFileInfoList> directoryEntries;
+
 		if (! legacyRules.isEmpty()) {
 			QStringList sources;
 
 			for (int i = 0; i < taskList.size(); i++)
-				sources += sourceFilesOf(contestant, taskList[i]);
+				sources += sourceFilesOf(contestant, taskList[i], directoryEntries);
 
 			QString path;
 			QVector<Violation::Match> matches;
@@ -200,7 +209,7 @@ void Contest::evaluateContestantRules() {
 			bool violated = false;
 
 			for (auto *task : taskList) {
-				const QStringList sources = sourceFilesOf(contestant, task);
+				const QStringList sources = sourceFilesOf(contestant, task, directoryEntries);
 
 				if (sources.isEmpty())
 					continue;

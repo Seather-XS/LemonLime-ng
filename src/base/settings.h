@@ -152,12 +152,9 @@ class Settings {
 	/// 导出目录：每个比赛日下的 `dist/reports/`（成绩单、统计）与 `dist/export/`（压缩包）。
 	static QString reportsPath();
 	static QString exportPath();
-	/// 准考证：名单 / 注意事项 / 模板放 `admission/`，生成的 PDF 放 `dist/admission/`。
-	static QString admissionPath();
-	static QString admissionOutputPath();
-	/// 建好 dist/reports/、dist/export/ 与 dist/admission/，并清掉早期版本留在比赛日根目录的 reports/、export/。
+	/// 建好 dist/reports/ 与 dist/export/，并清掉早期版本留在比赛日根目录的 reports/、export/。
 	static void ensureDistDirs();
-	/// 让资源管理器把比赛日目录按 problem / import / answers / statement / admission / dist 排列。
+	/// 让资源管理器把比赛日目录按 problem / import / answers / statement / dist 排列。
 	/// 做法是在该目录写一个隐藏 + 系统的 desktop.ini，用 [LocalizedFileNames] 给这几个文件夹
 	/// 加上不可见的零宽空格前缀——只改「显示名」，真实路径完全不变；换台机器或系统不支持时
 	/// 最多退回原来的字母序，不会破坏任何东西。

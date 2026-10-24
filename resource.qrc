@@ -18,6 +18,7 @@
         <file alias="edit-delete.svg">assets/pics/edit-delete.svg</file>
         <file alias="edit-find-replace.svg">assets/pics/edit-find-replace.svg</file>
         <file alias="edit-find.svg">assets/pics/edit-find.svg</file>
+        <file alias="file.svg">assets/pics/file.svg</file>
         <file alias="go-down.svg">assets/pics/go-down.svg</file>
         <file alias="go-up.svg">assets/pics/go-up.svg</file>
         <file alias="list-add.svg">assets/pics/list-add.svg</file>
