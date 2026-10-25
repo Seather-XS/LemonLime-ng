@@ -9,7 +9,6 @@
 
 #include "welcomedialog.h"
 #include "ui_welcomedialog.h"
-//
 #include <QPushButton>
 
 WelcomeDialog::WelcomeDialog(QWidget *parent) : QDialog(parent), ui(new Ui::WelcomeDialog) {

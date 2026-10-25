@@ -7,9 +7,7 @@
 
 #include "exttestcasemodifierdialog.h"
 #include "ui_exttestcasemodifierdialog.h"
-//
 #include "core/task.h"
-//
 #include <QtWidgets>
 
 ExtTestCaseModifierDialog::ExtTestCaseModifierDialog(QWidget *parent)

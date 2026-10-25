@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 
 #include "base/LemonType.hpp"
 #include "base/violation.h"
@@ -34,26 +33,19 @@ class Contest : public QObject {
 	void setContestTitle(const QString &);
 	const QString &getContestTitle() const;
 
-	/// —— 比赛日设置（语义见 gengen-tuack）——
 	bool getRegionEnabled() const;
 	bool getViolationCheck() const;
-	/// 比赛日是否启用这个编译器（语言）的违规检测——总开关关掉时一律 false。
 	bool isViolationCompilerEnabled(const QString &compilerName) const;
-	/// 只看「比赛日设置里有没有勾上这个语言」，与总开关无关（界面回显用）。
 	bool isViolationCompilerSelected(const QString &compilerName) const;
 	bool getNamingCheck() const;
 	const QString &getNamingPattern() const;
 	void setRegionEnabled(bool);
 	void setViolationCheck(bool);
-	/// 勾选这次比赛日要启用哪些编译器（语言）的违规检测规则。
 	void setViolationCompilers(const QStringList &compilerNames);
 	void setNamingCheck(bool);
 	void setNamingPattern(const QString &);
-	/// 导出的题面 PDF 文件名（不带扩展名，可含 `<day>` / `<title-day>` / `<title>` 占位符），
-	/// 保存在比赛日文件里。空表示用默认的 statement。
 	const QString &getStatementPdfName() const;
 	void setStatementPdfName(const QString &);
-	/// 按当前比赛日设置重算每位选手的违规 / 命名判定（改了设置不用重测）。
 	void evaluateContestantRules();
 
 	Task *getTask(int) const;
@@ -77,7 +69,6 @@ class Contest : public QObject {
 	bool violationCheck{false};
 	QStringList violationCompilers;
 	bool violationCompilersConfigured{false};
-	/// 旧版比赛日只有一份全局规则；没有按语言分开时，仍然按老办法统一检查。
 	QVector<ViolationRule> legacyViolationRules;
 	bool namingCheck{false};
 	QString namingPattern;
@@ -87,7 +78,6 @@ class Contest : public QObject {
 	QMap<QString, Contestant *> contestantList;
 	bool stopJudging{};
 	void judge(Contestant *);
-	/// ignoreRules：忽略命名 / 违规限制重测（照常编译运行，不做判定）。
 	void judge(const QVector<std::pair<Contestant *, int>> &, bool ignoreRules = false);
 	void clearPath(const QString &);
 	JudgingController *controller;
@@ -95,7 +85,6 @@ class Contest : public QObject {
   public slots:
 	void judge(const QList<std::pair<QString, QVector<int>>> &, bool ignoreRules = false);
 	void judgeAll();
-	// void judgeFinished();
 	void stopJudgingSlot();
 
   signals:
@@ -113,9 +102,6 @@ class Contest : public QObject {
 	void contestantJudgingStart(QString);
 	void contestantJudgingFinished();
 	void contestantJudgedDisplay(const QString &, const int, const int);
-	/// 选手因违规 / 命名不合规被跳过测试（标题 + 详情）。
-	/// 选手被取消测试（违规 / 命名不合规）：progress 是这位选手本轮被跳过的工时，
-	/// 用来让进度条跳过对应的量。
 	void contestantSkipped(const QString &name, const QString &title, const QString &message, int progress);
 	void compileError(int, int);
 	void stopJudgingSignal();

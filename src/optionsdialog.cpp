@@ -9,10 +9,8 @@
 
 #include "optionsdialog.h"
 #include "ui_optionsdialog.h"
-//
 #include "base/LemonLog.hpp"
 #include "base/settings.h"
-//
 #include <QtWidgets>
 #define LEMON_MODULE_NAME "OptionsDialog"
 

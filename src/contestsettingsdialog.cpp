@@ -28,14 +28,12 @@ ContestSettingsDialog::ContestSettingsDialog(QWidget *parent) : QDialog(parent) 
 
 	auto *mainLayout = new QVBoxLayout(this);
 
-	// —— 赛区 ——
 	auto *regionGroup = new QGroupBox(tr("Regions"), this);
 	auto *regionLayout = new QVBoxLayout(regionGroup);
 	regionCheck = new QCheckBox(tr("Enable regions (answers/<region>/<contestant>/)"), regionGroup);
 	regionLayout->addWidget(regionCheck);
 	mainLayout->addWidget(regionGroup);
 
-	// —— 违规检测：规则跟着编译器（语言）走，这里只勾选用哪些语言 ——
 	auto *violationGroup = new QGroupBox(tr("Violation checking"), this);
 	auto *violationLayout = new QVBoxLayout(violationGroup);
 	violationCheck = new QCheckBox(tr("Enable violation checking"), violationGroup);
@@ -48,7 +46,6 @@ ContestSettingsDialog::ContestSettingsDialog(QWidget *parent) : QDialog(parent) 
 	violationLayout->addWidget(compilerList, 1);
 	mainLayout->addWidget(violationGroup, 1);
 
-	// —— 选手文件夹命名限制 ——
 	auto *namingGroup = new QGroupBox(tr("Contestant folder naming restriction"), this);
 	auto *namingLayout = new QVBoxLayout(namingGroup);
 	namingCheck = new QCheckBox(tr("Enable contestant folder naming restriction"), namingGroup);

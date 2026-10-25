@@ -1,7 +1,7 @@
 \documentclass[a4paper, 12pt]{article}
 \usepackage{geometry}
 \geometry{a4paper, top=1in, bottom=1in, left=1in, right=1in, headsep=1.5em}
-\setlength{\intextsep}{0.1em}
+\setlength{\intextsep}{0.5em}
 \usepackage{fontspec}
 \usepackage{xeCJK}
 \usepackage{CJKfntef}
@@ -25,7 +25,6 @@
 \usepackage{stackengine}
 \usepackage{amssymb}
 \usepackage{fix-cm}
-\usepackage{needspace}
 
 \definecolor{mylinkcolor}{HTML}{FF007F}
 \hypersetup
@@ -42,27 +41,27 @@
 \newcommand{\kaishu}[1]{{\CJKfamily{kai} #1}}
 
 \setmonofont{Consolas}
+\setCJKmonofont{SimSun}
 
 \setlength{\parindent}{2em}
 \setlength{\headheight}{15pt}
 \setlist{
-    leftmargin=2em,
-    labelindent=0em,
+    leftmargin=2em, 
+    labelindent=1em,
+    labelwidth=0.5em,
     labelsep=0.5em,
-    labelwidth=1.5em,
     itemindent=0pt,
     listparindent=0pt,
-    topsep=0pt,
+    topsep=0em,
     partopsep=0pt,
     parsep=0pt,
     itemsep=0pt,
 }
-
-\setlist[1]{
+\setlist[itemize,enumerate,1]{
     leftmargin=3em,
     labelindent=2em,
-    labelsep=0.5em,
     labelwidth=0.5em,
+    labelsep=0.5em,
 }
 \setstretch{1.3}
 \mathchardef\plainmathcomma=\mathcode`\, 
@@ -137,6 +136,7 @@
 {
     \endtabularx
 }
+
 \newenvironment{tuacktable}[2][3]{%
     \par\begin{center}%
     \linespread{1.0}\selectfont
@@ -149,16 +149,18 @@
 
 \newcommand{\textbolddot}[1]{\stackunder[0.4ex]{\textbf{#1}}{\textbullet}}
 
-% 表格上下的留白长度，直接改这里的数值即可：
-%   \statementtableskip           普通表格（如《数据范围》）
-%   \statementoverviewtableskip   导览区三张表（概览表 / 提交源程序文件名 / 编译选项）
-\providecommand{\statementtableskip}{\bigskipamount}
-\providecommand{\statementoverviewtableskip}{0.6em}
-
 \renewcommand{\headrulewidth}{0.2pt}
+\makeatletter
+\renewcommand{\headrule}{%
+  \vspace*{-1pt}%
+  \hrule\@height\headrulewidth\@width\headwidth
+  \vspace{\headrulewidth}%
+}
+\makeatother
 
 \newcommand{\myTitleSize}{\fontsize{22pt}{26.4pt}\selectfont}
 \newcommand{\myDateSize}{\fontsize{15pt}{0.6pt}\selectfont}
+
 \newcommand{\bigtitle}{NOI/NOI 调试模板}
 \newcommand{\shorttitle}{NOI Debug}
 \newcommand{\myday}{第一轮}
@@ -168,9 +170,72 @@
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead{}
-\fancyhead[L]{{\footnotesize \bigtitle\hspace{0.5em}\shorttitle}}
-\fancyhead[R]{\footnotesize \myday\hspace{0.5em}\nouppercase{\leftmark}\unskip}
+\fancyhead[L]{{\footnotesize \bigtitle\ \shorttitle}}
+\fancyhead[R]{\footnotesize \myday\hspace{0.4em}\nouppercase{\leftmark}\unskip}
 \fancyfoot[C]{{\footnotesize 第 \thepage 页\hspace{2em}共 \hyperref[LastPage]{\pageref{LastPage}} 页}}
+
+\let\origquote\quote
+\let\endorigquote\endquote
+\renewenvironment{quote}%
+  {\begin{origquote}\CJKfamily{kai}}%
+  {\end{origquote}}
+
+\iffalse
+向您介绍本项目的特殊语法，这可以帮助您更快上手本项目：
+1. 标题
+   本项目的标题分为 \bigtitle、\shorttitle、\myday、\mydate 四个部分，分别对应：比赛全称、比赛简称、场次、时间
+   您可以在上方修改四个字段的内容来更改标题。如果您不希望显示某个内容，可在下方的标题页中把某个内容注释掉（比如本模板将 \mydate 注释掉了，您可以去掉注释看看会发生什么）
+   注意应该是注释正文内容，而不是留空某个字段而不注释，这将导致出现不应该的空白
+   如果您希望页眉显示更多的内容，请在上方修改
+2. 试题
+   本项目的试题标题由 \section 引导，需要在其中填入标题。注意本项目不会自动编号，如需要请手动完成。当然，也请您在试题前手动使用 \newpage 换页
+   试题中的子标题一般建议只使用 \subsection，这也符合 CCF 的习惯
+3. 文本。
+   - 使用 \file{...} 包裹文件名，等价于 \textbf{\textit{...}}，这也符合 CCF 的习惯
+   - 使用 \bolddot{...} 包裹文本，等价于 \textbf{\CJKunderdot{...}}，这也符合 CCF 的习惯。当然，您仍然可以调用 \textbf{...} 来进行不加点的加重
+   - 使用 \begin{ul} 与 \begin{ol} 环境可以快速调用无序与有序列表
+4. 其它
+   - 使用 \link{a}{b} 可以跳转到链接 b，并在 PDF 中显示为 a
+   - 使用 \begin{tuacktable} 环境可以快速生成仿真的 Tuack 风格表格。
+     使用方法：
+     - \begin{tuacktable}[m]{} //表示插入一个 m 列的表格，方括号内按照正常 \tabular 写法，如：\begin{tuacktable}[4]{1 & 2 & 3 & 4}。注意不要少写或多写参数
+     - 中间部分按照正常的表格写法即可，注意 \hline 与 \cline 的使用
+     - 注意表格的最后一行不需要你画线，由环境自动完成
+     使用示例：
+     --- 原表格 ---
+     \begin{table}[h]
+        \centering
+        \renewcommand{\arraystretch}{1.3}
+        \begin{tabular}{@{}c|c|c@{}}
+            \Xhline{2pt}
+            测试点编号 & $n=$ & 特殊性质 \\
+            \Xhline{1pt}
+            $1$ & $2$ & \multirow{4}{*}{无} \\ \cline{1-2}
+            $2$ & $4$ & \\ \cline{1-2}
+            $3, 4$ & $10$ & \\ \cline{1-2}
+            $5 \sim 8$ & $30$ & \\ \hline
+            $9$ & \multirow{2}{*}{$200$} & B \\ \cline{1-1}\cline{3-3}
+            $10, 11$ & & 无 \\ \hline
+            $12$ & \multirow{4}{*}{$10^5$} & A \\ \cline{1-1}\cline{3-3}
+            $13, 14$ & & B \\ \cline{1-1}\cline{3-3}
+            $15, 16$ & & C \\ \cline{1-1}\cline{3-3}
+            $17 \sim 20$ & & 无 \\ \Xhline{2pt}
+        \end{tabular}
+    \end{table}
+    --- 改写版 ---
+    \begin{tuacktable}[3]{测试点编号 & $n=$ & 特殊性质}
+        $1$ & $2$ & \multirow{4}{*}{无} \\ \cline{1-2}
+        $2$ & $4$ & \\ \cline{1-2}
+        $3, 4$ & $10$ & \\ \cline{1-2}
+        $5 \sim 8$ & $30$ & \\ \hline
+        $9$ & \multirow{2}{*}{$200$} & B \\ \cline{1-1}\cline{3-3}
+        $10, 11$ & & 无 \\ \hline
+        $12$ & \multirow{4}{*}{$10^5$} & A \\ \cline{1-1}\cline{3-3}
+        $13, 14$ & & B \\ \cline{1-1}\cline{3-3}
+        $15, 16$ & & C \\ \cline{1-1}\cline{3-3}
+        $17 \sim 20$ & & 无
+    \end{tuacktable}
+\fi
 
 \begin{document}
 \thispagestyle{empty}
@@ -197,5 +262,4 @@ USERNOTICE
 \thispagestyle{empty}
 \pagestyle{fancy}
 
-% Document body (problems) is injected from the generated LaTeX content.
 \end{document}

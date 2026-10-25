@@ -15,7 +15,7 @@ namespace {
 	const QString PLACEHOLDER_SECTION = QStringLiteral("<section>");
 	const QString PLACEHOLDER_NUMBER = QStringLiteral("<number>");
 	const QString PLACEHOLDER_CHAR = QStringLiteral("<char>");
-} // namespace
+} 
 
 auto Naming::defaultPattern() -> QString {
 	return QStringLiteral("<section>-S<number><number><number><number><number>");
@@ -40,7 +40,7 @@ auto Naming::toRegexBody(const QString &pattern, const QString &section) -> QStr
 		} else if (pattern.mid(index).startsWith(PLACEHOLDER_CHAR)) {
 			body += QStringLiteral("[A-Za-z]");
 			index += PLACEHOLDER_CHAR.size();
-		} else { // 普通字符：按字面量
+		} else { 
 			body += QRegularExpression::escape(QString(pattern.at(index)));
 			index += 1;
 		}

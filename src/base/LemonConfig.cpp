@@ -6,7 +6,6 @@
  */
 
 #include "LemonConfig.hpp"
-//
 #include "base/LemonUtils.hpp"
 #include "base/compiler.h"
 
@@ -30,7 +29,6 @@ namespace Lemon::base::config {
 		READ_JSON(json, outputFileExtensions);
 		READ_JSON(json, recentContest);
 
-		// CompilerList
 		if (json.contains("compilerList") && json["compilerList"].isArray()) {
 			QJsonArray _compilerList = json["compilerList"].toArray();
 			compilerList.clear();
@@ -74,4 +72,4 @@ namespace Lemon::base::config {
 		WRITE_JSON(json, compilerList);
 	}
 
-} // namespace Lemon::base::config
+} 

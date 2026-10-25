@@ -6,7 +6,6 @@
  */
 
 #pragma once
-//
 #include <QList>
 #include <QObject>
 #include <QString>
@@ -16,7 +15,7 @@ namespace Lemon {
 		enum Argument {
 			NORMAL = 0,
 			EXIT = 1,
-			LEMON_LINK = 2 // Maybe support URL...
+			LEMON_LINK = 2 
 		};
 		QList<Argument> arguments;
 		QString version;
@@ -24,7 +23,6 @@ namespace Lemon {
 		QString data;
 		QList<QString> links;
 		QList<QString> fullArgs;
-		//
 		bool debugLog;
 		bool exitLemon;
 	};
@@ -39,4 +37,4 @@ namespace Lemon {
 	};
 
 	inline LemonApplicationInterface *LemonCoreApplication = nullptr;
-} // namespace Lemon
+} 

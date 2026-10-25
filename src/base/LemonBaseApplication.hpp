@@ -6,9 +6,7 @@
  */
 
 #pragma once
-//
 #include <SingleApplication>
-//
 #include "base/LemonApplicationInterface.hpp"
 
 namespace Lemon {
@@ -26,4 +24,4 @@ namespace Lemon {
 	  private:
 		bool parseCommandLine(bool *canContinue, QString *errorMessage);
 	};
-} // namespace Lemon
+} 

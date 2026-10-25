@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 
 #include "base/violation.h"
 
@@ -38,7 +37,6 @@ class Compiler : public QObject {
 	double getMemoryLimitRatio() const;
 	bool getDisableMemoryLimitCheck() const;
 	bool getInterpreterAsWatcher() const;
-	/// 这个语言的违规检测限制；比赛日只决定用不用，不看这里有没有内容。
 	const QVector<ViolationRule> &getViolationRules() const;
 
 	void setCompilerType(CompilerType);

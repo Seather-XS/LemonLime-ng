@@ -1,37 +1,29 @@
-# Prerequisites
 *.d
 
-# Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
 
-# Precompiled Headers
 *.gch
 *.pch
 
-# Compiled Dynamic libraries
 *.so
 *.dylib
 *.dll
 
-# Fortran module files
 *.mod
 *.smod
 
-# Compiled Static libraries
 *.lai
 *.la
 *.a
 *.lib
 
-# Executables
 *.exe
 *.out
 *.app
 
-# Qt
 moc_*.cpp
 moc_*.h
 ui_*.cpp
@@ -39,7 +31,6 @@ ui_*.h
 qrc_resource.cpp
 lemon.pro.user
 
-# CMake
 .ninja_deps
 .ninja_log
 CMakeCache.txt
@@ -58,24 +49,20 @@ lemon-*-Linux.sh
 lemon-*-Linux.tar.Z
 lemon-*-Linux.tar.gz
 
-# Build output directories
 /build/
 /dist/
 release/
 LemonLime-*-v*.*.*-win-x64.zip
 tmp-*/
 
-# Generated translations and helper logs
 *.qm
 lupdate.txt
 build_log.txt
 
-# KDevelop
 .kdev4/
 *.kdev4
 .cache/
 
-# Extra
 build/
 build-debug/
 .idea/

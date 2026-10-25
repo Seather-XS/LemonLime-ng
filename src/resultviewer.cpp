@@ -8,7 +8,6 @@
  */
 
 #include "resultviewer.h"
-//
 #include "base/LemonLog.hpp"
 #include "base/LemonType.hpp"
 #include "base/settings.h"
@@ -17,7 +16,6 @@
 #include "core/task.h"
 #include "detaildialog.h"
 #include "judgingdialog.h"
-//
 #include <QApplication>
 #include <QAbstractButton>
 #include <QCheckBox>
@@ -69,12 +67,11 @@ void ResultViewer::changeEvent(QEvent *event) {
 void ResultViewer::showEvent(QShowEvent *event) {
 	QTableWidget::showEvent(event);
 
-	// 选项卡切过来时，把之前攒下的刷新补上。
 	if (needsRefresh)
 		refreshViewer();
 }
 
-void ResultViewer::contextMenuEvent(QContextMenuEvent * /*event*/) {
+void ResultViewer::contextMenuEvent(QContextMenuEvent *) {
 	QList<QTableWidgetSelectionRange> selectionRange = selectedRanges();
 
 	if (selectionRange.empty())
@@ -90,7 +87,6 @@ void ResultViewer::contextMenuEvent(QContextMenuEvent * /*event*/) {
 	if (! selectionRange.empty()) {
 		contextMenu->addAction(judgeSelectedAction);
 
-		// 没开违规 / 命名检测时没什么可忽略的。
 		judgeIgnoreLimitsAction->setEnabled(curContest && (curContest->getViolationCheck() ||
 		                                                   curContest->getNamingCheck()));
 		contextMenu->addAction(judgeIgnoreLimitsAction);
@@ -119,19 +115,14 @@ void ResultViewer::setContest(Contest *contest) {
 	connect(curContest, &Contest::taskDeletedForViewer, this, &ResultViewer::refreshViewer);
 	connect(curContest, &Contest::problemTitleChanged, this, &ResultViewer::refreshViewer);
 	connect(curContest, &Contest::taskJudgingFinished, this, &ResultViewer::refreshViewer);
-	// 被取消测试的选手不会产生 taskJudgingFinished，只发 contestantSkipped。
-	// 不接这个信号的话，他们的成绩行要等到下一个正常选手的某题测完才变。
 	connect(curContest, &Contest::contestantSkipped, this, &ResultViewer::refreshViewer);
 }
 
 int ResultViewer::taskColumnBase() const {
-	// 启用赛区时，选手名后多一列「赛区」，后面的列号整体右移一位。
 	return (curContest && curContest->getRegionEnabled()) ? 4 : 3;
 }
 
 void ResultViewer::refreshViewer() {
-	// 选项卡没显示时先不重建：大比赛要造几千个单元格，此时用户也看不到。
-	// （命令行里用的 viewer 没有父窗口，不受影响，照旧立即重建。）
 	if (! isVisible() && parentWidget()) {
 		needsRefresh = true;
 		return;
@@ -145,7 +136,6 @@ void ResultViewer::refreshViewer() {
 	if (! curContest)
 		return;
 
-	// 启用赛区时，在选手名后面加一列「赛区」（显示与导出保持一致）。
 	const bool withRegion = curContest->getRegionEnabled();
 	QStringList headerList;
 	headerList << tr("Rank") << tr("Name");
@@ -159,15 +149,6 @@ void ResultViewer::refreshViewer() {
 	curContest->copySettings(setting);
 	ColorTheme colors = setting.getCurrentColorTheme();
 
-	// #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-	// 	if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
-	// 		colors.invertLightness();
-	// 		LOG("Auto dark mode has been set");
-	// 	}
-	// #endif
-	// https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5
-	// Waiting QPalette::colorScheme implement
-	// So we use an alternative method.
 	if (shouldApplyDarkFrame()) {
 		colors.invertLightness();
 		LOG("Auto dark mode has been set");
@@ -243,8 +224,6 @@ void ResultViewer::refreshViewer() {
 		if (totalScore != -1) {
 			item(i, scoreColumn)->setData(Qt::DisplayRole, totalScore);
 
-			// 违规 / 命名不合规都是 0 分，照常参与排名，只用颜色区分原因
-			// （悬停不再弹原因，要看详情双击那一行）。
 			if (contestantList[i]->getDisqualifyState() == Contestant::ViolationDisqualified) {
 				item(i, scoreColumn)->setBackground(QColor(200, 60, 60));
 			} else if (contestantList[i]->getDisqualifyState() == Contestant::NamingDisqualified) {
@@ -256,8 +235,6 @@ void ResultViewer::refreshViewer() {
 			font.setBold(true);
 			item(i, scoreColumn)->setFont(font);
 
-			// 被判定取消测试的选手：一题都没跑，所以用时为 0；时间就是他这一轮
-			// 被判定取消的时间，照常显示。
 			item(i, timeColumn)->setData(Qt::DisplayRole, double(totalUsedTime) / 1000);
 
 			if (judgingTime.isValid())
@@ -326,8 +303,6 @@ void ResultViewer::judgeIgnoreLimits() {
 	if (judgeList.isEmpty())
 		return;
 
-	// 重测的单位是「整名选手」：违规 / 命名判定本来就是选手级的，只重测被点中的那一题
-	// 会让同一名选手的其它题停留在未测 / 0 分的状态。
 	const int taskCount = curContest->getTaskList().size();
 	QVector<int> allTasks;
 
@@ -341,7 +316,6 @@ void ResultViewer::judgeIgnoreLimits() {
 
 	judgeList = wholeList;
 
-	// 忽略限制重测会把选手的代码照常编出来跑，必须先让用户确认安全。
 	QMessageBox messageBox(QMessageBox::Warning, tr("Ignore Restrictions and Rejudge"),
 	                       tr("Please make sure the contestants' code will not harm your judging machine "
 	                          "before continuing to rejudge. Ignore the restrictions and rejudge?"),
@@ -518,12 +492,7 @@ void ResultViewer::deleteContestant() {
 	                                   QString("<span style=\"font-size:large\">") +
 	                                       tr("Are you sure to delete selected contestant(s)?") + "</span>",
 	                                   QMessageBox::Ok | QMessageBox::Cancel, this);
-	// QHBoxLayout *layout = new QHBoxLayout;
 	auto *checkBox = new QCheckBox(tr("Delete data in the disk as well"));
-	// layout->addWidget(checkBox);
-	// layout->setAlignment(checkBox, Qt::AlignHCenter);
-	// dynamic_cast<QGridLayout*>(messageBox->layout())->addLayout(layout, 1, 1);
-	// dynamic_cast<QGridLayout*>(messageBox->layout())->setVerticalSpacing(10);
 	messageBox->setCheckBox(checkBox);
 
 	if (messageBox->exec() != QMessageBox::Ok)

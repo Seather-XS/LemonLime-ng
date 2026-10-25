@@ -5,7 +5,6 @@
  */
 
 #include "columndialog.h"
-//
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
@@ -43,7 +42,6 @@ void ColumnDialog::buildUi() {
 	form->addRow(typeLabel, typeBox);
 	layout->addLayout(form);
 
-	// 模板
 	templateBox = new QWidget(this);
 	auto *templateForm = new QFormLayout(templateBox);
 	templateForm->setContentsMargins(0, 0, 0, 0);
@@ -52,7 +50,6 @@ void ColumnDialog::buildUi() {
 	templateForm->addRow(templateLabel, templateEdit);
 	layout->addWidget(templateBox);
 
-	// 随机
 	randomBox = new QWidget(this);
 	auto *randomForm = new QFormLayout(randomBox);
 	randomForm->setContentsMargins(0, 0, 0, 0);
@@ -177,7 +174,6 @@ auto ColumnDialog::collect() const -> AdmissionColumnRule {
 	value.name = column;
 	value.type = typeBox->currentIndex() == 1 ? QStringLiteral("random") : QStringLiteral("template");
 	value.templateText = templateEdit->text().trimmed();
-	// 模板里的数字 / 字母分组默认按赛区序号，改来源的界面留到以后。
 	value.numberSources = {QStringLiteral("regionSeq")};
 	value.charSources = {QStringLiteral("regionSeq")};
 	value.length = lengthBox->value();

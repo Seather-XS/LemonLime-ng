@@ -9,14 +9,11 @@
 
 #include "generalsettings.h"
 #include "ui_generalsettings.h"
-//
 #include "base/LemonLog.hpp"
 #include "base/LemonTranslator.hpp"
 #include "base/settings.h"
-//
 #include <QMessageBox>
 #include <QThread>
-//
 #define LEMON_MODULE_NAME "GeneralSettings"
 
 GeneralSettings::GeneralSettings(QWidget *parent) : QWidget(parent), ui(new Ui::GeneralSettings) {

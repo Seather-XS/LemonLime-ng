@@ -8,7 +8,6 @@
  */
 
 #include "exportutil.h"
-//
 #include "base/LemonType.hpp"
 #include "base/LemonUtils.hpp"
 #include "base/settings.h"
@@ -38,20 +37,16 @@ const auto resultStateMap = []() {
 	return resMap;
 }();
 namespace {
-	/// 结果表里「测试被取消」的配色：违规红、命名不合规紫（与 ResultViewer 一致）。
 	QString disqualifyColorCss(const Contestant *contestant) {
 		return contestant->getDisqualifyState() == Contestant::ViolationDisqualified ? QStringLiteral("#c83c3c")
 		                                                                            : QStringLiteral("#a05ac8");
 	}
-} // namespace
+} 
 
 auto ExportUtil::getContestantHtmlCode(Contest *contest, Contestant *contestant, int num) -> QString {
 	QString htmlCode;
 	QList<Task *> taskList = contest->getTaskList();
 
-	// 违规 / 命名不合规：这里只写「测试被取消」，具体原因跟在后面。
-	// 成绩表里这位选手的每一个试题格都指向这一段（#c<num>p<j>），所以除了第一题的锚点
-	// 之外，后面每道题也各放一个空锚点，否则点第一题以外的试题不会有任何反应。
 	if (contestant->isDisqualified()) {
 		for (int i = taskList.size() - 1; i >= 1; i--)
 			htmlCode += QString(R"(<div id="c%1p%2"></div>)").arg(num).arg(i);
@@ -233,11 +228,6 @@ auto ExportUtil::getContestantHtmlCode(Contest *contest, Contestant *contestant,
 	htmlCode += QString("<p><a href=\"#top\">%1</a></p>").arg(tr("Return to top"));
 	return htmlCode;
 }
-/*
- * Generate the HTML code for the summary page
- * Might be difficult to maintain
- * Use Javascript to shrink the filesize
- */
 void ExportUtil::exportHtml(QWidget *widget, Contest *contest, const QString &fileName,
                             const QList<Contestant *> *subset) {
 	Settings settings;
@@ -258,7 +248,6 @@ void ExportUtil::exportHtml(QWidget *widget, Contest *contest, const QString &fi
 	out << "<html><head>";
 	out << R"(<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />)";
 
-	// Style sheet
 	out << "<style type=\"text/css\">"
 	       "th, td {padding-left: 1em; padding-right: 1em; white-space: nowrap; "
 	       "text-align: center; verticle-align: middle;}"
@@ -315,7 +304,6 @@ void ExportUtil::exportHtml(QWidget *widget, Contest *contest, const QString &fi
 	out << QString(R"(<th class="th-0" scope="col">%1</th>)").arg(tr("Rank"));
 	out << QString(R"(<th class="th-0" scope="col">%1</th>)").arg(tr("Name"));
 
-	// 启用赛区时，选手名后加一列「赛区」，与软件里显示的成绩表一致。
 	if (contest->getRegionEnabled())
 		out << QString(R"(<th class="th-0" scope="col">%1</th>)").arg(tr("Region"));
 
@@ -346,7 +334,6 @@ void ExportUtil::exportHtml(QWidget *widget, Contest *contest, const QString &fi
 		int allScore = contestant->getTotalScore();
 
 		if (contestant->isDisqualified()) {
-			// 被判定取消的选手：与结果表一致地打上红（违规）/ 紫（命名不合规）底色。
 			out << QString("<td class=\"td-2\" style=\"background: %2; border: 2px solid %2;\">%1</td>")
 			           .arg(allScore)
 			           .arg(disqualifyColorCss(contestant));
@@ -444,8 +431,6 @@ void ExportUtil::exportHtml(QWidget *widget, Contest *contest, const QString &fi
 	out << "</body>";
 	out << "</html>";
 	QApplication::restoreOverrideCursor();
-	// 不在这里弹提示：一次「导出成绩」会写出总成绩单 + 每个赛区各一份，
-	// 统一由 exportResult() 在全部写完后弹一次「导出完成」（CLI 调用则完全不弹窗）。
 	Q_UNUSED(widget);
 }
 
@@ -453,7 +438,6 @@ auto ExportUtil::getSmallerContestantHtmlCode(Contest *contest, Contestant *cont
 	QString htmlCode;
 	QList<Task *> taskList = contest->getTaskList();
 
-	// 违规 / 命名不合规：只写「测试被取消」，后面附上原因。
 	if (contestant->isDisqualified()) {
 		htmlCode += QString("<p><span style=\"font-weight:bold; font-size:large;\">%1</span><br>")
 		                .arg(Contestant::disqualifiedText());
@@ -710,7 +694,6 @@ void ExportUtil::exportSmallerHtml(QWidget *widget, Contest *contest, const QStr
 		int allScore = contestant->getTotalScore();
 
 		if (contestant->isDisqualified()) {
-			// 与结果表一致：违规红、命名不合规紫。
 			out << QString("<td class=\"f\" style=\"background: %2;\">%1</td>")
 			           .arg(allScore)
 			           .arg(disqualifyColorCss(contestant));
@@ -745,7 +728,6 @@ void ExportUtil::exportSmallerHtml(QWidget *widget, Contest *contest, const QStr
 
 	out << "</body></html>";
 	QApplication::restoreOverrideCursor();
-	// 提示框统一由 exportResult() 弹（一次导出会写出总成绩单 + 每个赛区各一份），这里不再单独提示。
 }
 
 void ExportUtil::exportCsv(QWidget *widget, Contest *contest, const QString &fileName) {
@@ -943,7 +925,6 @@ void ExportUtil::exportResult(QWidget *widget, Contest *contest) {
 		return;
 	}
 
-	// 成绩单固定导到当前比赛日的 dist/reports/ 目录（工作目录就是比赛日目录），不给改路径。
 	const QString reportsDir = QDir::current().absoluteFilePath(Settings::reportsPath());
 
 	if (! QDir().mkpath(reportsDir)) {
@@ -956,7 +937,6 @@ void ExportUtil::exportResult(QWidget *widget, Contest *contest) {
 	const QString resultFile = reportsDir + QDir::separator() + QStringLiteral("result.html");
 	exportHtml(widget, contest, resultFile);
 
-	// 启用赛区时，再为每个赛区单独导出一份（赛区内单独排名）：result-<赛区>.html
 	if (contest->getRegionEnabled()) {
 		QMap<QString, QList<Contestant *>> byRegion;
 
@@ -972,7 +952,6 @@ void ExportUtil::exportResult(QWidget *widget, Contest *contest) {
 		}
 	}
 
-	// 全部写完后只提示这一次（命令行导出时 widget 为空，不弹窗）。
 	if (widget)
 		QMessageBox::information(widget, tr("LemonLime"), tr("Export is done"), QMessageBox::Ok);
 }

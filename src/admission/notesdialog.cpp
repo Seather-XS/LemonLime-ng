@@ -5,7 +5,6 @@
  */
 
 #include "notesdialog.h"
-//
 #include <QDialogButtonBox>
 #include <QFontDatabase>
 #include <QPlainTextEdit>

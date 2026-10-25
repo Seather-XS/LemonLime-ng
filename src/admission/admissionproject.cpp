@@ -5,9 +5,7 @@
  */
 
 #include "admissionproject.h"
-//
 #include "base/LemonLog.hpp"
-//
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -20,7 +18,6 @@
 #define LEMON_MODULE_NAME "Admission"
 
 namespace {
-	/// 钉定的 admission/ 根目录（绝对路径）。空的 = 工作目录下的 `admission/`。
 	QString admissionRootOverride;
 
 	QString sep() { return QString(QDir::separator()); }
@@ -57,7 +54,6 @@ namespace {
 		return true;
 	}
 
-	/// 抽掉开头那一块「键: 值」赛区信息，返回剩下的正文。
 	QString splitInfo(QString &markdown, QMap<QString, QString> &info) {
 		static const QRegularExpression entry(QStringLiteral(R"(^\s{0,3}([^\s:：#][^:：]{0,29})\s*[:：]\s*(.*)$)"));
 		static const QRegularExpression heading(QStringLiteral(R"(^\s{0,3}#{1,6}\s+)"));
@@ -81,7 +77,6 @@ namespace {
 		return body.join(QChar('\n')).trimmed();
 	}
 
-	/// 取 `# 名字` 那一节；整篇没有标题时（fallback）全部算这一节。
 	QString section(const QString &markdown, const QString &name, bool fallback) {
 		static const QRegularExpression heading(QStringLiteral(R"(^\s{0,3}(#{1,6})\s+(.*?)\s*$)"));
 		const QStringList lines = markdown.split(QChar('\n'));
@@ -123,7 +118,6 @@ namespace {
 		return {};
 	}
 
-	/// 把一段通告写成 .md 文件的内容（两端留一个空行，方便手改）。
 	QString composeNotes(const QString &markdown) {
 		QString text = markdown.trimmed();
 		return text.isEmpty() ? QString() : text + QChar('\n');
@@ -146,7 +140,7 @@ namespace {
 
 		return true;
 	}
-} // namespace
+} 
 
 auto AdmissionProject::root() -> QString {
 	return admissionRootOverride.isEmpty() ? QStringLiteral("admission") + sep() : admissionRootOverride;
@@ -168,7 +162,6 @@ auto AdmissionProject::regionFolder(const QString &region) -> QString {
 	return region.trimmed().isEmpty() ? regionsRoot() : regionsRoot() + region.trimmed() + sep();
 }
 
-/// 旧数据的兼容路径：老版把测试时间写在赛区的 region.json 里。
 auto AdmissionProject::regionJsonPath(const QString &region) -> QString {
 	return regionFolder(region) + QStringLiteral("region.json");
 }
@@ -308,7 +301,6 @@ bool AdmissionProject::load(bool regionEnabled, QString *error) {
 		packageName = policy.value(QStringLiteral("packageName")).toString(packageName);
 		overwrite = policy.value(QStringLiteral("overwrite")).toBool(overwrite);
 
-		// 输出文件名规则
 		const QJsonObject naming = policy.value(QStringLiteral("naming")).toObject();
 		namingEnabled = naming.value(QStringLiteral("enabled")).toBool(namingEnabled);
 		namingTemplate = naming.value(QStringLiteral("template")).toString(namingTemplate);
@@ -323,12 +315,10 @@ bool AdmissionProject::load(bool regionEnabled, QString *error) {
 		for (const auto &value : naming.value(QStringLiteral("charGroups")).toArray())
 			namingCharSources << value.toObject().value(QStringLiteral("source")).toString();
 
-		// 排座位策略
 		const QJsonObject seat = policy.value(QStringLiteral("seat")).toObject();
 		seatLayout = seat.value(QStringLiteral("layout")).toInt(seatLayout);
 		seatOrder = seat.value(QStringLiteral("order")).toString(seatOrder);
 
-		// 准考证号规则
 		const QJsonObject rule = config.value(QStringLiteral("idRule")).toObject();
 		idTemplate = rule.value(QStringLiteral("template")).toString(idTemplate);
 		idCharSources.clear();
@@ -344,7 +334,6 @@ bool AdmissionProject::load(bool regionEnabled, QString *error) {
 		AdmissionRegion region;
 		region.name = name;
 
-		// 旧版把测试时间写在赛区的 region.json 里：还没搬到 config.json 就先用它的。
 		if (examTime.isEmpty() && readText(regionJsonPath(name), text)) {
 			const QJsonObject object = QJsonDocument::fromJson(text.toUtf8()).object();
 			examTime = object.value(QStringLiteral("examTime")).toString();
@@ -379,7 +368,6 @@ bool AdmissionProject::createRegion(const QString &region, QString *error) {
 	item.name = region;
 	item.table.header = AdmissionTable::builtinColumns();
 
-	// 只有真正要落盘的文件才建出来：notes.md / contestants.csv / columns.json
 	QDir().mkpath(regionFolder(region));
 
 	if (! writeText(notesPath(region), QString(), error))
@@ -443,7 +431,6 @@ bool AdmissionProject::saveConfig(QString *error) const {
 	policy.insert(QStringLiteral("packageName"), packageName);
 	policy.insert(QStringLiteral("overwrite"), overwrite);
 
-	// 输出文件名规则
 	{
 		QJsonArray numbers;
 		QJsonArray chars;
@@ -471,7 +458,6 @@ bool AdmissionProject::saveConfig(QString *error) const {
 		policy.insert(QStringLiteral("naming"), naming);
 	}
 
-	// 排座位策略
 	{
 		QJsonObject seat;
 		seat.insert(QStringLiteral("layout"), seatLayout);
@@ -479,7 +465,6 @@ bool AdmissionProject::saveConfig(QString *error) const {
 		policy.insert(QStringLiteral("seat"), seat);
 	}
 
-	// 准考证号规则
 	QJsonObject idRule;
 	idRule.insert(QStringLiteral("template"), idTemplate);
 	{
@@ -515,7 +500,6 @@ void AdmissionProject::migrateLegacy(QStringList *log) {
 	if (! rootDir.exists())
 		return;
 
-	// 模板已经内置，旧版生成的 template.tex 直接删掉（里面是旧版布局，留着会误导）。
 	if (QFileInfo::exists(root() + QStringLiteral("template.tex"))) {
 		QFile::remove(root() + QStringLiteral("template.tex"));
 
@@ -523,8 +507,6 @@ void AdmissionProject::migrateLegacy(QStringList *log) {
 			*log << QStringLiteral("removed admission/template.tex (the template is built in now)");
 	}
 
-	// regions/ 已经存在就说明迁过了（别再动一次：admission/ 下的 contest-notes.md
-	// 之类会再被当成一个「赛区」，凭空多出一个目录）。
 	if (QDir(regionsRoot()).exists())
 		return;
 
@@ -545,7 +527,6 @@ void AdmissionProject::migrateLegacy(QStringList *log) {
 	for (const QString &name : mds) {
 		const QString base = QFileInfo(name).completeBaseName();
 
-		// contest-notes.md 是整场的「比赛注意」，不是赛区（老版把它放在 admission/ 下）。
 		if (base.compare(QStringLiteral("contest-notes"), Qt::CaseInsensitive) == 0)
 			continue;
 
@@ -555,8 +536,6 @@ void AdmissionProject::migrateLegacy(QStringList *log) {
 		if (! readText(root() + name, text))
 			continue;
 
-		// 旧版把考点 / 考场 / 测试时间写在 .md 开头：测试时间搬进 config.json，
-		// 考场与考点本来就应该写在名单（contestants.csv）里。
 		QMap<QString, QString> info;
 		const QString body = splitInfo(text, info);
 		const QString notes = section(body, QStringLiteral("注意事项"), true);
@@ -565,8 +544,6 @@ void AdmissionProject::migrateLegacy(QStringList *log) {
 		if (! general.isEmpty() && ! QFileInfo::exists(contestNotesPath()))
 			writeText(contestNotesPath(), composeNotes(general), nullptr);
 
-		// 旧版的测试时间 / 考场 / 考点都不再是赛区级的：测试时间搬进 config.json（若还没有），
-		// 考场与考点本来就应该写在名单（contestants.csv）里。
 		const QString legacyTime = info.value(QStringLiteral("测试时间")).trimmed();
 		QString configText;
 

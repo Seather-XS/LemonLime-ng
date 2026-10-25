@@ -2,12 +2,8 @@ cmake_minimum_required(VERSION 3.16.0)
 
 project(lemon LANGUAGES CXX)
 
-## Add paths to check for cmake modules:
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# ==================================================================================
-# CMake Macros
-# ==================================================================================
 include(FeatureSummary)
 
 macro(LEMONLOG MSG)
@@ -56,14 +52,12 @@ add_definitions(-DQT_NO_FOREACH)
 
 list(APPEND LEMON_QT_LIBS ${LEMON_QT_LIBNAME}::Core ${LEMON_QT_LIBNAME}::Gui ${LEMON_QT_LIBNAME}::Widgets)
 
-# 导出 .zip 用到 Qt 私有的 QZipWriter（Qt6Core.dll 里已导出，这里只需要它的头文件目录）。
 if(TARGET ${LEMON_QT_LIBNAME}::CorePrivate)
     list(APPEND LEMON_QT_LIBS ${LEMON_QT_LIBNAME}::CorePrivate)
 else()
     message(WARNING "${LEMON_QT_LIBNAME}::CorePrivate not found: .zip export may not build")
 endif()
 
-# 加密 zip 里的 deflate 压缩用 zlib；没找到就只是不压缩（依然能加密、能解压）。
 find_package(ZLIB)
 if(ZLIB_FOUND)
     add_compile_definitions(LEMON_HAVE_ZLIB)
@@ -77,7 +71,6 @@ set(SINGLEAPPLICATION_DIR ${CMAKE_SOURCE_DIR}/3rdparty/SingleApplication)
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 add_subdirectory(3rdparty/SingleApplication)
 
-# spdlog 
 add_compile_definitions(SPDLOG_COMPILED_LIB)
 add_compile_definitions(SPDLOG_BUILD_SHARED=OFF)
 set(spdlog_DIR ${CMAKE_SOURCE_DIR}/3rdparty/spdlog)
@@ -101,14 +94,9 @@ if(ENABLE_CCACHE)
     endif()
 endif()
 
-# ==================================================================================
-# Lemon Build Info
-# ==================================================================================
-
 file(STRINGS "${CMAKE_SOURCE_DIR}/makespec/VERSION" VERSION)
 file(STRINGS "${CMAKE_SOURCE_DIR}/makespec/VERSIONSUFFIX" VERSION_SUFFIX)
 
-# Get git commit hash as build version
 find_package(Git QUIET)
 if(GIT_FOUND)
     execute_process(
@@ -125,7 +113,6 @@ if(GIT_FOUND)
         set(BUILD_VERSION "no-git")
     endif()
 else()
-    # Fallback if git is not found
     execute_process(
         COMMAND "git" rev-parse --short HEAD
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -202,22 +189,10 @@ if(LEMON_CONFIG_DIR)
     LEMONLOG(LEMON_CONFIG_DIR)
 endif()
 
-# ==================================================================================
-# Lemon Base && Core
-# ==================================================================================
-
 include(cmake/lemon-base.cmake)
 include(cmake/lemon-core.cmake)
 
-# ==================================================================================
-# Lemon UI
-# ==================================================================================
-
 include(cmake/lemon-ui.cmake)
-    
-# ==================================================================================
-# Lemon Translations
-# ==================================================================================
 
 include(cmake/LemonTranslations.cmake)
 
@@ -227,7 +202,6 @@ if(EMBED_TRANSLATIONS)
     set(LEMON_EMBED_TRANSLATION_QRC ${CMAKE_BINARY_DIR}/translations.qrc)
 endif()
 
-# Qt language translations
 add_custom_target(lupdate
     COMMAND ${Qt_DIR}/../../../bin/lupdate
     ${LEMON_BASE_SOURCES}
@@ -237,11 +211,6 @@ add_custom_target(lupdate
     ${SINGLEAPPLICATION_SOURCES} -ts ${TRANSLATIONS_TS} -locations none -noobsolete
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 set_target_properties(lupdate PROPERTIES EXCLUDE_FROM_ALL TRUE)
-
-
-# ==================================================================================
-# Lemon Build
-# ==================================================================================
 
 set(QRC_RESOURCES
     resource.qrc
@@ -285,10 +254,6 @@ if(ENABLE_LTO)
         message(STATUS "IPO / LTO not supported, disabled")
     endif()
 endif()
-
-# ==================================================================================
-# Lemon Package
-# ==================================================================================
 
 include(cmake/deployment.cmake)
 

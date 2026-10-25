@@ -9,9 +9,7 @@
 
 #include "addtestcaseswizard.h"
 #include "ui_addtestcaseswizard.h"
-//
 #include "base/settings.h"
-//
 #include <QDir>
 #include <QMessageBox>
 #include <algorithm>
@@ -57,8 +55,6 @@ void AddTestCasesWizard::setSettings(Settings *_settings, bool check) {
 	ui->memoryLimit->setEnabled(check);
 	ui->memoryLimitLabel->setEnabled(check);
 	ui->mbLabel->setEnabled(check);
-	// ui->outputFilesPattern->setDisabled(interactorCheck);
-	// ui->outputFilesPatternLabel->setDisabled(interactorCheck);
 	refreshButtonState();
 }
 
@@ -243,7 +239,6 @@ void AddTestCasesWizard::searchMatchedFiles() {
 	QList<std::pair<QString, QString>> singleCases;
 	QList<QStringList> matchedPart;
 
-	// if(ui->outputFilesPattern->isEnabled()) {
 	for (int i = 0; i < inputFiles.size(); i++) {
 		loc.replace(inputFilesMatchedPart[i].join("*"), i);
 	}
@@ -256,12 +251,6 @@ void AddTestCasesWizard::searchMatchedFiles() {
 		}
 	}
 
-	/*} else {
-	    for (int i = 0; i < inputFiles.size(); i ++) {
-	            singleCases.append(std::make_pair(inputFiles[i], QString("")));
-	            matchedPart.append(inputFilesMatchedPart[i]);
-	    }
-	}*/
 	loc.clear();
 
 	for (int i = 0; i < singleCases.size(); i++) {

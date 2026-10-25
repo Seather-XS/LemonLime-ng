@@ -8,7 +8,6 @@
  */
 
 #include "filelineedit.h"
-//
 #include "base/settings.h"
 
 FileLineEdit::FileLineEdit(QWidget *parent) : QLineEdit(parent) { completer = nullptr; }
@@ -27,7 +26,6 @@ void FileLineEdit::getFiles(const QString &curDir, const QString &prefix, QStrin
 
 	files.append(fileList);
 
-	// Get file in Child dir
 	QStringList dirList = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
 
 	for (auto &&d : dirList) {
@@ -63,8 +61,6 @@ void FileLineEdit::setRootDirectory(const QString &relativeDir) {
 void FileLineEdit::refreshFileList() {
 	QStringList files;
 
-	// 限定根目录时只列出该目录（含其子目录）下的文件，补全项带上目录前缀，
-	// 这样填进控件的就是 <题>/graders/<文件> 这类可直接使用的相对路径。
 	if (rootDirectory.isEmpty())
 		getFiles(Settings::dataPath(), "", files);
 	else

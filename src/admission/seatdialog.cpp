@@ -5,7 +5,6 @@
  */
 
 #include "seatdialog.h"
-//
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QFormLayout>
@@ -106,7 +105,6 @@ void SeatDialog::updatePreview() {
 	lines << tr("Seat numbers: %1 digit(s)").arg(width);
 	lines << QString();
 
-	// 每个考点 / 考场分到多少人
 	QHash<QString, QHash<QString, int>> perVenue;
 
 	for (int row = 0; row < roomValues.size(); ++row)
@@ -125,7 +123,6 @@ void SeatDialog::updatePreview() {
 	const int nameColumn = table.columnIndex(QStringLiteral("姓名"));
 	lines << QString();
 
-	// 全都列出来（文本框自己滚）：“谁坐在哪个考场哪个座位”能一路看到最后一个。
 	for (int row = 0; row < seatValues.size(); ++row)
 		lines << QStringLiteral("%1. %2 → %3 / %4")
 		             .arg(row + 1)

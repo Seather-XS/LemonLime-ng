@@ -5,9 +5,7 @@
  */
 
 #include "admissioncolumns.h"
-//
 #include "admissionproject.h"
-//
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
@@ -38,7 +36,6 @@ namespace AdmissionColumns {
 			return array;
 		}
 
-		/// 可重算的随机列：按种子算出稳定的串（同一行永远一样）。
 		QString seededRandom(const QString &seed, const AdmissionColumnRule &rule) {
 			QString alphabet;
 
@@ -97,7 +94,7 @@ namespace AdmissionColumns {
 
 			return out;
 		}
-	} // namespace
+	} 
 
 	bool load(const QString &region, QList<AdmissionColumnRule> &rules, QString *error) {
 		rules.clear();
@@ -218,7 +215,6 @@ namespace AdmissionColumns {
 					return false;
 				}
 
-				// 引用必须指向「已经求值」的列：按 CSV 列从左到右处理。
 				const int nameColumn = table.columnIndex(QStringLiteral("姓名"));
 				const int idColumn = table.columnIndex(QStringLiteral("准考证号"));
 				const int seatColumn = table.columnIndex(QStringLiteral("座位号"));
@@ -258,14 +254,12 @@ namespace AdmissionColumns {
 						return false;
 					}
 
-					// 模板列总是按列序重算（源列变则变）；onlyEmpty 只对随机列生效。
 					table.rows[row][column] = value;
 				}
 
 				continue;
 			}
 
-			// 随机列：只填空值；可重算的按种子，同一行永远一样。
 			const int idColumn = table.columnIndex(QStringLiteral("准考证号"));
 			const int nameColumn = table.columnIndex(QStringLiteral("姓名"));
 
@@ -294,4 +288,4 @@ namespace AdmissionColumns {
 
 		return true;
 	}
-} // namespace AdmissionColumns
+} 

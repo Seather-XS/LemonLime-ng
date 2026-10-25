@@ -8,12 +8,9 @@
  */
 
 #include "settings.h"
-//
 #include "base/LemonLog.hpp"
 #include "base/compiler.h"
-//
 #include <cmath>
-//
 #include <QDir>
 #include <QFileInfo>
 #include <QLocale>
@@ -395,7 +392,7 @@ void Settings::copyFrom(Settings *other) {
 	setInputFileExtensions(other->getInputFileExtensions().join(";"));
 	setOutputFileExtensions(other->getOutputFileExtensions().join(";"));
 	setSplashTime(other->getSplashTime());
-	setUiLanguage(other->getUiLanguage()); // 为什么这个没复制啊！！！// 草
+	setUiLanguage(other->getUiLanguage()); 
 
 	for (auto &i : compilerList) {
 		delete i;
@@ -469,14 +466,6 @@ void Settings::saveSettings() {
 		settings.setValue("GrandRateH", colorThemeList[i]->getGrandRate().h);
 		settings.setValue("GrandRateS", colorThemeList[i]->getGrandRate().s);
 		settings.setValue("GrandRateL", colorThemeList[i]->getGrandRate().l);
-		/*
-		settings.setValue("MxColor", QVariant::fromValue(colorThemeList[i]->getMxColor()));
-		settings.setValue("MiColor", QVariant::fromValue(colorThemeList[i]->getMiColor()));
-		settings.setValue("NfColor", QVariant::fromValue(colorThemeList[i]->getNfColor()));
-		settings.setValue("CeColor", QVariant::fromValue(colorThemeList[i]->getCeColor()));
-		settings.setValue("GrandComp", QVariant::fromValue(colorThemeList[i]->getGrandComp()));
-		settings.setValue("GrandRate", QVariant::fromValue(colorThemeList[i]->getGrandRate()));
-		*/
 	}
 	settings.endArray();
 	settings.setValue("CurrentColorTheme", currentColorTheme);
@@ -563,7 +552,6 @@ void Settings::loadSettings() {
 	splashTime = settings.value("SplashTime", 500).toInt();
 	settings.endGroup();
 
-	// The colour scheme is fixed, stored themes are ignored.
 	auto *colorTheme = new ColorTheme;
 	colorTheme->setName("C");
 	colorTheme->setColor(hslTuple(120, 80.0, 65.0), hslTuple(120, 20.0, 98.0), hslTuple(180, 80.0, 78.0),
@@ -609,7 +597,6 @@ void Settings::loadSettings() {
 		compiler->setEnvironment(environment);
 		settings.endArray();
 
-		// 老版本没有这一项：按源文件后缀补一份默认限制；存过空列表就是用户真的清空了。
 		if (settings.contains("ViolationRules")) {
 			QVector<ViolationRule> rules;
 
@@ -657,12 +644,10 @@ auto Settings::upperBoundForFileSizeLimit() -> int { return 256 * 1024; }
 
 auto Settings::upperBoundForRejudgeTimes() -> int { return 12; }
 
-// gengen-tuack 布局：<比赛日>/problem/<题>/data/ 与 <比赛日>/answers/<赛区>/<选手>/
 auto Settings::dataPath() -> QString { return QString("problem") + QDir::separator(); }
 
 auto Settings::sourcePath() -> QString { return QString("answers") + QDir::separator(); }
 
-// 交互库（交互题头文件）与校验器只允许放在 <题>/graders/ 下，路径相对于 dataPath()。
 auto Settings::gradersPath(const QString &taskName) -> QString {
 	if (taskName.isEmpty())
 		return {};
@@ -677,24 +662,41 @@ auto Settings::graderFilePath(const QString &taskName, const QString &fileName) 
 	return gradersPath(taskName) + QFileInfo(fileName).fileName();
 }
 
-// 快速导入：把原 Lemon 的 data/<题>/<文件> 放进 import/ 下，一键配置
-// 成 gengen 布局的 problem/<题>/data/<文件>。
 auto Settings::importPath() -> QString { return QString("import") + QDir::separator(); }
 
 void Settings::ensureTaskDirs(const QString &taskName) {
 	if (taskName.isEmpty())
 		return;
 
-	// gengen-tuack 的试题目录：正式数据 / 下发样例 / 校验器与交互库 / 数据生成器
 	const QString base = dataPath() + taskName;
+	const QString generatorDir = base + QDir::separator() + QStringLiteral("generator");
+	const QString legacyGenDir = base + QDir::separator() + QStringLiteral("gen");
+
+	if (QDir(legacyGenDir).exists()) {
+		if (! QDir(generatorDir).exists() && QDir().rename(legacyGenDir, generatorDir)) {
+			LOG("Renamed the legacy gen/ folder of task", taskName, "to generator/");
+		} else if (QDir(generatorDir).exists()) {
+			QDir legacy(legacyGenDir);
+			QDir target(generatorDir);
+
+			for (const QFileInfo &info : legacy.entryInfoList(QDir::Files | QDir::Hidden)) {
+				const QString destination = target.absoluteFilePath(info.fileName());
+
+				if (! QFileInfo::exists(destination))
+					QFile::copy(info.absoluteFilePath(), destination);
+			}
+
+			legacy.removeRecursively();
+			LOG("Merged the legacy gen/ folder of task", taskName, "into generator/");
+		}
+	}
+
 	const QStringList subDirs = {QStringLiteral("data"), QStringLiteral("down"), QStringLiteral("graders"),
-	                             QStringLiteral("gen")};
+	                             QStringLiteral("generator")};
 
 	for (const QString &subDir : subDirs)
 		QDir().mkpath(base + QDir::separator() + subDir);
 
-	// 早期版本会顺手建一个空的 tests/ 目录（没人用），现在不再创建；
-	// 老工程里残留下来的那些一并清掉（里面有东西的话记一条日志，方便对照）。
 	QDir legacy(base + QDir::separator() + QStringLiteral("tests"));
 
 	if (legacy.exists()) {
@@ -708,10 +710,8 @@ void Settings::ensureTaskDirs(const QString &taskName) {
 
 auto Settings::selfTestPath() -> QString { return QString("selftest") + QDir::separator(); }
 
-// 每个比赛日一个 statement/ 目录：题面 markdown 与导出的 PDF 都固定放在这里。
 auto Settings::statementPath() -> QString { return QString("statement") + QDir::separator(); }
 
-// 导出物统一放 dist/ 下：成绩单与统计在 dist/reports/，导出的压缩包在 dist/export/。
 auto Settings::reportsPath() -> QString {
 	return QString("dist") + QDir::separator() + QStringLiteral("reports") + QDir::separator();
 }
@@ -724,8 +724,6 @@ void Settings::ensureDistDirs() {
 	QDir().mkpath(reportsPath());
 	QDir().mkpath(exportPath());
 
-	// 早期版本把导出物直接放在比赛日根目录下（reports/、export/）：老工程里残留的这两个
-	// 目录清掉（里面是上一次的导出结果，重新导出会在 dist/ 下生成）。有东西的话记一条日志。
 	for (const QString &legacy : {QStringLiteral("reports"), QStringLiteral("export")}) {
 		QDir dir(legacy);
 
@@ -742,10 +740,6 @@ void Settings::ensureDistDirs() {
 
 void Settings::ensureDayFolderOrdering(const QString &dayRoot) {
 #ifdef Q_OS_WIN32
-	// Windows 资源管理器只按文件名排序，没有「自定义顺序」这种东西。唯一不动真实路径的
-	// 办法是 desktop.ini 的 [LocalizedFileNames]：只改「显示名」，而排序跟显示名走。
-	// 显示名前面加上不可见的零宽空格（U+200B），个数决定先后——用户看到的名字仍然是
-	// problem / import / ...，排序却按我们给的顺序来。
 	const QStringList order = {QStringLiteral("problem"), QStringLiteral("import"),
 	                           QStringLiteral("answers"), QStringLiteral("statement"),
 	                           QStringLiteral("dist")};
@@ -755,7 +749,6 @@ void Settings::ensureDayFolderOrdering(const QString &dayRoot) {
 		return;
 
 	const QString iniPath = root.absoluteFilePath(QStringLiteral("desktop.ini"));
-	// 已经有用户自己的 desktop.ini（不是我们写的）就完全不碰，免得覆盖他的设置。
 	if (QFileInfo::exists(iniPath)) {
 		QFile existing(iniPath);
 
@@ -772,13 +765,10 @@ void Settings::ensureDayFolderOrdering(const QString &dayRoot) {
 		if (! root.exists(order.at(i)))
 			continue;
 
-		// 资源管理器的排序把「零宽空格更多」的排在前面，所以前缀要倒着给：
-		// problem 拿最多、dist 拿最少，排出来才是 problem → import → … → dist。
 		const QString prefix(order.size() - i, QChar(0x200B));
 		text += order.at(i) + QChar('=') + prefix + order.at(i) + QStringLiteral("\r\n");
 	}
 
-	// desktop.ini 必须用带 BOM 的 UTF-16LE（GetPrivateProfileString 才认得出非 ANSI 字符）。
 	QByteArray data;
 	data.append(char(0xFF));
 	data.append(char(0xFE));
@@ -789,7 +779,7 @@ void Settings::ensureDayFolderOrdering(const QString &dayRoot) {
 	}
 
 	if (QFile file(iniPath); file.open(QIODevice::ReadOnly) && file.readAll() == data)
-		return; // 内容没变就别动它（免得每次打开比赛日都刷新时间戳）
+		return; 
 
 	{
 		QFile file(iniPath);
@@ -800,12 +790,9 @@ void Settings::ensureDayFolderOrdering(const QString &dayRoot) {
 		file.write(data);
 	}
 
-	// 隐藏 + 系统：资源管理器默认不显示，看起来就像目录里本来就没有这个文件。
 	const std::wstring native = QDir::toNativeSeparators(iniPath).toStdWString();
 	SetFileAttributesW(native.c_str(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
 
-	// 光有 desktop.ini 还不够：资源管理器只认带 ReadOnly 标记的目录里的 desktop.ini。
-	// 目录的 ReadOnly 只是个标记（不影响在里面写文件），改的是我们自己的比赛日目录。
 	const std::wstring rootNative = QDir::toNativeSeparators(root.absolutePath()).toStdWString();
 	const DWORD attributes = GetFileAttributesW(rootNative.c_str());
 

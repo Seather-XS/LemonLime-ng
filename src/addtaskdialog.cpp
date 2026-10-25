@@ -9,18 +9,14 @@
 
 #include "addtaskdialog.h"
 #include "ui_addtaskdialog.h"
-//
 #include "base/settings.h"
-//
 #include <QComboBox>
 #include <QDir>
 #include <QFileInfo>
 #include <QSet>
-//
 #include <algorithm>
 
 namespace {
-	/// 在题目录及其 graders/ 子目录里按名字过滤找文件（返回 显示名, 绝对路径）。
 	QList<QPair<QString, QString>> candidateFiles(const QString &taskDir, const QStringList &nameFilters) {
 		QList<QPair<QString, QString>> found;
 		QSet<QString> seen;
@@ -44,8 +40,6 @@ namespace {
 		return found;
 	}
 
-	/// 把下拉框切到 stored 对应的项；存的那项没了（或本来就没存）就退回第一项，
-	/// 并把最终选择写回 stored。
 	void applySelection(QComboBox *combo, QString &stored) {
 		if (combo->count() == 0) {
 			stored.clear();
@@ -60,7 +54,7 @@ namespace {
 		combo->setCurrentIndex(target);
 		stored = combo->itemData(target).toString();
 	}
-} // namespace
+} 
 
 AddTaskDialog::AddTaskDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AddTaskDialog) {
 	ui->setupUi(this);
@@ -73,7 +67,6 @@ AddTaskDialog::AddTaskDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AddT
 	connect(ui->timeLimit, &QLineEdit::textChanged, this, &AddTaskDialog::timeLimitChanged);
 	connect(ui->memoryLimit, &QLineEdit::textChanged, this, &AddTaskDialog::memoryLimitChanged);
 
-	// 题型：与「试题」选项卡里的三个选项一致。
 	ui->taskTypeBox->addItem(tr("Traditional"), int(Task::Traditional));
 	ui->taskTypeBox->addItem(tr("Answers Only"), int(Task::AnswersOnly));
 	ui->taskTypeBox->addItem(tr("Interaction"), int(Task::Interaction));
@@ -88,7 +81,6 @@ AddTaskDialog::AddTaskDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AddT
 	ui->checkerBox->setToolTip(
 	    tr("Only .cpp files can be the checker; it is compiled once before judging."));
 
-	// 判题方式：与「试题」选项卡里的两项一致。
 	ui->comparisonModeBox->addItem(tr("Line-by-line mode (ignore extra spaces and tabs)"),
 	                               int(Task::IgnoreSpacesMode));
 	ui->comparisonModeBox->addItem(tr("Special judge mode (testlib)"), int(Task::TestlibSpecialJudgeMode));
@@ -121,7 +113,6 @@ void AddTaskDialog::taskBoxIndexChanged() {
 	if (index < 0 || index >= taskTypes.size())
 		return;
 
-	// 载入这一道题的设置，期间控件的变化不要回写。
 	loading = true;
 	ui->fullScore->setText(QString::number(fullScore[index]));
 	ui->timeLimit->setText(QString::number(timeLimit[index]));
@@ -134,7 +125,6 @@ void AddTaskDialog::taskBoxIndexChanged() {
 	updateOptionalRows();
 }
 
-// 交互库 / 接口 / 校验器的候选：这道题在导入目录下的对应文件（含 graders/ 子目录）。
 void AddTaskDialog::refreshCandidates() {
 	const int index = ui->taskBox->currentIndex();
 
@@ -152,13 +142,11 @@ void AddTaskDialog::refreshCandidates() {
 	for (const auto &file : candidateFiles(taskDir, {QStringLiteral("*.cpp")}))
 		ui->graderBox->addItem(file.first, file.second);
 
-	// 校验器：只能是 .cpp 源码，评测前会编译一次并复用编译结果。
 	ui->checkerBox->clear();
 
 	for (const auto &file : candidateFiles(taskDir, {QStringLiteral("*.cpp")}))
 		ui->checkerBox->addItem(file.first, file.second);
 
-	// 一个 .cpp 都没有时给个提示项，免得导入完才发现校验器没选上。
 	ui->checkerBox->setEnabled(ui->checkerBox->count() > 0);
 
 	if (ui->checkerBox->count() == 0)
@@ -169,7 +157,6 @@ void AddTaskDialog::refreshCandidates() {
 	applySelection(ui->checkerBox, checkerSources[index]);
 }
 
-// 交互题才要指定交互库/接口，自定义校验器才要指定校验器，其余两行藏起来。
 void AddTaskDialog::updateOptionalRows() {
 	const bool interaction = Task::TaskType(ui->taskTypeBox->currentData().toInt()) == Task::Interaction;
 

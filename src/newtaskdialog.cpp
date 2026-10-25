@@ -20,7 +20,6 @@
 #include <QVBoxLayout>
 
 namespace {
-	/// 标题 → 可作文件名的形式：去掉路径非法字符与空白，其余保留。
 	QString toFileName(const QString &title) {
 		QString name = title.trimmed();
 
@@ -33,7 +32,7 @@ namespace {
 
 		return name;
 	}
-} // namespace
+} 
 
 NewTaskDialog::NewTaskDialog(QWidget *parent) : QDialog(parent) {
 	setWindowTitle(tr("New Task"));
@@ -97,7 +96,6 @@ auto NewTaskDialog::getTimeLimit() const -> int { return timeLimitEdit->value();
 auto NewTaskDialog::getMemoryLimit() const -> int { return memoryLimitEdit->value(); }
 
 void NewTaskDialog::syncFileName() {
-	// 用户已经自己填过文件名，就不再被标题覆盖。
 	if (! fileEdited)
 		fileEdit->setText(toFileName(titleEdit->text()));
 

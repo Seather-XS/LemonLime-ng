@@ -7,19 +7,13 @@
 
 #include "exttestcasemodifier.h"
 #include "ui_exttestcasemodifier.h"
-//
 #include "core/task.h"
 #include "core/testcase.h"
 #include "exttestcaseupdaterdialog.h"
-//
 #include <functional>
 #include <memory>
 #include <optional>
 
-// Remap a single test case's subtask dependencies using a mapping function.
-// The mapper receives 0-indexed dependency indices and returns:
-//   - a mapped 0-indexed index, or
-//   - std::nullopt to remove that dependency.
 static void remapTestCaseDeps(TestCase *testCase, const std::function<std::optional<int>(int)> &mapper) {
 	const auto &currentDeps = testCase->getDependenceSubtask();
 	QSet<int> remappedDeps;
@@ -331,9 +325,6 @@ void ExtTestCaseModifier::splitSelected() {
 		auto out = now->getOutputFiles();
 		int allScore = now->getFullScore();
 
-		// Distribute the total score evenly across test cases.
-		// The first baseCaseCount cases get floor(allScore / n),
-		// the remaining cases get ceil(allScore / n).
 		int baseCaseCount = 0;
 
 		if (! in.empty())

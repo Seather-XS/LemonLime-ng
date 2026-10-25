@@ -458,6 +458,26 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="dataTab">
+       <attribute name="title">
+        <string>Data</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="DataWidget" name="dataWidget" native="true">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="statusTip">
+           <string>Generate the test data with gen.cpp + sol.cpp in the generator folder...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="exportTab">
        <attribute name="title">
         <string>Export</string>
@@ -1051,6 +1071,12 @@
    <class>ExportWidget</class>
    <extends>QWidget</extends>
    <header>exportwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DataWidget</class>
+   <extends>QWidget</extends>
+   <header>datawidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

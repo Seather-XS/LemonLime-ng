@@ -9,9 +9,7 @@
 
 #include "opencontestwidget.h"
 #include "ui_opencontestwidget.h"
-//
 #include "core/contest.h"
-//
 #include <QByteArrayView>
 #include <QFileDialog>
 #include <QJsonDocument>
@@ -46,7 +44,6 @@ void OpenContestWidget::refreshContestList() {
 		QString title;
 		char firstChar;
 		file.peek(&firstChar, 1);
-		// Don't support RFC 7159, but support RFC 4627
 		if (firstChar == '[' || firstChar == '{') {
 			QJsonParseError parseError;
 			QJsonObject inObj(QJsonDocument::fromJson(file.readAll(), &parseError).object());
@@ -114,7 +111,6 @@ void OpenContestWidget::addContest() {
 
 	char firstChar;
 	file.peek(&firstChar, 1);
-	// Don't support RFC 7159, but support RFC 4627
 	if (firstChar == '[' || firstChar == '{') {
 		QJsonParseError parseError;
 		QJsonObject inObj(QJsonDocument::fromJson(file.readAll(), &parseError).object());

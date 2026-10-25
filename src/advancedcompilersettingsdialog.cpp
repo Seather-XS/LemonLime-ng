@@ -9,11 +9,9 @@
 
 #include "advancedcompilersettingsdialog.h"
 #include "ui_advancedcompilersettingsdialog.h"
-//
 #include "base/compiler.h"
 #include "base/violation.h"
 #include "environmentvariablesdialog.h"
-//
 #include <QComboBox>
 #include <QFileDialog>
 #include <QHeaderView>
@@ -53,7 +51,7 @@ namespace {
 
 		return Violation::normalizeRules(rules);
 	}
-} // namespace
+} 
 
 AdvancedCompilerSettingsDialog::AdvancedCompilerSettingsDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::AdvancedCompilerSettingsDialog) {
@@ -135,7 +133,6 @@ void AdvancedCompilerSettingsDialog::resetEditCompiler(Compiler *compiler) {
 	configurationIndexChanged();
 	fillViolationTable(ui->violationTable, editCompiler->getViolationRules());
 
-	// 提示里写清这个编译器属于哪门语言：默认清单就是从这门语言的命令表里读的。
 	const QString language =
 	    Violation::languageNameFor(editCompiler->getCompilerName(), editCompiler->getSourceExtensions());
 	ui->violationHint->setText(
@@ -403,7 +400,6 @@ void AdvancedCompilerSettingsDialog::removeViolationRule() {
 }
 
 void AdvancedCompilerSettingsDialog::restoreDefaultViolationRules() {
-	// 默认清单从编译器所属语言的命令表里读取（gcc/g++ 用 C/C++，fpc 用 Pascal，……）。
 	fillViolationTable(ui->violationTable,
 	                   Violation::defaultRulesFor(editCompiler->getCompilerName(),
 	                                              editCompiler->getSourceExtensions()));

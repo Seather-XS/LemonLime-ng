@@ -8,7 +8,6 @@
  */
 
 #include "compiler.h"
-//
 #include "base/LemonUtils.hpp"
 
 Compiler::Compiler(QObject *parent) : QObject(parent) {
@@ -159,7 +158,6 @@ int Compiler::read(const QJsonObject &json) {
 	READ_JSON(json, disableMemoryLimitCheck);
 	READ_JSON(json, interpreterAsWatcher);
 
-	// 老配置里没有按语言分开的规则：按源文件后缀补一份默认清单。
 	if (json.contains("violationRules") && json["violationRules"].isArray()) {
 		QVector<ViolationRule> rules;
 
@@ -190,10 +188,10 @@ void Compiler::write(QJsonObject &json) const {
 
 	WRITE_JSON(json, environment.toStringList());
 
-	WRITE_JSON(json, timeLimitRatio);          // double
-	WRITE_JSON(json, memoryLimitRatio);        // double
-	WRITE_JSON(json, disableMemoryLimitCheck); // bool
-	WRITE_JSON(json, interpreterAsWatcher);    // bool
+	WRITE_JSON(json, timeLimitRatio);
+	WRITE_JSON(json, memoryLimitRatio);
+	WRITE_JSON(json, disableMemoryLimitCheck);
+	WRITE_JSON(json, interpreterAsWatcher);    
 
 	QJsonArray rules;
 

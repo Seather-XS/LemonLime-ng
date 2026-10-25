@@ -22,8 +22,6 @@
 #include <random>
 
 #include <windows.h>
-// Don't change the include order
-// psapi need type BOOL, which is included in windef.h
 #include <Psapi.h>
 #include <UserEnv.h>
 #include <VersionHelpers.h>
@@ -39,7 +37,7 @@ namespace {
 		    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
 		std::mt19937 gen(std::random_device{}());
 
-		std::uniform_int_distribution<int> rand(0, // [0, length of possibleCharacters - 1]
+		std::uniform_int_distribution<int> rand(0, 
 		                                        possibleCharacters.length() - 1);
 		QString randomString;
 		for (int i = 0; i < length; ++i) {
@@ -83,15 +81,12 @@ namespace {
 		return status == ERROR_SUCCESS;
 	}
 
-	/// TerminateProcess() 只是「发起」终止，进程还会存活一小会儿；不等它真的退出就
-	/// 返回的话，它占着的输入 / 输出文件删不掉，会一直留在工作目录里，把后面每个
-	/// 测试点都弄成「文件错误」（复制标准输入文件失败）。
 	void terminateProcessAndWait(HANDLE process, DWORD timeoutMs = 5000) {
 		TerminateProcess(process, 0);
 		WaitForSingleObject(process, timeoutMs);
 	}
 
-} // namespace
+} 
 
 ProcessRunnerResult WinProcessRunner::run() {
 	ProcessRunnerResult res;
@@ -113,12 +108,11 @@ ProcessRunnerResult WinProcessRunner::run() {
 	QString appContainerName = "Lemonlime" + getRandomString(10);
 
 #ifdef WINDOWS_APPCONTAINER_SUPPORT
-	//  Create Window App Container (Windows 8+)
 
 	auto hResult = CreateAppContainerProfile((const WCHAR *)(appContainerName.utf16()),
 	                                         (const WCHAR *)(appContainerName.utf16()),
 	                                         (const WCHAR *)(appContainerName.utf16()), nullptr, 0,
-	                                         &appContainerSID); // Without any Permissions
+	                                         &appContainerSID); 
 
 	if (hResult != S_OK) {
 		res.score = 0;
@@ -167,7 +161,6 @@ ProcessRunnerResult WinProcessRunner::run() {
 		return res;
 	}
 
-	// Make App Run in App Container
 	if (! UpdateProcThreadAttribute(siex.lpAttributeList, 0, PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES, &sc,
 	                                sizeof(sc), nullptr, nullptr)) {
 		res.score = 0;
@@ -178,8 +171,6 @@ ProcessRunnerResult WinProcessRunner::run() {
 		WARN("Last Error code:", GetLastError());
 		return res;
 	}
-
-	// Ban Child Processs
 
 	DWORD childProcessAttribute = PROCESS_CREATION_CHILD_PROCESS_RESTRICTED;
 
@@ -195,8 +186,6 @@ ProcessRunnerResult WinProcessRunner::run() {
 		return res;
 	}
 
-	// Load dlls
-	// Todo: If there's too many files under the path it'll be very slow
 	for (auto f : config.environment.value("PATH").split(';')) {
 		grantFileAccessPermissions(appContainerSID, (WCHAR *)f.utf16(),
 		                           FILE_GENERIC_EXECUTE | FILE_GENERIC_READ);
@@ -246,17 +235,12 @@ ProcessRunnerResult WinProcessRunner::run() {
 		CloseHandle(siex.StartupInfo.hStdError);
 	});
 
-	// Need 4 \0 to end the environment string, see CreateProcessW() documentation
 	QString environmentValues = config.environment.toStringList().join(QChar('\0')) + QChar('\0') +
 	                            QChar('\0') + QChar('\0') + QChar('\0');
 
 	QString commandLine = QString(R"("%1" %2)").arg(config.executableFile).arg(config.arguments);
 
 	if (! CreateProcessW(nullptr, (WCHAR *)(commandLine).utf16(), nullptr, &sa, TRUE,
-	                     // CREATE_NO_WINDOW 而不是 DETACHED_PROCESS：后者会让被评测程序完全
-	                     // 没有控制台，它调 system() 时 cmd.exe 只好自己新建一个 —— 屏幕上就
-	                     // 会冒出黑色终端窗口（选手代码里有 system() 时很常见）。
-	                     // CREATE_NO_WINDOW 会创建一个「不显示窗口」的控制台，子进程可以继承。
 	                     HIGH_PRIORITY_CLASS | EXTENDED_STARTUPINFO_PRESENT | CREATE_NO_WINDOW |
 	                         CREATE_UNICODE_ENVIRONMENT,
 	                     (LPVOID)(environmentValues.utf16()),
@@ -297,9 +281,6 @@ ProcessRunnerResult WinProcessRunner::run() {
 	timer.start();
 
 	while (timer.elapsed() <= config.timeLimit + extraTime) {
-		// 直接等进程本身（10ms 超时就回来看看内存），而不是「查询 + msleep(10)」：
-		// Windows 默认定时器精度是 15.6ms，msleep(10) 实际会睡 15.6ms，每个测试点都要
-		// 白等这么久；进程退出也能立刻发现。
 		if (WaitForSingleObject(pi.hProcess, 10) == WAIT_OBJECT_0) {
 			isProgramFinishedInExtraTimeLimit = true;
 			break;
@@ -339,7 +320,6 @@ ProcessRunnerResult WinProcessRunner::run() {
 	unsigned long exitCode;
 	GetExitCodeProcess(pi.hProcess, &exitCode);
 
-	// CCF 编程通则 3：程序应正常结束且 main() 返回 0（开关在通用设置里）。
 	if (config.requireReturnZero && exitCode != 0) {
 
 		res.score = 0;

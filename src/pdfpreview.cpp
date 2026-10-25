@@ -5,9 +5,7 @@
  */
 
 #include "pdfpreview.h"
-//
 #include "base/ProcessUtil.hpp"
-//
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -20,23 +18,16 @@
 #include <QStandardPaths>
 #include <QTimer>
 #include <QVBoxLayout>
-//
 #include <algorithm>
 
 namespace {
-	/// 预览页宽的上下限（css 像素）。页面就按预览窗那么宽显示，所以这两个值决定了
-	/// 极端窗口下的观感：太窄看不清、太宽渲染又慢又占内存。
 	constexpr int minPageWidthCss = 480;
 	constexpr int maxPageWidthCss = 1400;
 
-	/// 出图时在设备像素之外再超采样一点：缩放后细节更稳，也不至于太吃内存。
 	constexpr double supersample = 1.25;
 
-	/// A4 宽（pt）。渲染用 `-r <dpi>`（各版本 pdftocairo / pdftoppm 都支持），
-	/// 所以反过来按 A4 宽度算 dpi；不是 A4 的页面由 pixmap 的 devicePixelRatio 兜住显示宽度。
 	constexpr double a4WidthPt = 595.0;
 
-	/// `page-3.png` → 3，用于按页码而不是字典序排序。
 	int pageNumberOf(const QString &fileName) {
 		const QString base = QFileInfo(fileName).completeBaseName();
 		const int dash = base.lastIndexOf(QChar('-'));
@@ -48,7 +39,7 @@ namespace {
 		const int number = base.mid(dash + 1).toInt(&ok);
 		return ok ? number : 0;
 	}
-} // namespace
+} 
 
 PdfPreviewWidget::PdfPreviewWidget(QWidget *parent) : QWidget(parent) {
 	auto *layout = new QVBoxLayout(this);
@@ -80,7 +71,6 @@ PdfPreviewWidget::PdfPreviewWidget(QWidget *parent) : QWidget(parent) {
 
 	connect(refreshButton, &QPushButton::clicked, this, [this] { render(); });
 
-	// 切到题面选项卡时不立刻渲染，稍等一下，避免来回切标签时反复跑 pdftocairo。
 	renderTimer = new QTimer(this);
 	renderTimer->setSingleShot(true);
 	renderTimer->setInterval(300);
@@ -99,8 +89,6 @@ void PdfPreviewWidget::scheduleRender() {
 void PdfPreviewWidget::clearPages() {
 	for (QLabel *label : pageLabels) {
 		pagesLayout->removeWidget(label);
-		// deleteLater() 要等回到事件循环才真的删掉，其间旧图还贴在界面上（
-		// 渲染一次要好几秒，用户就会看到旧页面）：先藏起来，保证立刻消失。
 		label->hide();
 		label->deleteLater();
 	}
@@ -117,8 +105,6 @@ void PdfPreviewWidget::clear() {
 }
 
 void PdfPreviewWidget::setMessage(const QString &text) {
-	// 换提示文字通常意味着要显示别的东西了（比如「正在编译」），
-	// 顺手停掉还在跑的渲染，免得它稍后把提示顶掉。
 	abortRender();
 
 	message = text;
@@ -134,8 +120,6 @@ QString PdfPreviewWidget::currentInfoText() const { return infoLabel ? infoLabel
 void PdfPreviewWidget::setPdf(const QString &path) {
 	pdfPath = path;
 
-	// 渲染要起 pdftocairo 把每页转成 PNG 再读成 QPixmap，大题干能卡好几秒。
-	// 选项卡没显示就先记下来，等切过来（showEvent）再渲染。
 	if (isVisible()) {
 		render();
 	} else {
@@ -172,20 +156,15 @@ auto PdfPreviewWidget::displayWidthCss() const -> int {
 	if (! scroll)
 		return minPageWidthCss;
 
-	// 用滚动区自己的宽度（不是 viewport 宽度）再减掉垂直滚动条的宽度：
-	// 页面出现后滚动条会占掉这部分，预留了才不会横向溢出；这个值也不会因为
-	// 滚动条忽隐忽现而变来变去（那样会反复触发重渲染）。
 	const int bar = scroll->verticalScrollBar()->sizeHint().width();
 	return qBound(minPageWidthCss, scroll->width() - bar - 4, maxPageWidthCss);
 }
 
 auto PdfPreviewWidget::renderWidthPx() const -> int {
-	// 设备像素（屏幕上真实占多少点）× 超采样：这样贴上去 1:1，Qt 不会再去放大它。
 	const double px = displayWidthCss() * devicePixelRatioF() * supersample;
 	return qBound(640, qRound(px), 2600);
 }
 
-// 预览窗宽了 / 窄了（拖分隔条、改窗口大小）得按新宽度重渲染，否则图会被拉伸变糊。
 void PdfPreviewWidget::resizeEvent(QResizeEvent *event) {
 	QWidget::resizeEvent(event);
 
@@ -194,12 +173,10 @@ void PdfPreviewWidget::resizeEvent(QResizeEvent *event) {
 
 	const int wanted = displayWidthCss();
 
-	// 只有变化比较明显才重来：垂直滚动条出现 / 消失造成的十几像素抖动忽略掉。
 	if (renderedWidthCss <= 0 || qAbs(wanted - renderedWidthCss) >= qMax(8, renderedWidthCss / 20))
 		scheduleRender();
 }
 
-// 窗口被拖到另一块屏幕：像素比变了，原来那张图的像素不够，重渲染。
 void PdfPreviewWidget::changeEvent(QEvent *event) {
 	QWidget::changeEvent(event);
 
@@ -211,7 +188,6 @@ void PdfPreviewWidget::changeEvent(QEvent *event) {
 #endif
 }
 
-// 停掉还没跑完的渲染：先断开信号，否则 kill 后还会触发 finishRender 把新一波的结果顶掉。
 void PdfPreviewWidget::abortRender() {
 	if (! renderProcess)
 		return;
@@ -244,38 +220,29 @@ void PdfPreviewWidget::render() {
 		return;
 	}
 
-	// 重新渲染后尽量把视图留在原来的位置（要在清空页面之前记下比例）
 	QScrollBar *bar = scroll->verticalScrollBar();
 	pendingScrollFraction = bar->maximum() > 0 ? double(bar->value()) / double(bar->maximum()) : 0.0;
 
-	// 上一次还没跑完就先停掉，避免两次输出乱在一起
 	abortRender();
 	clearPages();
 
 	QDir().mkpath(tempDir.path());
 
-	// 清掉上一轮的图片，避免残留旧页
 	for (const QString &old : QDir(tempDir.path()).entryList({QStringLiteral("page-*.png")}, QDir::Files))
 		QFile::remove(tempDir.path() + QChar('/') + old);
 
 	messageLabel->setText(tr("Rendering ..."));
 
-	// 记住这一轮是按多宽出的图（finishRender 要用它设 pixmap 的像素比）
 	renderedWidthCss = displayWidthCss();
 	renderedWidthPx = renderWidthPx();
 
-	// 按 A4 宽度反推 dpi，让出图宽度 ≈ renderedWidthPx
 	const int dpi = qBound(96, qRound(72.0 * renderedWidthPx / a4WidthPt), 400);
 
-	// pdftocairo 渲染大题干要好几秒。这里用异步信号等它结束，
-	// 不能再用 waitForFinished()——那会像以前一样把整个界面卡死。
 	renderProcess = new QProcess(this);
 	Lemon::common::suppressConsoleWindow(*renderProcess);
 	renderProcess->setWorkingDirectory(tempDir.path());
 
 	connect(renderProcess, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
-		// 起不来（比如路径失效）时不会发 finished，只能在这里收拾；
-		// 其它错误（崩溃）会接着发 finished，交给 finishRender() 统一处理。
 		if (error != QProcess::FailedToStart || ! renderProcess)
 			return;
 
@@ -296,7 +263,7 @@ void PdfPreviewWidget::finishRender() {
 	renderProcess = nullptr;
 
 	if (! process)
-		return; // 已经被 abortRender() 接管
+		return; 
 
 	const bool ok = process->exitStatus() == QProcess::NormalExit && process->exitCode() == 0;
 	process->deleteLater();
@@ -325,8 +292,6 @@ void PdfPreviewWidget::finishRender() {
 		if (pixmap.isNull())
 			continue;
 
-		// 让页面按「预览窗宽度」显示：把像素比设成 图片宽 ÷ 目标显示宽，
-		// 于是这块图有多少像素就画多少像素（旧写法不设像素比，Qt 会按屏幕缩放插值放大 → 糊）。
 		fitPagePixmap(pixmap, renderedWidthCss > 0 ? renderedWidthCss : displayWidthCss());
 
 		auto *label = new QLabel(pagesWidget);

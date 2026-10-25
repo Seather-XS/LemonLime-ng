@@ -27,7 +27,6 @@ struct ProcessRunnerConfig {
 	double extraTimeRatio{};
 	bool standardInputCheck{};
 	bool standardOutputCheck{};
-	/// CCF 编程通则 3：选手程序正常结束且 main() 返回 0；非 0 退出按运行时错误计。
 	bool requireReturnZero{true};
 	QString inputFileName;
 	QString outputFileName;

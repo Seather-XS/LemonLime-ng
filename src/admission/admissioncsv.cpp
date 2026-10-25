@@ -5,7 +5,6 @@
  */
 
 #include "admissioncsv.h"
-//
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -18,7 +17,6 @@
 #endif
 
 namespace {
-	/// 把 GBK / GB18030 的字节解成 QString（导入国内系统导出的名单时很常见）。
 	bool decodeGbk(const QByteArray &raw, QString &text) {
 		text.clear();
 
@@ -57,7 +55,7 @@ namespace {
 		return ! decoder.hasError();
 #endif
 	}
-} // namespace
+} 
 
 auto AdmissionTable::builtinColumns() -> QStringList {
 	return {QStringLiteral("姓名"),   QStringLiteral("准考证号"), QStringLiteral("考点"),
@@ -68,8 +66,6 @@ void AdmissionTable::normalize() {
 	if (header.isEmpty())
 		header = builtinColumns();
 
-	// 内置列（姓名 / 准考证号 / 考点 / 考场 / 座位号 / 照片）固定在前面且总是存在；
-	// 单元格跟着列名一起搬，所以既不会错位，也不会丢数据。
 	QStringList wanted = builtinColumns();
 
 	for (const QString &name : header)
@@ -117,7 +113,6 @@ namespace AdmissionCsv {
 	}
 
 	bool looksLikeGbk(const QByteArray &raw) {
-		// 没有 BOM、又解不出合法 UTF-8 的，基本就是 GBK 这类本地编码。
 		if (raw.startsWith("\xEF\xBB\xBF"))
 			return false;
 
@@ -249,7 +244,6 @@ namespace AdmissionCsv {
 		QString text = QString::fromUtf8(raw);
 
 		if (looksLikeGbk(raw)) {
-			// 国内系统导出的 CSV 基本都是 GBK，直接转过来，不用让用户自己另存。
 			QString decoded;
 
 			if (! decodeGbk(raw, decoded)) {
@@ -286,4 +280,4 @@ namespace AdmissionCsv {
 		table.header = header.isEmpty() ? AdmissionTable::builtinColumns() : header;
 		return writeFile(path, table, error);
 	}
-} // namespace AdmissionCsv
+} 

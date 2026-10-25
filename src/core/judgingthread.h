@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 
 #include "base/LemonType.hpp"
 #include "processrunner.h"
@@ -22,7 +21,6 @@ class JudgingThread : public QThread {
 	Q_OBJECT
   public:
 	explicit JudgingThread(QObject *parent = nullptr);
-	// void setCheckRejudgeMode(bool);
 	void setExtraTimeRatio(double);
 	void setEnvironment(const QProcessEnvironment &);
 	void setWorkingDirectory(const QString &);
@@ -41,7 +39,6 @@ class JudgingThread : public QThread {
 	void setRawTimeLimit(int);
 	void setMemoryLimit(int);
 	void setRawMemoryLimit(int);
-	/// CCF 编程通则 3：程序非 0 退出按运行时错误计（可在通用设置里关掉）。
 	void setRequireReturnZero(bool);	void setInterpreterAsWatcher(bool);
 	int getTimeUsed() const;
 	qint64 getMemoryUsed() const;
@@ -54,10 +51,8 @@ class JudgingThread : public QThread {
 	void run();
 
   private:
-	// bool checkRejudgeMode;
 
 	bool needRejudge;
-	// Control some extra time program used, like kernel time, judge system fluctuation
 	double extraTimeRatio{};
 	QProcessEnvironment environment;
 	QString workingDirectory;
@@ -95,7 +90,6 @@ class JudgingThread : public QThread {
 	void judgeOutput();
 	void judgeTraditionalTask();
 	void judgeAnswersOnlyTask();
-	// void judgeInteractionTask();
 
   public slots:
 	void stopJudgingSlot();

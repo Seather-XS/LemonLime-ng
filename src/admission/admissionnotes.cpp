@@ -5,7 +5,6 @@
  */
 
 #include "admissionnotes.h"
-//
 #include <QRegularExpression>
 
 namespace AdmissionNotes {
@@ -33,7 +32,6 @@ namespace AdmissionNotes {
 	}
 
 	namespace {
-		/// `\href{...}` 里那一段也要转义：URL 里的 & % # _ 直接写会把 hyperref 弄崩。
 		QString escapeUrl(const QString &url) {
 			QString out;
 
@@ -55,13 +53,11 @@ namespace AdmissionNotes {
 			return out;
 		}
 
-		/// `[文字](链接)`：链接里不能有空格或圆括号，否则就按普通文本处理。
 		const QRegularExpression &linkPattern() {
 			static const QRegularExpression pattern(QStringLiteral(R"(\[([^\[\]]*)\]\(([^()\s]*)\))"));
 			return pattern;
 		}
 
-		/// 一行：先转义普通文本，再把超链接换成 \href。
 		QString renderLine(const QString &line) {
 			QString out;
 			int last = 0;
@@ -78,7 +74,7 @@ namespace AdmissionNotes {
 			out += escape(line.mid(last));
 			return out.trimmed();
 		}
-	} // namespace
+	} 
 
 	QString toLatex(const QString &text) {
 		QString normalized = text;
@@ -92,7 +88,6 @@ namespace AdmissionNotes {
 			const QString line = raw.trimmed();
 
 			if (line.isEmpty()) {
-				// 空行 = 分段
 				if (! lines.isEmpty()) {
 					paragraphs << lines.join(QStringLiteral("\\newline\n"));
 					lines.clear();
@@ -109,4 +104,4 @@ namespace AdmissionNotes {
 
 		return paragraphs.join(QStringLiteral("\\par\n"));
 	}
-} // namespace AdmissionNotes
+} 

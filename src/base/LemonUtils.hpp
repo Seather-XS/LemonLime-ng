@@ -12,9 +12,6 @@
 #include <QJsonObject>
 #include <type_traits>
 
-/*
- * Use a lot of SFAINE tricks to support varied data and container types
- */
 namespace Lemon::detail {
 	inline int jsonReadHelper(QString &val, const QJsonValue &jval) {
 		if (jval.isString()) {
@@ -141,7 +138,7 @@ namespace Lemon::detail {
 		jsonWriteHelper(val, jval);
 		json[name] = jval;
 	}
-} // namespace Lemon::detail
+} 
 
 namespace Lemon {
 	template <typename T> int readJson(T &x, const QString &name, const QJsonObject &json) {
@@ -150,7 +147,7 @@ namespace Lemon {
 	template <typename T> void writeJson(const T &x, const QString &name, QJsonObject &json) {
 		detail::jsonWriteHelper(x, name, json);
 	}
-} // namespace Lemon
+} 
 #define READ_JSON(json, x) Lemon::readJson(x, #x, json)
 #define WRITE_JSON(json, x) Lemon::writeJson(x, #x, json)
 namespace Lemon::common {
@@ -159,17 +156,10 @@ namespace Lemon::common {
 
 	bool FileExistsIn(const QDir &dir, const QString &fileName);
 
-	/// 把任意文本（例如赛区名）转成可以安全用作文件名的一部分：
-	/// 去掉 Windows 文件名不允许的字符，去掉结尾的点，空的话返回 fallback。
 	QString FileNameSafePart(const QString &name, const QString &fallback = QStringLiteral("region"));
 
-	/// 题面 PDF 文件名模板的占位符。模板里可以写：
-	///   `<day>`       比赛日文件名（不含扩展名，例如 day1）
-	///   `<title-day>` 比赛日标题（工程里那个比赛日的名字）
-	///   `<title>`     比赛标题（工程标题；没有工程时是比赛日的标题）
-	/// 还支持 `<title-day>` 的下划线写法 `<title_day>`。
 	QString ResolveStatementPdfName(const QString &pattern, const QString &dayName,
 	                                const QString &dayTitle, const QString &contestTitle,
 	                                const QString &fallback = QStringLiteral("statement"));
 
-} // namespace Lemon::common
+} 

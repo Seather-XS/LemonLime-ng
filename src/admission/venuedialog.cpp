@@ -5,7 +5,6 @@
  */
 
 #include "venuedialog.h"
-//
 #include <QDialogButtonBox>
 #include <QFont>
 #include <QHBoxLayout>
@@ -20,7 +19,6 @@ namespace {
 	const QString KindVenue = QStringLiteral("venue");
 	const QString KindRoom = QStringLiteral("room");
 
-	/// 考点这一行：名字加粗，容量列留空（容量只有考场才有）。
 	void makeVenueItem(QTreeWidgetItem *item, const QString &name) {
 		item->setData(0, KindRole, KindVenue);
 		item->setText(0, name);
@@ -37,7 +35,7 @@ namespace {
 		item->setText(1, QString::number(qMax(1, capacity)));
 		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
 	}
-} // namespace
+} 
 
 VenueDialog::VenueDialog(const QString &region, const QList<AdmissionVenue> &venues, QWidget *parent)
     : QDialog(parent), regionName(region) {
@@ -146,7 +144,7 @@ void VenueDialog::itemChanged(QTreeWidgetItem *item, int column) {
 	if (item->data(0, KindRole).toString() == KindRoom)
 		item->setText(1, QString::number(qMax(1, item->text(1).toInt())));
 	else
-		item->setText(1, QString()); // 考点只有名字，容量是考场的事
+		item->setText(1, QString()); 
 
 	updating = false;
 }

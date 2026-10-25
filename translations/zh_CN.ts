@@ -3311,6 +3311,16 @@ No: remove it from the contest only.</source>
         <source>Pack this contest day into .zip files for the target platforms...</source>
         <translation>把当前比赛日打包成各平台要的 .zip...</translation>
     </message>
+    <message>
+        <location filename="../src/forms/lemon.ui"/>
+        <source>Data</source>
+        <translation>数据</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/lemon.ui"/>
+        <source>Generate the test data with gen.cpp + sol.cpp in the generator folder...</source>
+        <translation>用 generator 目录里的 gen.cpp + sol.cpp 生成测试数据……</translation>
+    </message>
 </context>
 <context>
     <name>NewContestDialog</name>
@@ -4142,6 +4152,31 @@ No: remove it from the contest only.</source>
         <source>File name of the exported PDF (no extension). Placeholders: &lt;day&gt; = contest day file name, &lt;title-day&gt; = contest day title, &lt;title&gt; = contest title.</source>
         <translation>导出的 PDF 文件名（不带扩展名）。可以用占位符：&lt;day&gt; = 比赛日文件名，&lt;title-day&gt; = 比赛日标题，&lt;title&gt; = 比赛标题。</translation>
     </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp"/>
+        <source>Input File</source>
+        <translation>输入文件</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp"/>
+        <source>Output File</source>
+        <translation>输出文件</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp"/>
+        <source>Time Limit</source>
+        <translation>时间限制</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp"/>
+        <source>Memory Limit</source>
+        <translation>内存限制</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp"/>
+        <source>Filled into \proinfo of the ccpc template; leave it empty to omit an entry.</source>
+        <translation>填入 ccpc 模板的 \proinfo；留空则不输出该词条。</translation>
+    </message>
 </context>
 <context>
     <name>StatisticsBrowser</name>
@@ -4824,6 +4859,452 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/forms/welcomedialog.ui" line="39"/>
         <source>New</source>
         <translation>新建</translation>
+    </message>
+</context>
+<context>
+    <name>DataGenerator</name>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The file name prefix cannot be empty.</source>
+        <translation>文件名前缀不能为空。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>&lt;subid&gt; only works when "Configure by Subtask" is on.</source>
+        <translation>&lt;subid&gt; 只有在开启「按子任务配置」后可用。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>&lt;subid&gt; only works when "Name Files by Subtask" is on.</source>
+        <translation>&lt;subid&gt; 只有在开启「按子任务命名」后可用。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The number of test points must be positive.</source>
+        <translation>测试点数目必须是正整数。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The number of samples cannot be negative.</source>
+        <translation>样例数目不能是负数。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Unknown placeholder in the file name prefix: %1</source>
+        <translation>文件名前缀里有无法识别的占位符：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The file name %1 would be used twice; add &lt;testid&gt; to the prefix.</source>
+        <translation>文件名 %1 会被用两次，请在前缀里加上 &lt;testid&gt;。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The sample file name %1 would be used twice; add &lt;testid&gt; to the prefix.</source>
+        <translation>样例文件名 %1 会被用两次，请在前缀里加上 &lt;testid&gt;。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>No task selected.</source>
+        <translation>未选择试题。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The generator folder does not exist: %1</source>
+        <translation>generator 目录不存在：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Put gen.cpp (generator) and sol.cpp (model solution) into %1.</source>
+        <translation>请把 gen.cpp（生成器）与 sol.cpp（标程）放进 %1。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Nothing to generate.</source>
+        <translation>没有需要生成的数据。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>No C++ compiler is configured. Add one in Settings → Compilers first.</source>
+        <translation>还没有配置 C++ 编译器。请先在「设置 → 编译器」里添加一个。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Removed %1 old file(s) from data/ and down/.</source>
+        <translation>已清掉 data/ 与 down/ 里的 %1 个旧文件。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Generating %1 (subtask %2, test %3) ...</source>
+        <translation>正在生成 %1（子任务 %2，测试点 %3）……</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Generating sample %1 (test %2) ...</source>
+        <translation>正在生成样例 %1（测试点 %2）……</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Cannot start the generator: %1</source>
+        <translation>无法启动生成器：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The generator did not finish in %1 s on %2.</source>
+        <translation>生成器在 %1 秒内没有结束（%2）。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The generator exited with code %1 on %2.</source>
+        <translation>生成器以退出码 %1 结束（%2）。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The generator wrote nothing to stdout on %1.</source>
+        <translation>生成器没有向标准输出写任何数据（%1）。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Cannot write %1.</source>
+        <translation>无法写入 %1。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The model solution failed on %1: %2</source>
+        <translation>标程在 %1 上失败：%2</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>exit code %1</source>
+        <translation>退出码 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>No test case was generated.</source>
+        <translation>没有生成任何测试点。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Generated %1 test case(s) and %2 sample(s).</source>
+        <translation>已生成 %1 个测试点、%2 个样例。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Compiling %1 ...</source>
+        <translation>正在编译 %1……</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Cannot start the compiler: %1</source>
+        <translation>无法启动编译器：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Compiling %1 took longer than %2 s.</source>
+        <translation>编译 %1 超过了 %2 秒。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Compiling %1 failed: %2</source>
+        <translation>编译 %1 失败：%2</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>%1 is still the template. Write the model solution first.</source>
+        <translation>%1 还是模板，请先把标程写好。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Generating %1 (%2) ...</source>
+        <translation>正在生成 %1（%2）……</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Generating sample %1 (%2) ...</source>
+        <translation>正在生成样例 %1（%2）……</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Running the model solution on %1 (%2) ...</source>
+        <translation>正在用标程跑 %1（%2）……</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Answer written: %1 (%2 ms)</source>
+        <translation>答案已写出：%1（%2 毫秒）</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Answer written: %1 (%2)</source>
+        <translation>答案已写出：%1（%2）</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Cannot create %1.</source>
+        <translation>无法创建 %1。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Cannot move %1 into %2.</source>
+        <translation>无法把 %1 移动到 %2。</translation>
+    </message>
+</context>
+<context>
+    <name>DataWidget</name>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Tasks</source>
+        <translation>试题</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generator Settings</source>
+        <translation>生成设置</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>File Name Prefix</source>
+        <translation>文件名前缀</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Placeholders: &lt;name&gt; = task file name, &lt;testid&gt; = test point number, &lt;subid&gt; = subtask number (needs "Name Files by Subtask"). &lt;testid&gt; is zero-padded to two digits when naming by subtask. Sample names never use &lt;subid&gt;: it is dropped, and the generator still gets sub_id -1.</source>
+        <translation>可用占位符：&lt;name&gt; = 题目文件名，&lt;testid&gt; = 测试点编号，&lt;subid&gt; = 子任务编号（需要开启「按子任务命名」）。按子任务命名时 &lt;testid&gt; 会补足两位。样例名不使用 &lt;subid&gt;（会被去掉），生成器仍收到 sub_id = -1。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Configure by Subtask</source>
+        <translation>按子任务配置</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>One test point per subtask; a later subtask only scores when the earlier ones pass.</source>
+        <translation>每个子任务一个测试点；后面的子任务要在前面的子任务通过后才计分。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Test Cases</source>
+        <translation>测试点数目</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Test Points per Subtask</source>
+        <translation>子任务测试点数目</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Number of test points in each subtask, separated by spaces.</source>
+        <translation>各子任务的测试点数目，用空格分隔。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Name Files by Subtask</source>
+        <translation>按子任务命名</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>"&lt;subid&gt;" becomes usable and "&lt;testid&gt;" counts within each subtask. Otherwise the test points are numbered in generation order.</source>
+        <translation>开启后文件名里可以用 &lt;subid&gt;，&lt;testid&gt; 按子任务内编号；关闭时按生成顺序统一编号。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Samples</source>
+        <translation>样例数目</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Samples are generated with sub_id -1 and written to down/.</source>
+        <translation>样例生成时 sub_id 固定为 -1，文件写到 down/。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Input Suffix</source>
+        <translation>输入后缀</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Output Suffix</source>
+        <translation>输出后缀</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Sample Output Suffix</source>
+        <translation>样例输出后缀</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Remove the old files in data/ and down/ first</source>
+        <translation>先清掉 data/ 与 down/ 里的旧文件</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Write the result into the test cases of this task</source>
+        <translation>把生成结果写进这道题的测试点</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generate Data</source>
+        <translation>生成数据</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Compile generator/gen.cpp + generator/sol.cpp, run them, and configure the test cases.</source>
+        <translation>编译 generator/gen.cpp 与 generator/sol.cpp，运行并配置测试点。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Open generator Folder</source>
+        <translation>打开 generator 目录</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Log</source>
+        <translation>日志</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>There is no task in this contest day yet.</source>
+        <translation>这个比赛日还没有试题。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Will generate %1 in data/.</source>
+        <translation>将在 data/ 下生成：%1。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Will generate %1 … %2 in data/ (%3 files).</source>
+        <translation>将在 data/ 下生成 %1 … %2（共 %3 个文件）。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Samples: %1 in down/.</source>
+        <translation>样例：down/ 下的 %1。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Samples: %1 … %2 in down/ (%3 files).</source>
+        <translation>样例：down/ 下的 %1 … %2（共 %3 个文件）。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Subtasks: %1.</source>
+        <translation>子任务：%1。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>No C++ compiler is configured. Add one in Settings → Compilers first.</source>
+        <translation>还没有配置 C++ 编译器。请先在「设置 → 编译器」里添加一个。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>The compiler "%1" has no configuration.</source>
+        <translation>编译器「%1」没有任何编译参数。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>No task selected.</source>
+        <translation>未选择试题。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>The input / output suffixes cannot be empty.</source>
+        <translation>输入 / 输出后缀不能为空。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>The test points per subtask must be positive integers, e.g. "5 5 4 6".</source>
+        <translation>子任务测试点数目必须是正整数，例如 5 5 4 6。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Fill in the test points per subtask, e.g. "5 5 4 6".</source>
+        <translation>请填写各子任务的测试点数目，例如 5 5 4 6。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Cannot plan the test data.</source>
+        <translation>无法规划测试数据。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generating ...</source>
+        <translation>正在生成……</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Task: %1</source>
+        <translation>试题：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generation failed.</source>
+        <translation>生成失败。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Failed: %1</source>
+        <translation>失败：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Done.</source>
+        <translation>完成。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Done: %1 test case(s) and %2 sample(s).</source>
+        <translation>完成：%1 个测试点、%2 个样例。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>The test cases were left untouched.</source>
+        <translation>没有改动测试点。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Configured %1 test case(s).</source>
+        <translation>已配置 %1 个测试点。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Cannot create %1</source>
+        <translation>无法创建 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Edit gen.cpp</source>
+        <translation>编辑 gen.cpp</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Edit sol.cpp</source>
+        <translation>编辑 sol.cpp</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Open gen.cpp with the default editor (it is created from a template when missing).</source>
+        <translation>用系统默认编辑器打开 gen.cpp（没有时先放一份模板）。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Open sol.cpp with the default editor (a skeleton is created when missing).</source>
+        <translation>用系统默认编辑器打开 sol.cpp（没有时先放一份骨架）。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Cannot open %1</source>
+        <translation>无法打开 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generation failed: %1</source>
+        <translation>生成失败：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Data generated; %1 test case(s) configured.</source>
+        <translation>数据已生成，已配置 %1 个测试点。</translation>
     </message>
 </context>
 </TS>

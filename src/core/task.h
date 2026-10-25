@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 
 #include <QMap>
 #include <QObject>
@@ -37,7 +36,6 @@ class Task : public QObject {
 
 	const QList<TestCase *> &getTestCaseList() const;
 	const QString &getProblemTitle() const;
-	/// 题目在磁盘上的目录名：优先用源文件名（如 plus），为空时退回去用标题。
 	QString getDirectoryName() const;
 	bool getSubFolderCheck() const;
 	const QString &getSourceFileName() const;
@@ -96,14 +94,11 @@ class Task : public QObject {
 
 	void copyTo(Task *);
 
-	/// 交互题：确保 problem/<题>/graders/<题>.h 与 <题>_grader.cpp 存在，
-	/// 并自动指定交互库路径 / 交互库名称 / 接口实现路径（已填值不覆盖）。
 	void prepareInteraction();
 
 	void refreshCompilerConfiguration(Settings *);
 	int getTotalTimeLimit() const;
 	int getTotalScore() const;
-	/// 试题级默认时间 / 空间限制（新建测试点时沿用；gengen 的 time/memory limit）。
 	int getDefaultTimeLimit() const;
 	int getDefaultMemoryLimit() const;
 	int writeToJson(QJsonObject &in);

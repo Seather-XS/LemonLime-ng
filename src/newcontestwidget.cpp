@@ -9,7 +9,6 @@
 
 #include "newcontestwidget.h"
 #include "ui_newcontestwidget.h"
-//
 #include <QFileDialog>
 
 NewContestWidget::NewContestWidget(QWidget *parent) : QWidget(parent), ui(new Ui::NewContestWidget) {

@@ -9,7 +9,6 @@
 
 #include "lemon.h"
 #include "ui_lemon.h"
-//
 #include "addcompilerwizard.h"
 #include "addtaskdialog.h"
 #include "base/LemonBase.hpp"
@@ -23,6 +22,7 @@
 #include "core/contestant.h"
 #include "core/task.h"
 #include "core/testcase.h"
+#include "datawidget.h"
 #include "daydialog.h"
 #include "detaildialog.h"
 #include "exportwidget.h"
@@ -32,7 +32,6 @@
 #include "statisticsbrowser.h"
 #include "statementeditwidget.h"
 #include "welcomedialog.h"
-//
 #include <QByteArrayView>
 #include <QDesktopServices>
 #include <QFileDialog>
@@ -45,7 +44,6 @@
 #include <QUrl>
 #include <algorithm>
 #include <chrono>
-//
 #define LEMON_MODULE_NAME "Lemon"
 
 LemonLime::LemonLime(QWidget *parent) : QMainWindow(parent), ui(new Ui::LemonLime) {
@@ -59,7 +57,6 @@ LemonLime::LemonLime(QWidget *parent) : QMainWindow(parent), ui(new Ui::LemonLim
 	ui->actionChangeContestName->setEnabled(false);
 	ui->actionContestSettings->setEnabled(false);
 	dataDirWatcher = nullptr;
-	// 数据目录监听的去抖定时器：目录一变就打标记，400ms 后统一重建一次。
 	dataWatcherTimer = new QTimer(this);
 	dataWatcherTimer->setSingleShot(true);
 	dataWatcherTimer->setInterval(400);
@@ -73,9 +70,12 @@ LemonLime::LemonLime(QWidget *parent) : QMainWindow(parent), ui(new Ui::LemonLim
 	connect(this, &LemonLime::dataPathChanged, ui->taskEdit, &TaskEditWidget::dataPathChanged);
 	connect(this, &LemonLime::dataPathChanged, ui->testCaseEdit, &TestCaseEditWidget::dataPathChanged);
 	connect(ui->summary, &SummaryTree::currentItemChanged, this, &LemonLime::summarySelectionChanged);
-	// 删试题会让 problem/<题>/ 整个目录消失，删完得重新挂监听。
 	connect(ui->summary, &SummaryTree::taskAboutToBeDeleted, this, &LemonLime::releaseDataWatcher);
 	connect(ui->summary, &SummaryTree::taskChanged, this, &LemonLime::resetDataWatcher);
+	connect(ui->summary, &SummaryTree::taskChanged, this, [this] {
+		if (ui->dataWidget)
+			ui->dataWidget->refresh();
+	});
 	connect(ui->optionsAction, &QAction::triggered, this, &LemonLime::showOptionsDialog);
 	connect(ui->actionContestSettings, &QAction::triggered, this, &LemonLime::showContestSettingsDialog);
 	connect(ui->cleanupButton, &QPushButton::clicked, this, &LemonLime::cleanupButtonClicked);
@@ -95,9 +95,17 @@ LemonLime::LemonLime(QWidget *parent) : QMainWindow(parent), ui(new Ui::LemonLim
 	connect(ui->moveDownButton, &QToolButton::clicked, this, &LemonLime::moveDownTask);
 	connect(ui->resultViewer, &ResultViewer::itemSelectionChanged, this, &LemonLime::viewerSelectionChanged);
 	connect(ui->resultViewer, &ResultViewer::contestantDeleted, this, &LemonLime::contestantDeleted);
-	// 题面 PDF 改了名字：导出选项卡里的题面下拉框跟着换默认项。
 	connect(ui->statementEdit, &StatementEditWidget::pdfFileNameChanged, ui->exportWidget,
 	        &ExportWidget::setDefaultStatementFile);
+	connect(ui->dataWidget, &DataWidget::contestModified, this, [this] {
+		if (! curContest)
+			return;
+
+		ui->summary->setContest(curContest);
+		saveContest(curFile);
+	});
+	connect(ui->dataWidget, &DataWidget::statusChanged, this,
+	        [this](const QString &message) { ui->statusBar->showMessage(message); });
 	connect(ui->newAction, &QAction::triggered, this, &LemonLime::newAction);
 	connect(ui->openAction, &QAction::triggered, this, &LemonLime::loadAction);
 	connect(ui->saveAction, &QAction::triggered, this, &LemonLime::saveAction);
@@ -145,7 +153,7 @@ void LemonLime::changeEvent(QEvent *event) {
 	}
 }
 
-void LemonLime::closeEvent(QCloseEvent * /*event*/) {
+void LemonLime::closeEvent(QCloseEvent *) {
 	ui->statementEdit->saveIfNeeded();
 
 	if (curContest)
@@ -201,17 +209,11 @@ void LemonLime::insertWatchPath(const QString &curDir, QFileSystemWatcher *watch
 }
 
 void LemonLime::resetDataWatcher() {
-	// 目录内容一变（判题时数据文件一直在写）就会收到通知。
-	// 重建 watcher 要遍历 problem/ 下所有目录，还会连带触发各个文件补全框重扫一遍，
-	// 所以这里只打一个标记，攒 400ms 再统一做一次。
 	if (dataWatcherTimer)
 		dataWatcherTimer->start();
 }
 
 void LemonLime::releaseDataWatcher() {
-	// QFileSystemWatcher 在 Windows 上是用 FindFirstChangeNotification() 实现的，
-	// 每个被监视的目录都会挂一个句柄，占住目录不放：目录被监视着就删不掉（连父目录
-	// 一起删也会失败）。删试题 / 删比赛日之前必须先把它拆掉。
 	delete dataDirWatcher;
 	dataDirWatcher = nullptr;
 }
@@ -220,7 +222,6 @@ void LemonLime::rebuildDataWatcher() {
 	releaseDataWatcher();
 	dataDirWatcher = new QFileSystemWatcher(this);
 	insertWatchPath(Settings::dataPath(), dataDirWatcher);
-	// 只挂到去抖入口，避免每个文件的变动都全量重扫一遍。
 	connect(dataDirWatcher, &QFileSystemWatcher::directoryChanged, this, &LemonLime::resetDataWatcher);
 	connect(dataDirWatcher, &QFileSystemWatcher::fileChanged, this, &LemonLime::resetDataWatcher);
 	emit dataPathChanged();
@@ -296,7 +297,6 @@ void LemonLime::showContestSettingsDialog() {
 
 	if (dialog->exec() == QDialog::Accepted) {
 		dialog->applyTo(curContest);
-		// 违规 / 命名判定只在测试时进行，这里只刷新界面，不提前给选手定性。
 		refreshSummary();
 		ui->resultViewer->refreshViewer();
 		ui->statisticsBrowser->refresh();
@@ -664,12 +664,8 @@ void LemonLime::saveContest(const QString &fileName) {
 	if (fileName.isEmpty())
 		return;
 
-	// curFile 以前只存文件名，完全依赖当前工作目录；工作目录一旦被切走
-	// （例如误把工程文件当成比赛日载入），保存就会写进别的文件里。这里统一用绝对路径。
 	const QString target = QFileInfo(fileName).absoluteFilePath();
 
-	// 工程文件（contest.conf）只允许由 saveProjectFile() 写：比赛日的数据一旦写进去，
-	// 整场比赛的配置（标题 + 比赛日列表）就没了。写入前做最后一道拦截。
 	bool projectTarget = ! projectFile.isEmpty() && target == QFileInfo(projectFile).absoluteFilePath();
 
 	if (! projectTarget && QFileInfo::exists(target)) {
@@ -701,21 +697,11 @@ void LemonLime::saveContest(const QString &fileName) {
 	QJsonObject out;
 	curContest->writeToJson(out);
 	file.write(QJsonDocument(out).toJson(QJsonDocument::Compact));
-	/* QByteArray data;
-	QDataStream _out(&data, QIODevice::WriteOnly);
-	curContest->writeToStream(_out);
-	data = qCompress(data);
-	QDataStream out(&file);
-	out << unsigned(MagicNumber) << qChecksum(QByteArrayView(data))
-	    << static_cast<int>(data.length()); // Qt 6+ uses qsizetype for length
-	out.writeRawData(data.data(), data.length()); */
 	QApplication::restoreOverrideCursor();
 	ui->statusBar->showMessage(tr("Saved"), 1000);
 }
 
 void LemonLime::loadContest(const QString &filePath) {
-	// 工程文件（contest.conf，含 days 数组）→ 载入第一个比赛日；
-	// 否则把单个 .cdf 当作「只有一个比赛日」的工程，保持向后兼容。
 	bool isProject = false;
 	QFile probe(filePath);
 
@@ -735,8 +721,6 @@ void LemonLime::loadContest(const QString &filePath) {
 		return;
 	}
 
-	// 名字是 contest.conf 却没有 days 列表 —— 这是被写坏的比赛工程文件。
-	// 绝不能把它当成「一个比赛日」载入：那样它自己会被当成比赛日文件重新写回去。
 	if (QFileInfo(filePath).fileName().compare(QStringLiteral("contest.conf"), Qt::CaseInsensitive) == 0) {
 		LOG("Refused to load a broken project file:", filePath);
 		QMessageBox::warning(this, tr("Error"),
@@ -744,7 +728,6 @@ void LemonLime::loadContest(const QString &filePath) {
 		return;
 	}
 
-	// 单个 .cdf / .conf 当作「只有一个比赛日」的工程载入，保持向后兼容。
 	curProject = DayProject();
 	projectFile.clear();
 	projectFileNewlyCreated = false;
@@ -775,13 +758,10 @@ void LemonLime::loadProject(const QString &path) {
 	projectFileNewlyCreated = false;
 	curDayIndex = -1;
 
-	// 与 gengen-tuack 一致：打开比赛后弹窗选择 / 新建比赛日。
 	chooseDay();
 }
 
 void LemonLime::migrateLayout() {
-	// 旧 Lemon 布局：<比赛日>/data/<题>/... 与 <比赛日>/source/<选手>/
-	// 新 gengen 布局：<比赛日>/problem/<题>/data/... 与 <比赛日>/answers/<赛区>/<选手>/
 	const QString oldData = QStringLiteral("data");
 	const QString oldSource = QStringLiteral("source");
 	const QString newData = QStringLiteral("problem");
@@ -795,7 +775,6 @@ void LemonLime::migrateLayout() {
 
 		for (const QFileInfo &fi : QDir(oldData).entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries)) {
 			if (fi.isDir()) {
-				// 每个题的数据目录整体搬到 problem/<题>/data/
 				const QString target =
 				    newData + QDir::separator() + fi.fileName() + QDir::separator() + QStringLiteral("data");
 				QDir().mkpath(target);
@@ -803,7 +782,6 @@ void LemonLime::migrateLayout() {
 				for (const QFileInfo &f : QDir(fi.absoluteFilePath()).entryInfoList(QDir::Files))
 					QFile::copy(f.absoluteFilePath(), target + QDir::separator() + f.fileName());
 			} else {
-				// 平铺的文件（SPJ / 交互库等）路径不变，直接搬到 problem/ 下
 				QFile::copy(fi.absoluteFilePath(), newData + QDir::separator() + fi.fileName());
 			}
 		}
@@ -812,8 +790,6 @@ void LemonLime::migrateLayout() {
 		LOG("Legacy data/ migrated to problem/");
 	}
 
-	// 目录已经是新布局、但工程里还存着旧路径（如 <题>/<文件>）时，把路径归一化到
-	// problem/<题>/data/<文件>，否则判定会报"找不到标准输入文件"。
 	if (normalizeTestCasePaths())
 		saveContest(curFile);
 }
@@ -825,7 +801,6 @@ bool LemonLime::normalizeTestCasePaths() {
 	bool changed = false;
 
 	for (auto *task : curContest->getTaskList()) {
-		// 数据目录以（创建后固定的）文件名为准，与 addTask / import 流程保持一致。
 		QString taskName = task->getSourceFileName();
 
 		if (taskName.isEmpty())
@@ -842,7 +817,6 @@ bool LemonLime::normalizeTestCasePaths() {
 
 			const QString normalized = prefix + QFileInfo(stored).fileName();
 
-			// 只有在新位置确实能找到文件时才改写，避免破坏用户自定义的路径。
 			if (QFileInfo::exists(Settings::dataPath() + normalized))
 				return normalized;
 
@@ -884,8 +858,6 @@ void LemonLime::loadDay(const QString &filePath) {
 	if (curContest)
 		closeAction();
 
-	// 载入过程中任何一步失败，都不能把「空比赛」留在 curContest 里：curFile 还是上一次
-	// 的路径，30 秒一次的自动保存会把空白内容写进那个文件（比赛配置就是这样丢的）。
 	auto *loaded = new Contest(this);
 	const QString name = QFileInfo(filePath).fileName();
 
@@ -902,13 +874,10 @@ void LemonLime::loadDay(const QString &filePath) {
 		abort();
 		return;
 	}
-	// 有些编辑器（记事本 / VS Code）存 UTF-8 会带 BOM：不跳过的话下面 peek 到的不是 '{'，
-	// 会被当成老的二进制比赛文件，报「File is broken」。
 	if (file.peek(3).startsWith(QByteArrayLiteral("\xEF\xBB\xBF")))
 		file.seek(3);
 	char firstChar;
 	file.peek(&firstChar, 1);
-	// Don't support RFC 7159, but support RFC 4627
 	if (firstChar == '[' || firstChar == '{') {
 		QJsonParseError parseError;
 		QJsonObject inObj(QJsonDocument::fromJson(file.readAll(), &parseError).object());
@@ -962,7 +931,6 @@ void LemonLime::loadDay(const QString &filePath) {
 	}
 
 	curContest = loaded;
-	// curFile 存绝对路径：保存不再依赖当前工作目录，避免写进别的比赛日 / 工程里。
 	const QString absolutePath = QFileInfo(filePath).absoluteFilePath();
 	curFile = absolutePath;
 	QDir::setCurrent(QFileInfo(absolutePath).path());
@@ -970,18 +938,11 @@ void LemonLime::loadDay(const QString &filePath) {
 	QDir().mkdir(Settings::dataPath());
 	QDir().mkdir(Settings::sourcePath());
 	QDir().mkdir(Settings::importPath());
-	// 每个比赛日一个 statement/ 目录：题面 markdown 与导出的 PDF 都放这里。
 	QDir().mkpath(Settings::statementPath());
-	// 导出物统一放 dist/ 下（dist/reports 成绩单与统计、dist/export 压缩包）；
-	// 顺便清掉老工程根目录里残留的 reports/、export/。
 	Settings::ensureDistDirs();
-	// 让资源管理器按 problem / import / answers / statement / dist 显示这些目录
-	// （隐藏的 desktop.ini，只改显示名，真实路径不变）。
 	Settings::ensureDayFolderOrdering(QDir::currentPath());
 
-	// 补齐每个试题的标准子目录（data / down / graders / gen），顺便清掉老的 tests/
 	for (auto *task : curContest->getTaskList()) {
-		// 目录跟着（固定的）文件名走，与 addTask / import 流程一致。
 		const QString base = task->getSourceFileName().isEmpty() ? task->getProblemTitle()
 		                                                        : task->getSourceFileName();
 		Settings::ensureTaskDirs(base);
@@ -990,8 +951,6 @@ void LemonLime::loadDay(const QString &filePath) {
 			task->prepareInteraction();
 	}
 
-	// 违规 / 命名判定不在载入时进行：未测试过的选手和普通选手看起来完全一样，
-	// 只有真正开始测试时才扫描代码并给出「测试被取消」的结论。
 	ui->summary->setContest(curContest);
 	ui->resultViewer->setContest(curContest);
 	ui->resultViewer->refreshViewer();
@@ -1022,8 +981,6 @@ void LemonLime::loadDay(const QString &filePath) {
 		    tr("LemonLime-ng - %1 / %2").arg(curProject.title, curContest->getContestTitle()));
 
 	ui->tabWidget->setCurrentIndex(0);
-	// 题面：加载当前比赛日的 statement/statement.md，并把占位符要用的上下文交给它
-	// （比赛日文件名 / 比赛日标题 / 比赛标题）。
 	const QString dayTitle =
 	    (projectFile.isEmpty() || curDayIndex < 0 || curDayIndex >= curProject.days.size())
 	        ? QString()
@@ -1033,7 +990,8 @@ void LemonLime::loadDay(const QString &filePath) {
 	ui->statementEdit->setDayContext(curContest, QFileInfo(curFile).completeBaseName(), dayTitle,
 	                                 projectTitle);
 	ui->statementEdit->reload();
-	// 导出：重新列出当前比赛日能打包的内容（默认题面取题面选项卡算出来的名字）
+	ui->dataWidget->setSettings(settings);
+	ui->dataWidget->setContest(curContest);
 	ui->exportWidget->setDayFile(curFile);
 	ui->exportWidget->setContest(curContest);
 	ui->exportWidget->setDefaultStatementFile(ui->statementEdit->pdfFileName());
@@ -1052,7 +1010,6 @@ void LemonLime::newContest(const QString &title, const QString &savingName, cons
 	if (curContest)
 		closeAction();
 
-	// 三层结构：先只建立「比赛（工程）」本身，随后由「比赛日」窗口新建第一个比赛日。
 	curProject = DayProject();
 	curProject.title = title;
 	projectFile = QDir(path).absoluteFilePath(QStringLiteral("contest.conf"));
@@ -1065,7 +1022,6 @@ void LemonLime::newContest(const QString &title, const QString &savingName, cons
 	settings->setRecentContest(recentContest);
 	LOG("New Contest -", title);
 
-	// 与 gengen-tuack 一致：建完比赛后再弹窗选择 / 新建比赛日。
 	chooseDay(true);
 }
 
@@ -1080,16 +1036,15 @@ void LemonLime::newAction() {
 }
 
 void LemonLime::closeAction() {
-	// 还处于当前比赛日的工作目录，先把题面写回去。
 	ui->statementEdit->saveIfNeeded();
 	saveContest(curFile);
-	// 关掉比赛日后可能整个比赛日目录都要被删（deleteDayAt），先把监听器拆掉。
 	releaseDataWatcher();
 	ui->summary->setContest(nullptr);
 	ui->taskEdit->setEditTask(nullptr);
 	ui->resultViewer->setContest(nullptr);
 	ui->statisticsBrowser->setContest(nullptr);
 	ui->exportWidget->setContest(nullptr);
+	ui->dataWidget->setContest(nullptr);
 	delete curContest;
 	curContest = nullptr;
 	ui->tabWidget->setCurrentIndex(0);
@@ -1193,7 +1148,6 @@ void LemonLime::addTaskWithScoreScale(const QString &title,
 	curContest->addTask(newTask);
 	Settings::ensureTaskDirs(title);
 
-	// 题型 / 判题方式就是导入时选的那个；交互题与自定义校验器顺带把选好的文件路径填上。
 	newTask->setComparisonMode(comparisonMode);
 
 	if (comparisonMode == Task::TestlibSpecialJudgeMode && ! checkerSource.isEmpty())
@@ -1213,7 +1167,6 @@ void LemonLime::addTaskWithScoreScale(const QString &title,
 		if (! graderSource.isEmpty())
 			newTask->setGrader(Settings::graderFilePath(title, QFileInfo(graderSource).fileName()));
 
-		// 没配全（或一个都没指定）的按原来的默认补上：生成 <题>.h 与 <题>_grader.cpp。
 		if (interactorSource.isEmpty() || graderSource.isEmpty())
 			newTask->prepareInteraction();
 	}
@@ -1314,7 +1267,6 @@ void LemonLime::addTasksAction() {
 			    Settings::dataPath() + taskName + QDir::separator() + QStringLiteral("data");
 			QDir().mkpath(targetDir);
 
-			// 把 import 里的数据搬进 problem/<题>/data/（搬不动就拷贝）
 			for (const auto &item : testCases[i]) {
 				const QStringList names{item.first, item.second};
 
@@ -1336,8 +1288,6 @@ void LemonLime::addTasksAction() {
 				}
 			}
 
-			// 交互题带上交互库与接口，自定义校验器带上校验器文件：都要从 import/ 搬进
-			// problem/<题>/graders/。
 			const Task::TaskType taskType = dialog->getTaskType(i);
 			const Task::ComparisonMode comparisonMode = dialog->getComparisonMode(i);
 			const QString interactorSource = dialog->getInteractorSource(i);
@@ -1379,7 +1329,6 @@ void LemonLime::addTasksAction() {
 			                      dialog->getMemoryLimit(i), taskType, comparisonMode, interactorSource,
 			                      graderSource, checkerSource);
 
-			// 导入完就把 import/ 下这道题的整个目录清掉（不管还剩什么文件）。
 			QDir(Settings::importPath() + taskName).removeRecursively();
 		}
 	}
@@ -1387,12 +1336,10 @@ void LemonLime::addTasksAction() {
 	ui->summary->setContest(curContest);
 }
 
-// problem/ 已经是 gengen 布局，题目和数据都不需要再搬：直接登记还没配置的试题与测试点。
 void LemonLime::addProblemTasksAction() {
 	if (! curContest)
 		return;
 
-	// 扩展名沿用设置里的配置；没配就用 Lemon 的默认值。
 	QStringList inputFilters = settings->getInputFileExtensions();
 
 	if (inputFilters.isEmpty())
@@ -1426,7 +1373,6 @@ void LemonLime::addProblemTasksAction() {
 		if (! QDir(dataDir).exists())
 			continue;
 
-		// getFiles() 只列 QDir::Files，data/ 下的子目录不会被读进来。
 		QMap<QString, QString> inputFiles;
 		QMap<QString, QString> outputFiles;
 		getFiles(dataDir, inputFilters, inputFiles);
@@ -1446,7 +1392,6 @@ void LemonLime::addProblemTasksAction() {
 		Task *task = tasksByDir.value(taskName.toLower(), nullptr);
 
 		if (! task) {
-			// 新题：目录名就是文件名，题目标题也先按目录名填，后面能在「试题」里改。
 			task = new Task;
 			task->setProblemTitle(taskName);
 			task->setSourceFileName(taskName);
@@ -1461,7 +1406,6 @@ void LemonLime::addProblemTasksAction() {
 			tasksByDir.insert(taskName.toLower(), task);
 			addedTasks.append(taskName);
 
-			// graders/<题>.h + <题>_grader.cpp 是交互题的固定命名，存在就顺手配置上。
 			const QString interactor = Settings::graderFilePath(taskName, taskName + QStringLiteral(".h"));
 			const QString grader =
 			    Settings::graderFilePath(taskName, taskName + QStringLiteral("_grader.cpp"));
@@ -1474,7 +1418,6 @@ void LemonLime::addProblemTasksAction() {
 				task->setGrader(grader);
 			}
 
-			// 与 import/ 的导入保持一致：总分 100 均摊到各测试点（超过 100 个点时 1 分一个）。
 			const int sumScore = qMax(100, cases.size());
 			const int scorePer = sumScore / cases.size();
 			const int scoreLos = sumScore - scorePer * cases.size();
@@ -1494,14 +1437,12 @@ void LemonLime::addProblemTasksAction() {
 			continue;
 		}
 
-		// 已有试题：记下配过的输入文件，只补 data/ 里新出现的那些。
 		QSet<QString> configured;
 
 		for (auto *testCase : task->getTestCaseList())
 			for (const QString &input : testCase->getInputFiles())
 				configured.insert(QDir::cleanPath(QDir::fromNativeSeparators(input)));
 
-		// 新测试点沿用最后一个测试点的分数与限制，保证同一道题内规格一致。
 		int score = settings->getDefaultFullScore();
 		int timeLimit = task->getDefaultTimeLimit() > 0 ? task->getDefaultTimeLimit()
 		                                                : settings->getDefaultTimeLimit();
@@ -1580,7 +1521,6 @@ void LemonLime::changeContestName() {
 
 	curContest->setContestTitle(newName);
 
-	// 三层结构下「更改标题」改的是当前比赛日的标题，同步写回工程文件。
 	if (! projectFile.isEmpty() && curDayIndex >= 0 && curDayIndex < curProject.days.size()) {
 		curProject.days[curDayIndex].title = newName;
 		saveProjectFile();
@@ -1602,8 +1542,6 @@ void LemonLime::saveProjectFile() {
 	if (projectFile.isEmpty())
 		return;
 
-	// 覆盖前留一份上一次的内容：误写 / 写坏时还能救回来。
-	// 新建比赛时不留：那时文件里只有刚写进去的内容，留 .bak 只会在比赛目录里多一个垃圾文件。
 	if (! projectFileNewlyCreated && QFile::exists(projectFile)) {
 		const QString backup = projectFile + QStringLiteral(".bak");
 		QFile::remove(backup);
@@ -1651,7 +1589,6 @@ void LemonLime::openDay(int index) {
 	if (projectFile.isEmpty() || index < 0 || index >= curProject.days.size())
 		return;
 
-	// loadDay() 内部会先 closeAction() 保存当前比赛日，再切到新的工作目录。
 	curDayIndex = index;
 	loadDay(curProject.dayPath(QFileInfo(projectFile).absolutePath(), index));
 }
@@ -1660,7 +1597,6 @@ bool LemonLime::createDay(const QString &title, const QString &fileName) {
 	if (projectFile.isEmpty() || fileName.isEmpty())
 		return false;
 
-	// 比赛日目录直接建在比赛目录下的一级子目录里，名字里不允许出现路径分隔符。
 	if (fileName.contains(QLatin1Char('/')) || fileName.contains(QLatin1Char('\\'))) {
 		QMessageBox::warning(this, tr("New Contest Day"),
 		                     tr("The folder name cannot contain path separators."), QMessageBox::Close);
@@ -1693,7 +1629,6 @@ bool LemonLime::createDay(const QString &title, const QString &fileName) {
 	saveProjectFile();
 	curDayIndex = curProject.days.size() - 1;
 
-	// 生成空的比赛日文件，再载入它。
 	{
 		QDir::setCurrent(dayDir);
 		QDir().mkdir(Settings::dataPath());
@@ -1728,7 +1663,6 @@ bool LemonLime::chooseDay(bool preferNew) {
 		if (dialog.exec() != QDialog::Accepted)
 			return false;
 
-		// 「打开」页签里点了删除：删完再让用户重新选。
 		if (dialog.isDeleteRequested()) {
 			deleteDayAt(dialog.getSelectedIndex());
 			continue;
@@ -1751,7 +1685,6 @@ void LemonLime::deleteDayAt(int index, bool deleteFiles) {
 	const QString dayDir = root.absoluteFilePath(QFileInfo(entry.file).path());
 	const bool wasCurrent = (index == curDayIndex);
 
-	// 先保存并关闭当前比赛日，避免它仍持有被删目录中的文件句柄。
 	if (curContest && wasCurrent)
 		closeAction();
 
@@ -1813,7 +1746,6 @@ void LemonLime::removeDay() {
 
 void LemonLime::renameProject() {
 	if (projectFile.isEmpty()) {
-		// 单个 .cdf 的旧工程没有工程标题，退化为更改比赛标题。
 		changeContestName();
 		return;
 	}

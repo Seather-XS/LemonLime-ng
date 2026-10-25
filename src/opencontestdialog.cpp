@@ -9,7 +9,6 @@
 
 #include "opencontestdialog.h"
 #include "ui_opencontestdialog.h"
-//
 #include <QPushButton>
 
 OpenContestDialog::OpenContestDialog(QWidget *parent) : QDialog(parent), ui(new Ui::OpenContestDialog) {

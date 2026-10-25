@@ -5,7 +5,6 @@
  */
 
 #include "admissionwidget.h"
-//
 #include "admissiongenerator.h"
 #include "admissionproject.h"
 #include "csveditordialog.h"
@@ -13,7 +12,6 @@
 #include "core/contestant.h"
 #include "notesdialog.h"
 #include "venuedialog.h"
-//
 #include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
@@ -45,7 +43,6 @@ namespace {
 		                     : QStringLiteral("—");
 	}
 
-	/// 某个赛区的产物目录（按赛区 / 按考场两种布局都算进来）。
 	QString outputFolderFor(const AdmissionProject &project, const QString &region) {
 		const QString root = AdmissionGenerator::outputRoot();
 
@@ -66,7 +63,7 @@ namespace {
 
 		return count;
 	}
-} // namespace
+} 
 
 AdmissionWidget::AdmissionWidget(QWidget *parent) : QWidget(parent) {
 	project = new AdmissionProject();
@@ -84,7 +81,6 @@ AdmissionWidget::AdmissionWidget(QWidget *parent) : QWidget(parent) {
 }
 
 AdmissionWidget::~AdmissionWidget() {
-	// 关窗口时可能刚好还在敲标题：析构前再存一次
 	saveIfNeeded();
 	delete project;
 }
@@ -136,9 +132,6 @@ void AdmissionWidget::buildUi() {
 	packageBox = new QComboBox(this);
 	overwriteBox = new QCheckBox(this);
 	overwriteBox->setChecked(true);
-	// 条目现在就要填好：等 reload() 里现填会触发 currentIndexChanged → optionsChanged() →
-	// 拿还没 load() 的空 project 写盘，把 config.json 与 contest-notes.md 冲掉
-	// （「标题重启就没了」就是这么来的）。填的时候屏蔽信号。
 	{
 		QSignalBlocker layoutBlocker(layoutBox);
 		QSignalBlocker packageBlocker(packageBox);
@@ -185,7 +178,6 @@ void AdmissionWidget::buildUi() {
 
 	connect(refreshButton, &QPushButton::clicked, this, &AdmissionWidget::refreshClicked);
 
-	// 输入框里敲完不一定会有 editingFinished（直接关掉程序就白敲了），所以停下来就落盘
 	saveTimer = new QTimer(this);
 	saveTimer->setSingleShot(true);
 	saveTimer->setInterval(400);
@@ -275,15 +267,12 @@ void AdmissionWidget::refresh() { reload(); }
 
 void AdmissionWidget::reload() {
 	if (! contest) {
-		// 比赛日关了：解除钉定，免得还往刚才那个目录里写
 		AdmissionProject::useRoot(QString());
 		loaded = false;
 		return;
 	}
 
-	// 把 admission/ 钉成绝对路径：以后就算工作目录被别处改掉，也不会写错比赛日
 	AdmissionProject::useRoot(QFileInfo(AdmissionProject::root()).absoluteFilePath());
-	// 重新读盘前先把还在输入框里的标题 / 测试时间存下来，免得被回填覆盖掉
 	if (saveTimer && saveTimer->isActive()) {
 		saveTimer->stop();
 		saveTextEdits();
@@ -301,7 +290,6 @@ void AdmissionWidget::reload() {
 	if (! project->load(contest->getRegionEnabled(), &error))
 		appendLog(tr("Cannot load admission data: %1").arg(error));
 
-	// 回填选项时不要把 optionsChanged 又跑一遍（会写入文件）
 	QSignalBlocker layoutBlocker(layoutBox);
 	QSignalBlocker packageBlocker(packageBox);
 	QSignalBlocker overwriteBlocker(overwriteBox);
@@ -316,7 +304,6 @@ void AdmissionWidget::reload() {
 	overwriteBox->setChecked(project->overwrite);
 
 	{
-		// 标题留空就用比赛日标题（把比赛日标题当灰字提示）。
 		QSignalBlocker blocker(titleEdit);
 		titleEdit->setText(project->title);
 		titleEdit->setPlaceholderText(dayTitle);
@@ -393,7 +380,6 @@ void AdmissionWidget::openOutputClicked() {
 }
 
 void AdmissionWidget::optionsChanged() {
-	// 还没读盘就改选项：内存里是空 project，写下去就把盘上的设置清了
 	if (! loaded || ! contest)
 		return;
 
@@ -415,7 +401,6 @@ void AdmissionWidget::editListClicked() {
 	if (! region)
 		return;
 
-	// 名单编辑器下半部分是「注意事项」，点 OK 时它自己会落盘。
 	CsvEditorDialog dialog(region->name, region->table, project, this);
 	dialog.exec();
 	rebuildTable();
@@ -529,8 +514,6 @@ void AdmissionWidget::saveTextEdits() {
 	project->examTime = examTime;
 	QString error;
 
-	// 只动 config.json：标题 / 测试时间跟名单无关，别为了它把各赛区的 CSV 重写一遍。
-	// 存盘是后台行为，成功不吭声；只有失败才提示。
 	if (! project->saveConfig(&error))
 		appendLog(tr("Cannot save admission config: %1").arg(error));
 }
@@ -614,7 +597,6 @@ int AdmissionWidget::build(const QStringList &regions) {
 	QString saveError;
 	project->save(&saveError);
 
-	// 每次生成都从头记：上一次的日志留着，会让人以为这次也生成了那些文件
 	log->clear();
 	appendLog(tr("— build started %1 · folders: %2 · packages: %3 —")
 	              .arg(QTime::currentTime().toString(QStringLiteral("HH:mm:ss")),

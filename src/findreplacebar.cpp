@@ -5,7 +5,6 @@
  */
 
 #include "findreplacebar.h"
-//
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QKeyEvent>
@@ -22,7 +21,6 @@ FindReplaceBar::FindReplaceBar(QWidget *parent) : QWidget(parent) {
 	outer->setContentsMargins(0, 0, 0, 0);
 	outer->setSpacing(2);
 
-	// ---- 第一行：查找 ----
 	auto *findRow = new QHBoxLayout();
 	findRow->setContentsMargins(0, 0, 0, 0);
 	findRow->addWidget(new QLabel(tr("Find:"), this));
@@ -50,7 +48,6 @@ FindReplaceBar::FindReplaceBar(QWidget *parent) : QWidget(parent) {
 	findRow->addWidget(closeButton);
 	outer->addLayout(findRow);
 
-	// ---- 第二行：替换（常显，与 statement-editor 一致）----
 	auto *replaceRow = new QHBoxLayout();
 	replaceRow->setContentsMargins(0, 0, 0, 0);
 	replaceRow->addWidget(new QLabel(tr("Replace:"), this));
@@ -91,7 +88,6 @@ void FindReplaceBar::activate(bool focusReplace) {
 
 	const QString selected = editor->textCursor().selectedText();
 
-	// 编辑器里选中了什么就带进查找框（单行内容才对得上）
 	if (! selected.isEmpty() && ! selected.contains(QChar(0x2029)) && ! selected.contains(QChar('\n')))
 		findEdit->setText(selected);
 
@@ -120,7 +116,6 @@ bool FindReplaceBar::eventFilter(QObject *watched, QEvent *event) {
 			return true;
 		}
 
-		// Shift+Enter 往上找
 		if (watched == findEdit && (key->key() == Qt::Key_Return || key->key() == Qt::Key_Enter) &&
 		    key->modifiers().testFlag(Qt::ShiftModifier)) {
 			find(false);
@@ -166,7 +161,6 @@ void FindReplaceBar::find(bool forward) {
 		return;
 	}
 
-	// 没找到就回绕到另一端再试一次
 	QTextCursor cursor = editor->textCursor();
 	cursor.movePosition(forward ? QTextCursor::Start : QTextCursor::End);
 	editor->setTextCursor(cursor);
@@ -188,7 +182,6 @@ void FindReplaceBar::replaceCurrent() {
 
 	QTextCursor cursor = editor->textCursor();
 
-	// 当前选中的就是要找的内容才替换，否则先找下一个
 	if (cursor.hasSelection() && cursor.selectedText() == text) {
 		cursor.insertText(replaceEdit->text());
 		editor->setTextCursor(cursor);
@@ -224,7 +217,7 @@ void FindReplaceBar::replaceAll() {
 		count++;
 
 		if (count > 100000)
-			break;  // 保险丝
+			break;  
 	}
 
 	cursor.endEditBlock();

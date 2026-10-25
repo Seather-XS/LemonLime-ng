@@ -9,7 +9,6 @@
 
 #include "newcontestdialog.h"
 #include "ui_newcontestdialog.h"
-//
 #include <QPushButton>
 
 NewContestDialog::NewContestDialog(QWidget *parent) : QDialog(parent), ui(new Ui::NewContestDialog) {

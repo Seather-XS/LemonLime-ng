@@ -5,7 +5,6 @@
  */
 
 #include "admissionnaming.h"
-//
 #include <QObject>
 #include <QRegularExpression>
 
@@ -72,7 +71,6 @@ namespace AdmissionNaming {
 				return context.columns.value(key.mid(7)).toInt(ok);
 
 			if (key == QStringLiteral("id")) {
-				// 准考证号里的数字尾部：HN-S01192 → 1192
 				static const QRegularExpression trailing(QStringLiteral(R"((\d+)\s*$)"));
 				const QRegularExpressionMatch match = trailing.match(context.id);
 
@@ -91,7 +89,7 @@ namespace AdmissionNaming {
 			*ok = false;
 			return context.regionSeq;
 		}
-	} // namespace
+	} 
 
 	QStringList reservedKeywords() {
 		return {QStringLiteral("section"), QStringLiteral("number"), QStringLiteral("char"),
@@ -208,7 +206,6 @@ namespace AdmissionNaming {
 					++group;
 				}
 
-				// 先把这一组的宽度数出来（连续同类算一组）
 				int width = 0;
 				int scan = index;
 
@@ -313,4 +310,4 @@ namespace AdmissionNaming {
 
 		return out.right(2);
 	}
-} // namespace AdmissionNaming
+} 

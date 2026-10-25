@@ -9,7 +9,6 @@
 
 #include "detaildialog.h"
 #include "ui_detaildialog.h"
-//
 #include "base/LemonType.hpp"
 #include "base/settings.h"
 #include "core/contest.h"
@@ -18,7 +17,6 @@
 #include "core/task.h"
 #include "core/testcase.h"
 #include "judgingdialog.h"
-//
 #include <QMessageBox>
 #include <QScrollBar>
 
@@ -40,13 +38,11 @@ void DetailDialog::refreshViewer(Contest *_contest, Contestant *_contestant) {
 	htmlCode += "</head><body>";
 	QList<Task *> taskList = contest->getTaskList();
 
-	// 成绩来自「忽略限制重测」的选手：说明一句，免得看到违规代码拿满分而困惑。
 	if (contestant->isIgnoreRulesJudged())
 		htmlCode += QString("<p><i>%1</i></p>").arg(
 		    tr("The results come from \"Ignore Restrictions and Rejudge\": the code content was not "
 		       "checked."));
 
-	// 违规 / 命名不合规的选手：详情窗口里只写「测试被取消 (...）」，点 (...) 看详情。
 	if (contestant->isDisqualified()) {
 		htmlCode += "<p><span style=\"font-weight:bold; font-size:large;\">";
 		htmlCode += Contestant::disqualifiedText();

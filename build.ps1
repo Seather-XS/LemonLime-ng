@@ -31,35 +31,25 @@
 #>
 [CmdletBinding()]
 param(
-    # 构建类型
     [ValidateSet('Release', 'RelWithDebInfo', 'Debug')]
     [string]$BuildType = 'Release',
 
-    # 关闭 LTO（编译快很多，运行略慢；排查崩溃时建议关掉）
     [switch]$NoLto,
 
-    # 先删掉构建目录再配置
     [switch]$Clean,
 
-    # 构建后打一个发布压缩包
     [switch]$Package,
 
-    # 打进压缩包名字里的版本号，默认用时间戳
     [string]$Version,
 
-    # Qt 安装位置
     [string]$QtDir = 'D:\Qt\6.8.3\mingw_64',
 
-    # MinGW 运行时/bin（libstdc++、libgcc、windeployqt 的兄弟目录不在这里）
     [string]$ToolchainBin = 'D:\Qt\Tools\mingw1310_64\bin',
 
-    # cmake.exe（和 ninja.exe 在同一个目录）
     [string]$CmakeBin = 'C:\mingw64\bin\cmake.exe',
 
-    # 自定义构建目录（不填则按构建类型自动取 build / build-relwithdebinfo / build-debug）
     [string]$BuildDir,
 
-    # 自定义发布输出目录（不填则用 .\dist\lemon-<版本>）
     [string]$OutDir
 )
 
@@ -79,15 +69,11 @@ if ($NoLto) { $lto = 'OFF' } else { $lto = 'ON' }
 
 function Write-Step($text) { Write-Host "`n=== $text ===" -ForegroundColor Cyan }
 
-# ------------------------------------------------------------------ 环境检查
 Write-Step '检查工具链'
 
 if (-not (Test-Path $CmakeBin)) { throw "找不到 cmake：$CmakeBin（用 -CmakeBin 指定）" }
 if (-not (Test-Path $QtDir)) { throw "找不到 Qt：$QtDir（用 -QtDir 指定）" }
 
-# 注意顺序：ToolchainBin（Qt 自带的 MinGW，和 Qt 预编译库同一套 ABI）必须排在
-# cmake 所在目录前面。否则若 cmake 目录里也带了 g++（比如 C:\mingw64\bin），
-# 会选中版本不一致的编译器，链接 Qt 静态库时报 __imp___argc 之类的错误。
 $env:Path = $ToolchainBin + ';' + (Split-Path $CmakeBin -Parent) + ';' + $env:Path
 
 if (-not (Get-Command ninja.exe -ErrorAction SilentlyContinue)) { throw 'PATH 里找不到 ninja.exe' }
@@ -97,7 +83,6 @@ Write-Host "Qt        : $QtDir"
 Write-Host "构建目录  : $BuildDir"
 Write-Host "构建类型  : $BuildType (LTO=$lto)"
 
-# --------------------------------------------------- 关掉正在运行的旧程序
 Write-Step '关闭正在运行的 lemon.exe'
 
 Get-Process lemon -ErrorAction SilentlyContinue |
@@ -107,7 +92,6 @@ Get-Process lemon -ErrorAction SilentlyContinue |
         Stop-Process -Id $_.Id -Force
     }
 
-# ------------------------------------------------------------------ 配置
 if ($Clean -and (Test-Path $BuildDir)) {
     Write-Step "清理 $BuildDir"
     Remove-Item -Recurse -Force $BuildDir
@@ -120,7 +104,6 @@ Write-Step 'CMake 配置'
     "-DCMAKE_PREFIX_PATH=$QtDir"
 if ($LASTEXITCODE -ne 0) { throw "CMake 配置失败（exit $LASTEXITCODE）" }
 
-# ------------------------------------------------------------------ 构建
 Write-Step '构建 lemon（LTO 时链接会比较久）'
 & $CmakeBin --build $BuildDir --target lemon
 if ($LASTEXITCODE -ne 0) { throw "构建失败（exit $LASTEXITCODE）" }
@@ -130,7 +113,6 @@ if (-not (Test-Path $exe)) { throw "构建结束但没找到 $exe" }
 
 Write-Host ("构建完成：" + $exe + "  (" + [math]::Round((Get-Item $exe).Length / 1MB, 1) + " MB)") -ForegroundColor Green
 
-# ------------------------------------------------------------------ 打包
 if (-not $Package) {
     Write-Host "`n提示：加 -Package 可以顺便生成发布 zip。" -ForegroundColor DarkGray
     return
@@ -144,10 +126,8 @@ if (-not $OutDir) { $OutDir = Join-Path $root ("dist\lemon-" + $Version) }
 if (Test-Path $OutDir) { Remove-Item -Recurse -Force $OutDir }
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 
-# 1) 主程序
 Copy-Item $exe (Join-Path $OutDir 'lemon.exe')
 
-# 2) 题面模板：lemon.exe 会在自己旁边找 statement-templates/
 $templates = Join-Path $root 'assets\statement-templates'
 if (Test-Path $templates) {
     Copy-Item $templates (Join-Path $OutDir 'statement-templates') -Recurse
@@ -156,13 +136,11 @@ if (Test-Path $templates) {
     Write-Warning "没有找到 $templates，发布包里将没有题面模板（导出 PDF 会失败）"
 }
 
-# 3) 说明文件
 foreach ($doc in 'README.md', 'LICENSE', 'BUILD.md') {
     $src = Join-Path $root $doc
     if (Test-Path $src) { Copy-Item $src $OutDir }
 }
 
-# 4) Qt 运行库（DLL + platforms 等插件 + MinGW 运行库）
 $windeployqt = Join-Path $QtDir 'bin\windeployqt.exe'
 if (-not (Test-Path $windeployqt)) { throw "找不到 windeployqt：$windeployqt" }
 
@@ -173,7 +151,6 @@ if ($BuildType -eq 'RelWithDebInfo') { $deployArgs = $deployArgs | Where-Object 
 & $windeployqt @deployArgs (Join-Path $OutDir 'lemon.exe')
 if ($LASTEXITCODE -ne 0) { throw "windeployqt 失败（exit $LASTEXITCODE）" }
 
-# 5) 压缩
 $zip = Join-Path (Split-Path $OutDir -Parent) ("lemon-" + $Version + '.zip')
 if (Test-Path $zip) { Remove-Item -Force $zip }
 

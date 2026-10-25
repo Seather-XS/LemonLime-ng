@@ -8,7 +8,6 @@
  */
 
 #include "summarytree.h"
-//
 #include "addtestcaseswizard.h"
 #include "base/settings.h"
 #include "core/contest.h"
@@ -122,7 +121,7 @@ void SummaryTree::setContest(Contest *contest) {
 
 void SummaryTree::setSettings(Settings *_settings) { settings = _settings; }
 
-void SummaryTree::contextMenuEvent(QContextMenuEvent * /*event*/) {
+void SummaryTree::contextMenuEvent(QContextMenuEvent *) {
 	auto *contextMenu = new QMenu(this);
 	QTreeWidgetItem *curItem = currentItem();
 
@@ -161,7 +160,6 @@ void SummaryTree::addTask() {
 	if (! curContest || ! settings)
 		return;
 
-	// 弹出小窗口输入：显示标题 / 文件名（跟随标题、不可改）/ 时间限制 / 空间限制
 	NewTaskDialog dialog(this);
 	dialog.setDefaults(tr("Problem %1").arg(addCount + 1), settings->getDefaultTimeLimit(),
 	                   settings->getDefaultMemoryLimit());
@@ -283,7 +281,6 @@ void SummaryTree::deleteTask() {
 	}
 
 	delete curItem;
-	// 先让数据目录监听器松手，curContest->deleteTask() 才能把磁盘上的题目录删掉。
 	emit taskAboutToBeDeleted();
 	curContest->deleteTask(index);
 	emit taskChanged();
@@ -335,7 +332,6 @@ void SummaryTree::itemChanged(QTreeWidgetItem *item) {
 	if (index != -1) {
 		Task *curTask = curContest->getTask(index);
 		curTask->setProblemTitle(item->text(0));
-		// 目录跟着（创建后固定的）文件名走，而不是显示标题。
 		const QString base = curTask->getSourceFileName().isEmpty() ? curTask->getProblemTitle()
 		                                                            : curTask->getSourceFileName();
 		Settings::ensureTaskDirs(base);

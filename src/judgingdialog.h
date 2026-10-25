@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 
 #include "base/LemonType.hpp"
 #include <QDialog>
@@ -40,7 +39,6 @@ class JudgingDialog : public QDialog {
 	Contest *curContest{};
 	QTextCursor *cursor;
 	bool stopJudging{};
-	/// 上一行输出的选手名，避免同一选手重复输出「开始测试选手」
 	QString lastContestant;
 
   public slots:

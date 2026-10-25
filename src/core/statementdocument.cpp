@@ -5,9 +5,7 @@
  */
 
 #include "core/statementdocument.h"
-//
 #include "base/LemonLog.hpp"
-//
 #include <QRegularExpression>
 
 #define LEMON_MODULE_NAME "Statement"
@@ -25,9 +23,6 @@ namespace {
 		return list;
 	}
 
-	// 注意：必须**按值**返回。QStringLiteral 产生的是一个临时 QString，
-	// 返回 const QString& 会得到悬垂引用；一旦这 16 字节被后面的调用覆盖，
-	// 拼接时就变成读野指针（粘贴长题面后崩溃就是因为这个）。
 	QString problemMarkerText() { return QStringLiteral("<!-- PROBLEM -->"); }
 
 	const QRegularExpression &sectionPattern() {
@@ -63,6 +58,12 @@ namespace {
 		return re;
 	}
 
+	const QRegularExpression &proinfoLinePattern() {
+		static const QRegularExpression re(QStringLiteral(R"(^\s*<!--\s*PROINFO:\s*(?<values>.*?)\s*-->\s*$)"),
+		                                   QRegularExpression::CaseInsensitiveOption);
+		return re;
+	}
+
 	QString normalizeNewlines(const QString &text) {
 		QString result = text;
 		result.replace(QStringLiteral("\r\n"), QStringLiteral("\n"));
@@ -81,7 +82,6 @@ namespace {
 		return result;
 	}
 
-	/// 只去掉首尾的换行符（保留空格），与 statement-editor 的 `strip("\n")` 一致。
 	QString stripNewlines(const QString &text) {
 		int begin = 0;
 		int end = text.length();
@@ -95,7 +95,6 @@ namespace {
 		return text.mid(begin, end - begin);
 	}
 
-	/// 去掉首尾的空行（与 statement-editor 的 `_normalize_block` 一致）。
 	QString normalizeBlock(const QString &text) {
 		QStringList lines = text.split(QChar('\n'));
 
@@ -218,7 +217,7 @@ namespace {
 
 		return kept.join(QChar('\n'));
 	}
-} // namespace
+} 
 
 const QStringList &StatementDocument::knownSections() { return knownSectionsList(); }
 
@@ -252,7 +251,6 @@ bool StatementDocument::matchProblemHeading(const QString &line, QString &title,
 	title.clear();
 	english.clear();
 
-	// 手写解析（不用正则）：标题可能很长且含大量括号，正则回溯会把栈吃光。
 	if (! line.startsWith(QChar('#')))
 		return false;
 
@@ -264,7 +262,6 @@ bool StatementDocument::matchProblemHeading(const QString &line, QString &title,
 	if (text.isEmpty())
 		return true;
 
-	// 末尾形如 `（英文名）` 时拆出英文名
 	const QChar last = text.at(text.length() - 1);
 
 	if (last == QChar(0xff09) || last == QChar(')')) {
@@ -293,23 +290,12 @@ void StatementDocument::splitProblemArea(const QString &text, QStringList &head,
 	head.clear();
 	problems.clear();
 
-	// `<!-- PROBLEM -->` 只是试题块之间的分隔符，本身不属于任何一段正文：解析时直接吞掉。
-	// 否则它会被当成上一题正文的一部分，而重写时又会在每题前面再补一个 —— 于是每存一次
-	// 就多留一个标记，statement.md 里的 `<!-- PROBLEM -->` 就这样越攒越多。
 	bool inProblem = false;
-	// 这一段里有没有出现过标题行（`# ...` / 空的 `#`）。见下面 flush() 的说明。
 	bool sawHeading = false;
 	StatementProblem current;
 
 	auto flush = [&] {
 		if (inProblem) {
-			// 既没有标题也没有正文的空段，是旧文件里攒下的标记残渣（连着两个
-			// `<!-- PROBLEM -->`），丢掉。
-			//
-			// 但「分隔符 + 标题行」哪怕标题是空的也要留着：`#` 这一行是用户真的
-			// 留了一个空题目（编辑器写出来的就是这个形状）。如果顺手把它丢了，
-			// 文档里的题目数就会悄悄少一个 —— 左树还是按旧的数量建的，点最后一题
-			// 就会「找不到这一题」，界面看起来就像题面整篇不见了。
 			const bool blank = current.title.trimmed().isEmpty() && current.english.trimmed().isEmpty() &&
 			                   current.body.join(QChar('\n')).trimmed().isEmpty();
 
@@ -333,8 +319,6 @@ void StatementDocument::splitProblemArea(const QString &text, QStringList &head,
 		QString english;
 
 		if (matchProblemHeading(line, title, english)) {
-			// 兼容旧写法（没有分隔符、直接按 `# 标题` 分块）：当前这段已经有内容时，
-			// 这个标题就是下一题的开头；紧跟分隔符的空段则直接补上标题。
 			const bool empty = current.title.isEmpty() && current.english.isEmpty() && current.body.isEmpty();
 
 			if (! inProblem || ! empty)
@@ -347,10 +331,18 @@ void StatementDocument::splitProblemArea(const QString &text, QStringList &head,
 			continue;
 		}
 
-		if (inProblem)
+		if (inProblem) {
+			QStringList proinfoValues;
+
+			if (StatementProblem::parseProinfoLine(line, proinfoValues)) {
+				current.proinfo = proinfoValues;
+				continue;
+			}
+
 			current.body.append(line);
-		else
+		} else {
 			head.append(line);
+		}
 	}
 
 	flush();
@@ -365,9 +357,12 @@ QString StatementDocument::serializeProblemArea(const QStringList &head, const Q
 
 	for (const StatementProblem &problem : problems) {
 		QString block = problem.heading();
+		const QString proinfo = StatementProblem::proinfoComment(problem.proinfo);
 		const QString body = normalizeBlock(problem.body.join(QChar('\n')));
 
-		// 标题与正文之间固定一个空行（与 statement-editor 的 join_problem_title 一致）
+		if (! proinfo.isEmpty())
+			block += QStringLiteral("\n\n") + proinfo;
+
 		if (! body.isEmpty())
 			block += QStringLiteral("\n\n") + body;
 
@@ -403,6 +398,40 @@ QString StatementProblem::heading() const {
 	return QStringLiteral("# %1（%2）").arg(name, eng);
 }
 
+bool StatementProblem::parseProinfoLine(const QString &line, QStringList &values) {
+	const QRegularExpressionMatch matched = proinfoLinePattern().match(line);
+
+	if (! matched.hasMatch())
+		return false;
+
+	values.clear();
+
+	for (const QString &part : matched.captured(QStringLiteral("values")).split(QChar('|')))
+		values.append(part.trimmed());
+
+	values = normalizedProinfo(values);
+	return true;
+}
+
+QString StatementProblem::proinfoComment(const QStringList &values) {
+	const QStringList normalized = normalizedProinfo(values);
+
+	if (normalized.isEmpty())
+		return {};
+
+	return QStringLiteral("<!-- PROINFO: %1 -->").arg(normalized.join(QStringLiteral(" | ")));
+}
+
+QStringList StatementProblem::normalizedProinfo(QStringList values) {
+	for (QString &value : values)
+		value = value.trimmed();
+
+	while (! values.isEmpty() && values.last().isEmpty())
+		values.removeLast();
+
+	return values;
+}
+
 StatementDocument StatementDocument::parse(const QString &text) {
 	StatementDocument doc;
 	const QString normalized = normalizeNewlines(text);
@@ -419,7 +448,6 @@ StatementDocument StatementDocument::parse(const QString &text) {
 			doc.metaValues.insert(entry.key, entry.value);
 	}
 
-	// 按 `<!-- SECTION: -->` 标记切分：区段与其它正文交替保存，未编辑的部分原样保留。
 	int position = 0;
 	const QRegularExpression &pattern = sectionPattern();
 	QRegularExpressionMatchIterator it = pattern.globalMatch(body);

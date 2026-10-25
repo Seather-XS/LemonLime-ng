@@ -6,21 +6,17 @@
  */
 
 #include "LemonApplicationInterface.hpp"
-//
 #include "base/LemonBase.hpp"
 #include "base/LemonLog.hpp"
 #include "base/LemonTranslator.hpp"
-#include "base/settings.h" // TODO: Config Refactor
-//
+#include "base/settings.h" 
 #include <QCoreApplication>
 #include <QTime>
-//
 #define LEMON_MODULE_NAME "LemonApplicationInterface"
 
 using namespace Lemon;
 
 LemonApplicationInterface::LemonApplicationInterface() {
-	// ConfigObject = new LemonConfigObject;
 	LemonCoreApplication = this;
 	LOG("LemonLime", LEMON_VERSION_STRING, "on", QSysInfo::prettyProductName(),
 	    QSysInfo::currentCpuArchitecture());
@@ -30,6 +26,5 @@ LemonApplicationInterface::LemonApplicationInterface() {
 }
 
 LemonApplicationInterface::~LemonApplicationInterface() {
-	// delete ConfigObject;
 	LemonCoreApplication = nullptr;
 }

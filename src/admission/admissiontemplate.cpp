@@ -5,7 +5,6 @@
  */
 
 #include "admissiontemplate.h"
-//
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -32,7 +31,7 @@ namespace AdmissionTemplate {
 
 			return text;
 		}
-	} // namespace
+	} 
 
 	QString root() {
 		static const QString cached = [] {
@@ -141,8 +140,6 @@ namespace AdmissionTemplate {
 		QStringList found;
 		const QStringList lines = text.split(QChar('\n'));
 
-		// 注释里不替换：注释里写 {{xxx}} 只是给程序看的说明，而且多行替换会把
-		// 后面的行挤出注释，直接变成参与编译的真代码。
 		for (int i = 0; i < lines.size(); ++i) {
 			if (i > 0)
 				out += QChar('\n');
@@ -183,4 +180,4 @@ namespace AdmissionTemplate {
 
 		return out;
 	}
-} // namespace AdmissionTemplate
+} 

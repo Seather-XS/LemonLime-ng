@@ -3284,6 +3284,16 @@ No: remove it from the contest only.</translation>
         <source>Pack this contest day into .zip files for the target platforms...</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../src/forms/lemon.ui"/>
+        <source>Data</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <location filename="../src/forms/lemon.ui"/>
+        <source>Generate the test data with gen.cpp + sol.cpp in the generator folder...</source>
+        <translation>Generate the test data with gen.cpp + sol.cpp in the generator folder...</translation>
+    </message>
 </context>
 <context>
     <name>NewContestDialog</name>
@@ -4113,6 +4123,31 @@ No: remove it from the contest only.</translation>
         <source>File name of the exported PDF (no extension). Placeholders: &lt;day&gt; = contest day file name, &lt;title-day&gt; = contest day title, &lt;title&gt; = contest title.</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp"/>
+        <source>Input File</source>
+        <translation>Input File</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp"/>
+        <source>Output File</source>
+        <translation>Output File</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp"/>
+        <source>Time Limit</source>
+        <translation>Time Limit</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp"/>
+        <source>Memory Limit</source>
+        <translation>Memory Limit</translation>
+    </message>
+    <message>
+        <location filename="../src/statementeditwidget.cpp"/>
+        <source>Filled into \proinfo of the ccpc template; leave it empty to omit an entry.</source>
+        <translation>Filled into \proinfo of the ccpc template; leave it empty to omit an entry.</translation>
+    </message>
 </context>
 <context>
     <name>StatisticsBrowser</name>
@@ -4788,6 +4823,452 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/forms/welcomedialog.ui" line="39"/>
         <source>New</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>DataGenerator</name>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The file name prefix cannot be empty.</source>
+        <translation>The file name prefix cannot be empty.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>&lt;subid&gt; only works when "Configure by Subtask" is on.</source>
+        <translation>&lt;subid&gt; only works when "Configure by Subtask" is on.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>&lt;subid&gt; only works when "Name Files by Subtask" is on.</source>
+        <translation>&lt;subid&gt; only works when "Name Files by Subtask" is on.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The number of test points must be positive.</source>
+        <translation>The number of test points must be positive.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The number of samples cannot be negative.</source>
+        <translation>The number of samples cannot be negative.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Unknown placeholder in the file name prefix: %1</source>
+        <translation>Unknown placeholder in the file name prefix: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The file name %1 would be used twice; add &lt;testid&gt; to the prefix.</source>
+        <translation>The file name %1 would be used twice; add &lt;testid&gt; to the prefix.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The sample file name %1 would be used twice; add &lt;testid&gt; to the prefix.</source>
+        <translation>The sample file name %1 would be used twice; add &lt;testid&gt; to the prefix.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>No task selected.</source>
+        <translation>No task selected.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The generator folder does not exist: %1</source>
+        <translation>The generator folder does not exist: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Put gen.cpp (generator) and sol.cpp (model solution) into %1.</source>
+        <translation>Put gen.cpp (generator) and sol.cpp (model solution) into %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Nothing to generate.</source>
+        <translation>Nothing to generate.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>No C++ compiler is configured. Add one in Settings → Compilers first.</source>
+        <translation>No C++ compiler is configured. Add one in Settings → Compilers first.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Removed %1 old file(s) from data/ and down/.</source>
+        <translation>Removed %1 old file(s) from data/ and down/.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Generating %1 (subtask %2, test %3) ...</source>
+        <translation>Generating %1 (subtask %2, test %3) ...</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Generating sample %1 (test %2) ...</source>
+        <translation>Generating sample %1 (test %2) ...</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Cannot start the generator: %1</source>
+        <translation>Cannot start the generator: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The generator did not finish in %1 s on %2.</source>
+        <translation>The generator did not finish in %1 s on %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The generator exited with code %1 on %2.</source>
+        <translation>The generator exited with code %1 on %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The generator wrote nothing to stdout on %1.</source>
+        <translation>The generator wrote nothing to stdout on %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Cannot write %1.</source>
+        <translation>Cannot write %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>The model solution failed on %1: %2</source>
+        <translation>The model solution failed on %1: %2</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>exit code %1</source>
+        <translation>exit code %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>No test case was generated.</source>
+        <translation>No test case was generated.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Generated %1 test case(s) and %2 sample(s).</source>
+        <translation>Generated %1 test case(s) and %2 sample(s).</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Compiling %1 ...</source>
+        <translation>Compiling %1 ...</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Cannot start the compiler: %1</source>
+        <translation>Cannot start the compiler: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Compiling %1 took longer than %2 s.</source>
+        <translation>Compiling %1 took longer than %2 s.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Compiling %1 failed: %2</source>
+        <translation>Compiling %1 failed: %2</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>%1 is still the template. Write the model solution first.</source>
+        <translation>%1 is still the template. Write the model solution first.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Generating %1 (%2) ...</source>
+        <translation>Generating %1 (%2) ...</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Generating sample %1 (%2) ...</source>
+        <translation>Generating sample %1 (%2) ...</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Running the model solution on %1 (%2) ...</source>
+        <translation>Running the model solution on %1 (%2) ...</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Answer written: %1 (%2 ms)</source>
+        <translation>Answer written: %1 (%2 ms)</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Answer written: %1 (%2)</source>
+        <translation>Answer written: %1 (%2)</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Cannot create %1.</source>
+        <translation>Cannot create %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Cannot move %1 into %2.</source>
+        <translation>Cannot move %1 into %2.</translation>
+    </message>
+</context>
+<context>
+    <name>DataWidget</name>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Tasks</source>
+        <translation>Tasks</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generator Settings</source>
+        <translation>Generator Settings</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>File Name Prefix</source>
+        <translation>File Name Prefix</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Placeholders: &lt;name&gt; = task file name, &lt;testid&gt; = test point number, &lt;subid&gt; = subtask number (needs "Name Files by Subtask"). &lt;testid&gt; is zero-padded to two digits when naming by subtask. Sample names never use &lt;subid&gt;: it is dropped, and the generator still gets sub_id -1.</source>
+        <translation>Placeholders: &lt;name&gt; = task file name, &lt;testid&gt; = test point number, &lt;subid&gt; = subtask number (needs "Name Files by Subtask"). &lt;testid&gt; is zero-padded to two digits when naming by subtask. Sample names never use &lt;subid&gt;: it is dropped, and the generator still gets sub_id -1.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Configure by Subtask</source>
+        <translation>Configure by Subtask</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>One test point per subtask; a later subtask only scores when the earlier ones pass.</source>
+        <translation>One test point per subtask; a later subtask only scores when the earlier ones pass.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Test Cases</source>
+        <translation>Test Cases</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Test Points per Subtask</source>
+        <translation>Test Points per Subtask</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Number of test points in each subtask, separated by spaces.</source>
+        <translation>Number of test points in each subtask, separated by spaces.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Name Files by Subtask</source>
+        <translation>Name Files by Subtask</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>"&lt;subid&gt;" becomes usable and "&lt;testid&gt;" counts within each subtask. Otherwise the test points are numbered in generation order.</source>
+        <translation>"&lt;subid&gt;" becomes usable and "&lt;testid&gt;" counts within each subtask. Otherwise the test points are numbered in generation order.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Samples</source>
+        <translation>Samples</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Samples are generated with sub_id -1 and written to down/.</source>
+        <translation>Samples are generated with sub_id -1 and written to down/.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Input Suffix</source>
+        <translation>Input Suffix</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Output Suffix</source>
+        <translation>Output Suffix</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Sample Output Suffix</source>
+        <translation>Sample Output Suffix</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Remove the old files in data/ and down/ first</source>
+        <translation>Remove the old files in data/ and down/ first</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Write the result into the test cases of this task</source>
+        <translation>Write the result into the test cases of this task</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generate Data</source>
+        <translation>Generate Data</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Compile generator/gen.cpp + generator/sol.cpp, run them, and configure the test cases.</source>
+        <translation>Compile generator/gen.cpp + generator/sol.cpp, run them, and configure the test cases.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Open generator Folder</source>
+        <translation>Open generator Folder</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Log</source>
+        <translation>Log</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>There is no task in this contest day yet.</source>
+        <translation>There is no task in this contest day yet.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Will generate %1 in data/.</source>
+        <translation>Will generate %1 in data/.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Will generate %1 … %2 in data/ (%3 files).</source>
+        <translation>Will generate %1 … %2 in data/ (%3 files).</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Samples: %1 in down/.</source>
+        <translation>Samples: %1 in down/.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Samples: %1 … %2 in down/ (%3 files).</source>
+        <translation>Samples: %1 … %2 in down/ (%3 files).</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Subtasks: %1.</source>
+        <translation>Subtasks: %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>No C++ compiler is configured. Add one in Settings → Compilers first.</source>
+        <translation>No C++ compiler is configured. Add one in Settings → Compilers first.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>The compiler "%1" has no configuration.</source>
+        <translation>The compiler "%1" has no configuration.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>No task selected.</source>
+        <translation>No task selected.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>The input / output suffixes cannot be empty.</source>
+        <translation>The input / output suffixes cannot be empty.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>The test points per subtask must be positive integers, e.g. "5 5 4 6".</source>
+        <translation>The test points per subtask must be positive integers, e.g. "5 5 4 6".</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Fill in the test points per subtask, e.g. "5 5 4 6".</source>
+        <translation>Fill in the test points per subtask, e.g. "5 5 4 6".</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Cannot plan the test data.</source>
+        <translation>Cannot plan the test data.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generating ...</source>
+        <translation>Generating ...</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Task: %1</source>
+        <translation>Task: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generation failed.</source>
+        <translation>Generation failed.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Failed: %1</source>
+        <translation>Failed: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Done.</source>
+        <translation>Done.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Done: %1 test case(s) and %2 sample(s).</source>
+        <translation>Done: %1 test case(s) and %2 sample(s).</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>The test cases were left untouched.</source>
+        <translation>The test cases were left untouched.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Configured %1 test case(s).</source>
+        <translation>Configured %1 test case(s).</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Cannot create %1</source>
+        <translation>Cannot create %1</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Edit gen.cpp</source>
+        <translation>Edit gen.cpp</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Edit sol.cpp</source>
+        <translation>Edit sol.cpp</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Open gen.cpp with the default editor (it is created from a template when missing).</source>
+        <translation>Open gen.cpp with the default editor (it is created from a template when missing).</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Open sol.cpp with the default editor (a skeleton is created when missing).</source>
+        <translation>Open sol.cpp with the default editor (a skeleton is created when missing).</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Cannot open %1</source>
+        <translation>Cannot open %1</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generation failed: %1</source>
+        <translation>Generation failed: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Data generated; %1 test case(s) configured.</source>
+        <translation>Data generated; %1 test case(s) configured.</translation>
     </message>
 </context>
 </TS>

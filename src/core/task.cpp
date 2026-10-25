@@ -205,7 +205,6 @@ void Task::prepareInteraction() {
 	const QString headerName = base + QStringLiteral(".h");
 	const QString graderName = base + QStringLiteral("_grader.cpp");
 
-	// 只创建空文件，若已存在则不覆盖内容。
 	const QStringList files = {gradersAbs + sep + headerName, gradersAbs + sep + graderName};
 
 	for (const QString &path : files) {
@@ -218,7 +217,6 @@ void Task::prepareInteraction() {
 			file.close();
 	}
 
-	// 三个参数只在为空时自动指定，避免覆盖用户已有设置。
 	const QString gradersRel = base + sep + QStringLiteral("graders") + sep;
 
 	if (interactor.isEmpty())
@@ -423,9 +421,6 @@ int Task::readFromJson(const QJsonObject &in) {
 
 	READ_JSON(in, answerFileExtension);
 
-	// NOTE: testCaseList is empty here; readFromJson is only called once on a
-	// freshly constructed Task. If this invariant ever changes, call
-	// qDeleteAll(testCaseList) before clear() to avoid leaks.
 	testCaseList.clear();
 	QJsonArray testCases;
 	READ_JSON(in, testCases);

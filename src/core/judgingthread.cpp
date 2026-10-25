@@ -32,20 +32,12 @@
 
 JudgingThread::JudgingThread(QObject *parent) : QThread(parent) {
 	moveToThread(this);
-	// checkRejudgeMode = false;
 	needRejudge = false;
 	stopJudging = false;
 	timeUsed = -1;
 	memoryUsed = -1;
 	judgedTimes = 0;
-	// QTime   t =  QTime::currentTime();
-	// qsrand(static_cast<unsigned int>(t.msec() + t.second() * 1000));
 }
-
-/*void JudgingThread::setCheckRejudgeMode(bool check)
-{
-    checkRejudgeMode = check;
-}*/
 
 void JudgingThread::setExtraTimeRatio(double ratio) { extraTimeRatio = ratio; }
 
@@ -105,21 +97,12 @@ auto JudgingThread::getNeedRejudge() const -> bool { return needRejudge; }
 
 void JudgingThread::stopJudgingSlot() { stopJudging = true; }
 
-// Chunked file reader used by the line/space comparators below.
-//
-// nextUntilNewLine() / nextUntilSpace() return at most 32 chars per call --
-// they do NOT truncate a long line; callers must loop until eof() to consume
-// the whole line/token. The 32-byte cap keeps `result` (a fixed-capacity
-// std::string reserved at 32) from reallocating, which is the hot path of
-// per-test-case comparison.
 class BufferedStreamReader {
 
   public:
-	static const int BUFFER_SIZE = 1 << 18; // 128 KiB
+	static const int BUFFER_SIZE = 1 << 18; 
 	explicit BufferedStreamReader(const char *filename) : file(fopen(filename, "r")) {
 		result.reserve(32);
-		// Start with bufPos == bufEnd so the first peekChar() triggers an
-		// fread; avoids a separate "primed?" flag.
 		bufPos = buffer + BUFFER_SIZE;
 		bufEnd = buffer + BUFFER_SIZE;
 		lineNumber = 1;
@@ -139,7 +122,7 @@ class BufferedStreamReader {
 	char buffer[BUFFER_SIZE], *bufEnd, *bufPos;
 	bool isEof;
 	int lineNumber;
-	std::string result; // Fixed Length String,Optimize for speed
+	std::string result; 
 	auto peekChar() -> char;
 	void tryNextLine();
 
@@ -156,8 +139,6 @@ auto BufferedStreamReader::peekChar() -> char {
 		return '\0';
 	}
 	if (bufPos == bufEnd) {
-		// Buffer drained -- refill. fread returning 0 means real EOF; latch it
-		// so further peekChar() calls short-circuit without touching the FILE*.
 		bufPos = buffer;
 		bufEnd = buffer + fread(buffer, 1, BUFFER_SIZE, file);
 		if (bufPos == bufEnd) {
@@ -168,9 +149,6 @@ auto BufferedStreamReader::peekChar() -> char {
 	return *bufPos;
 }
 
-// Consume one line terminator (\n, \r, or \r\n) if the cursor sits on one,
-// and bump lineNumber. Idempotent when not on a terminator -- safe to call
-// before each token read.
 void BufferedStreamReader::tryNextLine() {
 	char c = peekChar();
 	if (c != '\r' && c != '\n')
@@ -183,11 +161,6 @@ void BufferedStreamReader::tryNextLine() {
 	lineNumber++;
 }
 
-// Read up to 32 chars from the current position, stopping at any line
-// terminator or EOF. Does NOT consume the terminator -- the next call to
-// tryNextLine() (invoked at the top here) will. Returning a chunk shorter
-// than 32 chars is the signal that the caller has reached end-of-line/EOF;
-// otherwise the caller must call again to read the rest of a long line.
 auto BufferedStreamReader::nextUntilNewLine() -> std::string_view {
 	result.clear();
 	tryNextLine();
@@ -201,10 +174,6 @@ auto BufferedStreamReader::nextUntilNewLine() -> std::string_view {
 	return result;
 }
 
-// Skip leading whitespace (advancing lineNumber across newlines), then read
-// up to 32 non-space chars. Same chunked-read contract as nextUntilNewLine:
-// short return means token end; long tokens must be read across multiple
-// calls. Returns an empty view at EOF.
 auto BufferedStreamReader::nextUntilSpace() -> std::string_view {
 	result.clear();
 	for (char c = peekChar(); std::isspace(c) && ! eof(); c = peekChar())
@@ -352,7 +321,6 @@ void JudgingThread::compareWithDiff(const QString &contestantOutput) {
 
 	QProcess diffProcess;
 	Lemon::common::suppressConsoleWindow(diffProcess);
-	// 与 QProcess::execute() 一致：比较工具的输出直接透传，不缓存。
 	diffProcess.setProcessChannelMode(QProcess::ForwardedChannels);
 	diffProcess.start(cmd, cmdArgs);
 	diffProcess.waitForFinished(-1);
@@ -757,8 +725,6 @@ void JudgingThread::judgeOutput() {
 }
 
 namespace {
-	/// 删除临时文件；Windows 上文件可能还被刚被杀掉的进程占着一小会儿，删不掉就
-	/// 稍等再试几次。返回 false 表示最终仍然没删掉。
 	bool removeTemporaryFile(const QString &path) {
 		if (path.isEmpty())
 			return true;
@@ -773,7 +739,7 @@ namespace {
 		WARN("Failed to remove", path);
 		return ! QFile::exists(path);
 	}
-} // namespace
+} 
 
 void JudgingThread::judgeTraditionalTask() {
 	if (! QFileInfo::exists(inputFile)) {
@@ -786,8 +752,6 @@ void JudgingThread::judgeTraditionalTask() {
 	const QString copiedInput = workingDirectory + task->getInputFileName();
 	const QString producedOutput = workingDirectory + task->getOutputFileName();
 
-	// 清理必须比复制先挂上：复制失败（比如残留文件占着位置）时会直接 return，
-	// 不先清掉残留的话，残留会一直在，后面每个测试点都会跟着失败。
 	auto cleanupTempFiles = qScopeGuard([&] {
 		if (! task->getStandardInputCheck())
 			removeTemporaryFile(copiedInput);
@@ -801,8 +765,6 @@ void JudgingThread::judgeTraditionalTask() {
 	});
 
 	if (! task->getStandardInputCheck()) {
-		// QFile::copy() 碰到已存在的目标会直接失败，所以先把上一轮的残留清掉。
-		// 超时被杀的程序可能还没来得及放手，removeTemporaryFile() 会等它一下。
 		removeTemporaryFile(copiedInput);
 
 		if (! QFile::copy(inputFile, copiedInput)) {
@@ -891,7 +853,7 @@ void JudgingThread::run() {
 	needRejudge = false;
 
 	switch (task->getTaskType()) {
-		case Task::Interaction: // treat interaction task as traditional task
+		case Task::Interaction: 
 			[[fallthrough]];
 		case Task::Traditional:
 			[[fallthrough]];

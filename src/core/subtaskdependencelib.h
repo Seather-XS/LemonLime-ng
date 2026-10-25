@@ -6,7 +6,6 @@
  */
 
 #pragma once
-//
 
 #include "base/LemonType.hpp"
 #include <QObject>

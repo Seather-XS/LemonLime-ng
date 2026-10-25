@@ -7,26 +7,20 @@
  */
 
 #include "LemonTranslator.hpp"
-//
 #include <base/LemonBase.hpp>
 #include <base/LemonLog.hpp>
 #include <base/LemonUtils.hpp>
-//
 
 #define LEMON_MODULE_NAME "Translator"
 
 using namespace Lemon;
 
-// path searching list.
 auto getLanguageSearchPaths() -> QStringList {
-	// Configuration Path
 	QStringList list = LemonAssetsPaths("lang");
 #ifdef LEMON_EMBED_TRANSLATIONS
-	// If the translations have been embedded.
 	list << QString(":/translation/");
 #endif
 #ifdef LEMON_TRANSLATION_PATH
-	// Platform-specific dir, if specified.
 	list << QString(LEMON_TRANSLATION_PATH);
 #endif
 	return list;
@@ -69,4 +63,4 @@ namespace Lemon::common {
 		}
 		return false;
 	}
-} // namespace Lemon::common
+} 

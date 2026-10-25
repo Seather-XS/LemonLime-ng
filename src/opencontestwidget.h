@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 
 #include <QMessageBox>
 #include <QStringList>

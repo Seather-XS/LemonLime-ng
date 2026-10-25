@@ -29,7 +29,6 @@
 
 #define LEMON_MODULE_NAME "TaskJudger"
 
-// testlib.h is a large header, building a checker needs more time than a contestant source
 static const int CHECKER_COMPILE_TIME_LIMIT_MS = 90000;
 
 auto TaskJudger::suffixRank(const QStringList &extensionOrder, const QString &fileName) -> int {
@@ -89,11 +88,9 @@ void TaskJudger::setContestant(Contestant *contestant) { this->contestant = cont
 
 Contestant *TaskJudger::getContestant() const { return contestant; }
 
-// Get executable file
 auto TaskJudger::traditionalTaskPrepare() -> bool {
 	makeDialogAlert(tr("Preparing..."));
 
-	// Get the source code of contestant
 	compileState = NoValidSourceFile;
 	compileMessage.clear();
 	QString contestantName = contestant->getContestantName();
@@ -124,10 +121,6 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 		QStringList files = contestantDir.entryList(filters, QDir::Files);
 		sourceFile = "";
 
-		// 同一个语言声明了多个后缀时（g++ 默认 `cpp;cc;cxx`、fpc 默认 `pas;pp;inc`），
-		// 按声明的先后顺序取第一个存在的源文件；跨语言的优先级由编译器列表的顺序决定
-		// （外层 for 按列表逐个试，第一个能编译成功的说了算）——CCF 的 .c → .cpp → .pas
-		// 就靠「gcc 排在 g++ 前面」实现，不需要另外配一份后缀顺序。
 		if (task->getTaskType() != Task::Communication && task->getTaskType() != Task::CommunicationExec)
 			files = TaskJudger::orderSourceFiles(i->getSourceExtensions(), files);
 
@@ -135,8 +128,6 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 			const QString candidate = contestantDirName + QDir::separator() + files[j];
 			const qint64 fileSize = QFileInfo(candidate).size();
 
-			// CCF 编程通则 2：每道题的源程序不得大于 100KB（通用设置里可改）。
-			// 超了就说明原因，别只报一句「没有有效源文件」——用户根本不知道哪里出了问题。
 			if (fileSize > qint64(settings->getFileSizeLimit()) * 1024) {
 				if (compileMessage.isEmpty())
 					compileMessage = tr("Source file %1 is larger than the %2 KB limit.")
@@ -166,7 +157,6 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 		if (sourceFile.isEmpty())
 			continue;
 		QDir(QDir::toNativeSeparators(temporaryDir.path()) + QDir::separator()).mkdir(contestantName);
-		// Copy files to temporary dir
 		if (task->getTaskType() == Task::Communication || task->getTaskType() == Task::CommunicationExec) {
 			sourceFile = "";
 			sourcePaths = task->getSourceFilesPath();
@@ -187,7 +177,6 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 		QString extraFiles = "";
 
 		if (task->getTaskType() == Task::Interaction) {
-			// 交互库只从 <题>/graders/ 下读取：工程里存的是哪里的路径都按文件名去该目录找。
 			QString taskName = task->getSourceFileName();
 
 			if (taskName.isEmpty())
@@ -208,7 +197,6 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 				                    .arg(QFileInfo(interactorSource).fileName(),
 				                         QDir::fromNativeSeparators(Settings::gradersPath(taskName))));
 
-			// 主接口程序同样只在 <题>/graders/ 下读取。
 			const QString graderSource =
 			    Settings::dataPath() + Settings::graderFilePath(taskName, task->getGrader());
 
@@ -230,7 +218,6 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 			}
 		}
 
-		// Get compiler configuration
 		QStringList configurationNames = i->getConfigurationNames();
 		QStringList compilerArguments = i->getCompilerArguments();
 		QStringList interpreterArguments = i->getInterpreterArguments();
@@ -255,7 +242,6 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 
 			QString variable = values[k].mid(0, tmp);
 			if (environment.contains(variable))
-				// ';' for windows ':' for linux
 				environment.insert(variable, environment.value(variable) +
 #ifdef Q_OS_WIN32
 				                                 ";"
@@ -324,7 +310,6 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 					compileMessage = tr("Main grader (grader.*) cannot be found");
 					break;
 				}
-				// Why? It's unix Only
 				auto graderArgument = compilerArguments[configurationIndex] + " -pthread";
 				arguments.append(graderArgument);
 				graderArgument.replace("%s.*", mainGraderName);
@@ -342,7 +327,6 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 				compilerProcess.setProcessEnvironment(environment);
 				compilerProcess.setWorkingDirectory(QDir::toNativeSeparators(temporaryDir.path()) +
 				                                    QDir::separator() + contestantName);
-				// TODO: 需要重构代码来处理含空格路径问题
 
 				compilerProcess.start(i->getCompilerLocation(),
 				                      k.split(QLatin1Char(' '), Qt::SkipEmptyParts));
@@ -411,7 +395,6 @@ auto TaskJudger::traditionalTaskPrepare() -> bool {
 		if (i->getCompilerType() == Compiler::InterpretiveWithoutByteCode)
 			compileState = CompileSuccessfully;
 
-		// One file compiled, skip all other files
 		break;
 	}
 
@@ -542,8 +525,6 @@ int TaskJudger::judge() {
 			score[i].push_back(overallStatus[i]);
 
 		if (isSkipped) {
-			// 依赖的子任务没过：这组测试点整组跳过。进度要照常走（进度条的上限把这组
-			// 的时限也算进去了），日志里也把每个测试点标成 Skipped，免得看起来像卡住。
 			for (int j = 0; j < task->getTestCase(i)->getInputFiles().size(); j++)
 				taskSkipped(std::make_pair(i, j));
 
@@ -564,13 +545,7 @@ int TaskJudger::judge() {
 
 			auto *thread = new JudgingThread();
 			thread->setExtraTimeRatio(settings->getDefaultExtraTimeRatio());
-			// CCF 编程通则 3：程序必须以 0 退出（通用设置里可关）
 			thread->setRequireReturnZero(settings->getRequireReturnZero());
-			// 全部测试点共用同一个工作目录（就是准备阶段放选手程序的那个目录）：
-			// 以前每个测试点都新开一个 _i.j 目录、把可执行文件再拷一份，而 Windows 会对
-			// 每次新出现的 .exe 做一遍实时扫描，实测一个测试点要白等 ~120ms。
-			// 现在只有输入文件（在 JudgingThread 里）按测试点拷，程序本体只拷一次。
-			// 每个测试点跑完都会把输入/输出/_tmpout/_tmperr 删掉，所以不会互相干扰。
 			QString workingDirectory = QDir::toNativeSeparators(
 			                               QDir(QDir::toNativeSeparators(temporaryDir.path()) +
 			                                    QDir::separator() + contestantName)

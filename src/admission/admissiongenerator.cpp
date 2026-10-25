@@ -5,7 +5,6 @@
  */
 
 #include "admissiongenerator.h"
-//
 #include "admissioncolumns.h"
 #include "admissionnaming.h"
 #include "admissionnotes.h"
@@ -13,7 +12,6 @@
 #include "admissiontemplate.h"
 #include "base/LemonLog.hpp"
 #include "base/ProcessUtil.hpp"
-//
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
@@ -33,10 +31,8 @@ namespace {
 
 	QString toolPath(const QString &name) { return QStandardPaths::findExecutable(name); }
 
-	/// 纯文本进 LaTeX 前转义（真正的实现在 AdmissionNotes 里）。
 	QString escapeLatex(const QString &value) { return AdmissionNotes::escape(value).trimmed(); }
 
-	/// 文件名安全化：去掉 Windows 不允许的字符，限长，空的话给个兜底。
 	QString sanitize(const QString &name, const QString &fallback = QStringLiteral("ticket")) {
 		static const QRegularExpression illegal(QStringLiteral(R"([\\/:*?"<>|\x00-\x1F])"));
 		QString out = name.trimmed();
@@ -51,7 +47,6 @@ namespace {
 		return out.isEmpty() ? fallback : out;
 	}
 
-	/// 照片路径：绝对路径直接用，否则先按赛区目录找，再按比赛日目录找。
 	QString resolvePhoto(const QString &value, const QString &region) {
 		const QString trimmed = value.trimmed();
 
@@ -140,7 +135,6 @@ namespace {
 		return process.exitCode();
 	}
 
-	/// 从 xelatex 的 .log 里挑出报错段落。
 	QString analyzeLog(const QString &path) {
 		const QString text = readTextFile(path);
 
@@ -171,7 +165,7 @@ namespace {
 
 		return blocks.join(QStringLiteral("\n\n")).trimmed();
 	}
-} // namespace
+} 
 
 AdmissionGenerator::AdmissionGenerator(QObject *parent) : QObject(parent) {}
 
@@ -279,7 +273,6 @@ int AdmissionGenerator::generate(AdmissionProject &project, const QStringList &o
 		const QString label = region->name.isEmpty() ? tr("(no region)") : region->name;
 		QString notesError;
 
-		// 生成列 / 随机列：按列序求值（引用必须指向已经求值的列）
 		AdmissionTable table = region->table;
 		QList<AdmissionColumnRule> rules;
 
@@ -290,7 +283,6 @@ int AdmissionGenerator::generate(AdmissionProject &project, const QStringList &o
 			emit logMessage(tr("%1: column generation failed: %2").arg(label, notesError));
 		}
 
-		// 注意事项 / 比赛注意：只认 [文字](链接)，其余当纯文本
 		const QString notesLatex = AdmissionNotes::toLatex(region->notes);
 		const QString generalLatex = AdmissionNotes::toLatex(project.contestNotes);
 
@@ -335,7 +327,6 @@ int AdmissionGenerator::generate(AdmissionProject &project, const QStringList &o
 
 			++globalSeq;
 
-			// 输出文件名：启用了命名规则就按规则渲染，否则用准考证号
 			AdmissionNamingContext namingContext;
 			namingContext.section = region->name;
 			namingContext.name = name;
@@ -368,8 +359,6 @@ int AdmissionGenerator::generate(AdmissionProject &project, const QStringList &o
 			if (base.trimmed().isEmpty())
 				base = QStringLiteral("ticket");
 
-			// 额外行 = 名单里锁定列之外的自定义列：按「列名 | 该行的值」印在锁定行之后。
-			// 单元格里同样可以写占位符（<row> <name> <id> <seat> <room> 以及其它列名）。
 			QString extraRowsLatex;
 
 			if (table.header.size() > AdmissionTable::builtinColumns().size()) {
@@ -424,7 +413,6 @@ int AdmissionGenerator::generate(AdmissionProject &project, const QStringList &o
 			                               : QString());
 			QDir().mkpath(ticketOut);
 
-			// 沙箱：每个选手一个干净目录（xelatex 的中间产物都落在这里）
 			const QString work = native(sandbox.path()) + QStringLiteral("/ticket");
 			QDir(work).removeRecursively();
 			QDir().mkpath(work);
@@ -432,7 +420,6 @@ int AdmissionGenerator::generate(AdmissionProject &project, const QStringList &o
 			if (! fonts.isEmpty())
 				copyPath(fonts, work + QStringLiteral("/fonts"));
 
-			// 照片：列表里给的是路径（相对赛区目录或比赛日目录都行），拷进沙箱后按比例放进右侧方框。
 			const QString photoInput = csv(QStringLiteral("照片"));
 			QString photoLatex;
 
@@ -510,7 +497,6 @@ int AdmissionGenerator::generate(AdmissionProject &project, const QStringList &o
 				} else {
 					++failed;
 					++regionFailed;
-					// 失败时把 .tex / .log 留一份，方便照着报错改名单或环境
 					const QString keep = outputRoot + QStringLiteral("/_failed");
 					QDir().mkpath(keep);
 					QFile::remove(keep + QChar('/') + unique + QStringLiteral(".tex"));
@@ -528,7 +514,6 @@ int AdmissionGenerator::generate(AdmissionProject &project, const QStringList &o
 			emit progress(done, total);
 		}
 
-		// 按赛区打包
 		if (project.packageByRegion && ! cancelled && QFileInfo::exists(regionOut)) {
 			const QString zipName =
 			    project.packageName.isEmpty() ? QStringLiteral("admission-{region}") : project.packageName;

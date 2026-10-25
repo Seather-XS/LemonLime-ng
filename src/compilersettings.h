@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 
 #include <QAction>
 #include <QWidget>

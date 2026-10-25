@@ -12,7 +12,6 @@
 #include <QString>
 #include <QTextStream>
 #include <iostream>
-//
 #include <base/LemonBaseApplication.hpp>
 #include <base/LemonMacro.hpp>
 
@@ -21,21 +20,16 @@
 #define NEWLINE "\r\n"
 #define ___LOG_EXPAND(___x) , QPair<std::string, decltype(___x)>(std::string(#___x), [&] { return ___x; }())
 
-// Generate pairs for each variable passed as args to use in the log.
-// with line 73: QTextStream &operator<<(QTextStream &stream, const std::pair<TKey, TVal> &pair)
 #define GEN_PAIR(...) FOREACH_CALL_FUNC(___LOG_EXPAND, __VA_ARGS__)
 
 #ifdef QT_DEBUG
 #define LEMON_IS_DEBUG true
-// __FILE__ ":" QT_STRINGIFY(__LINE__),
-// https://doc.qt.io/qt-5/qtglobal.html#Q_FUNC_INFO
 #define LEMON_LOG_PREPEND_CONTENT Q_FUNC_INFO,
 #else
 #define LEMON_IS_DEBUG false
 #define LEMON_LOG_PREPEND_CONTENT
 #endif
 
-// prepend module name in log
 #define _LOG_ARG_(...) "[" LEMON_MODULE_NAME "]", LEMON_LOG_PREPEND_CONTENT __VA_ARGS__
 
 #define WARN(...) Lemon::base::log_concat<LEMON_LOG_WARN>(_LOG_ARG_(__VA_ARGS__))
@@ -66,7 +60,7 @@ namespace Lemon::base {
 			logger->warn(logString);
 		}
 	}
-} // namespace Lemon::base
+} 
 
 template <typename TKey, typename TVal>
 QTextStream &operator<<(QTextStream &stream, const QPair<TKey, TVal> &pair) {

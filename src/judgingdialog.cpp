@@ -9,13 +9,11 @@
 
 #include "judgingdialog.h"
 #include "ui_judgingdialog.h"
-//
 #include "base/LemonType.hpp"
 #include "core/contest.h"
 #include "core/contestant.h"
 #include "core/subtaskdependencelib.h"
 #include "core/task.h"
-//
 #include <QMessageBox>
 #include <QPalette>
 #include <QProcess>
@@ -24,14 +22,13 @@
 #include <QTextDocument>
 
 namespace {
-	/// 日志里「普通文字」的格式：与 QTextBrowser 默认一致（不加粗、不改颜色）。
 	QTextCharFormat plainLogFormat(const QTextBrowser *viewer) {
 		QTextCharFormat format;
 		format.setFont(viewer->document()->defaultFont());
 		format.setForeground(QBrush(viewer->palette().color(QPalette::Text)));
 		return format;
 	}
-} // namespace
+} 
 
 JudgingDialog::JudgingDialog(QWidget *parent) : QDialog(parent), ui(new Ui::JudgingDialog) {
 	ui->setupUi(this);
@@ -352,7 +349,6 @@ void JudgingDialog::taskJudgedDisplay(const QString &taskName, const QList<QList
 }
 
 void JudgingDialog::contestantJudgingStart(const QString &contestantName) {
-	// 同一选手的多个试题只写一次「开始测试选手」。
 	if (contestantName == lastContestant)
 		return;
 
@@ -411,7 +407,6 @@ void JudgingDialog::contestantSkipped(const QString &contestantName, const QStri
 	cursor->insertBlock(blockFormat);
 	cursor->insertText(QStringLiteral("%1 ").arg(contestantName), plainLogFormat(ui->logViewer));
 	cursor->insertText(Contestant::disqualifiedText(), plainLogFormat(ui->logViewer));
-	// 这位选手一题都没跑，进度条要把他的那份工时跳过，否则最后走不满。
 	ui->progressBar->setValue(ui->progressBar->value() + progress);
 	QScrollBar *bar = ui->logViewer->verticalScrollBar();
 

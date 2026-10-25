@@ -32,7 +32,6 @@ ProcessRunnerResult UnixProcessRunner::run() {
 	int extraTime = qCeil(qMax(2000, config.timeLimit * 2) * config.extraTimeRatio);
 
 #ifdef Q_OS_LINUX
-	// TODO: rewrite with cgroup
 	QFile watcher(config.workingDirectory + QUuid::createUuid().toString(QUuid::Id128));
 
 	if (config.interpreterAsWatcher) {
@@ -182,8 +181,6 @@ ProcessRunnerResult UnixProcessRunner::run() {
 	QElapsedTimer timer;
 	timer.start();
 
-	// Using rlimit to limit CPU time can only be accurate to seconds,
-	// so here it is rounded up to an integer second.
 	long long killTimeLimit = (config.timeLimit + 999) / 1000 * 1000 + extraTime;
 	while (timer.elapsed() <= killTimeLimit) {
 		if (runner->waitForFinished(10)) {
@@ -208,8 +205,6 @@ ProcessRunnerResult UnixProcessRunner::run() {
 		delete runner;
 		res.score = 0;
 		res.timeUsed = res.memoryUsed = -1;
-		// Watcher usually needs to handle the situation of program timeout and kill it. Therefore, it is
-		// abnormal for watcher to timeout itself, and report FAIL instead of TLE.
 		res.result = CannotStartProgram;
 		res.message = "Watcher time limit exceeded";
 		return res;

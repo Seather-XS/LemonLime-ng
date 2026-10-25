@@ -9,10 +9,8 @@
 
 #include "testcaseeditwidget.h"
 #include "ui_testcaseeditwidget.h"
-//
 #include "base/settings.h"
 #include "core/testcase.h"
-//
 #include <QAction>
 
 TestCaseEditWidget::TestCaseEditWidget(QWidget *parent) : QWidget(parent), ui(new Ui::TestCaseEditWidget) {
@@ -35,7 +33,7 @@ TestCaseEditWidget::TestCaseEditWidget(QWidget *parent) : QWidget(parent), ui(ne
 	connect(this, &TestCaseEditWidget::dataPathChanged, ui->inputFileEdit, &FileLineEdit::refreshFileList);
 	connect(this, &TestCaseEditWidget::dataPathChanged, ui->outputFileEdit, &FileLineEdit::refreshFileList);
 	connect(ui->subtaskDependecne, &QLineEdit::editingFinished, this,
-	        &TestCaseEditWidget::subtaskDependenceChanged); // auto save subtaskDependence
+	        &TestCaseEditWidget::subtaskDependenceChanged); 
 	connect(ui->addButton, &QPushButton::clicked, this, &TestCaseEditWidget::addSingleCase);
 	connect(deleteAction, &QAction::triggered, this, &TestCaseEditWidget::deleteSingleCase);
 	connect(ui->fullScore, &QLineEdit::textChanged, this, &TestCaseEditWidget::fullScoreChanged);
@@ -99,7 +97,6 @@ void TestCaseEditWidget::setEditTestCase(TestCase *testCase, bool check) {
 	ui->memoryLimit->setEnabled(check);
 	ui->memoryLimitLabel->setEnabled(check);
 	ui->mbLabel->setEnabled(check);
-	// ui->outputFileEdit->setDisabled(check2);
 }
 
 void TestCaseEditWidget::setSettings(Settings *_settings) {
@@ -175,11 +172,9 @@ void TestCaseEditWidget::subtaskDependenceChanged() {
 	QStringList list = text.isEmpty() ? QStringList() : text.split(',');
 
 	if (editTestCase->checkDependenceSubtask(list)) {
-		// QMessageBox::information(this, tr("Information"), tr("Finished!"), QMessageBox::Close);
 		editTestCase->setDependenceSubtask(list);
 	} else {
 		ui->subtaskDependecne->setFocus();
-		// ui->subtaskDependecne->set
 		QMessageBox::warning(this, tr("Error"), tr("Dependence subtask index error!"), QMessageBox::Close);
 	}
 }

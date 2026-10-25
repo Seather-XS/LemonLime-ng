@@ -23,8 +23,6 @@
 
 namespace {
 
-// 自定义校验器只支持 C++ 源码（.cpp）：评测前编译一次，之后复用编译结果。
-// 现成的可执行文件、其它后缀的源码都不再接受。
 const QString CHECKER_SUFFIX("cpp");
 const QString TESTLIB_RESOURCE(":/testlib/testlib.h");
 const QString TESTLIB_HEADER("testlib.h");
@@ -102,7 +100,6 @@ QString compileChecker(const QString &source, const QString &compilerLocation, c
 		argument.replace("%s", base);
 	}
 
-	// A checker may ship its own testlib.h, which takes precedence over the bundled one.
 	QString includeDir = QFileInfo(source).absolutePath();
 
 	if (! QFile::exists(includeDir + QDir::separator() + TESTLIB_HEADER))
@@ -175,7 +172,7 @@ void addPostRoutine() {
 	qAddPostRoutine(SpecialJudge::cleanup);
 }
 
-} // namespace
+} 
 
 auto SpecialJudge::resolve(const QString &checkerPath, const QString &compilerLocation,
                            const QString &compileTemplate, int timeLimitMs, QString &error) -> QString {

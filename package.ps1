@@ -84,8 +84,6 @@ param(
 
     [switch]$NoBuild,
 
-    # 只保留真正用得到的 Qt 组件（最小体积）。不加就是 windeployqt 的完整输出，
-    # 与原版发布包的形态一致。
     [switch]$TrimQt,
 
     [switch]$KeepEverything,
@@ -96,7 +94,6 @@ param(
 
     [switch]$NoTemplates,
 
-    # -OutDir 指向已有内容的目录时，默认拒绝（怕误删），加了这个才允许清空
     [switch]$Force
 )
 
@@ -115,7 +112,6 @@ function Write-Step($text) { Write-Host "`n=== $text ===" -ForegroundColor Cyan 
 function Write-Ok($text) { Write-Host $text -ForegroundColor Green }
 function Write-Dim($text) { Write-Host $text -ForegroundColor DarkGray }
 
-# ------------------------------------------------------------------ 从 CMakeCache 读配置
 $cache = Join-Path $BuildDir 'CMakeCache.txt'
 $buildType = 'Release'
 $ltoOn = $true
@@ -129,7 +125,6 @@ if (Test-Path -LiteralPath $cache) {
     if (-not $QtDir) {
         $qtLine = Select-String -Path $cache -Pattern '^Qt6_DIR:PATH=(.*)$' | Select-Object -First 1
         if ($qtLine) {
-            # <Qt>/lib/cmake/Qt6 → <Qt>
             $QtDir = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $qtLine.Matches[0].Groups[1].Value.Trim()))
         }
     }
@@ -142,7 +137,6 @@ Write-Host "部署目录  : $OutDir$(if ($inPlace) { '（就地部署）' })"
 Write-Host "构建类型  : $buildType (LTO=$(if ($ltoOn) { 'ON' } else { 'OFF' }))"
 Write-Host "Qt        : $QtDir"
 
-# ------------------------------------------------------------------ 1) 构建
 if (-not $NoBuild) {
     Write-Step "构建（$buildType）"
     $buildArgs = @{
@@ -164,12 +158,10 @@ if (-not (Test-Path -LiteralPath $sourceExe)) {
     throw "找不到 $sourceExe，先构建一次（或者不要加 -NoBuild）"
 }
 
-# ------------------------------------------------------------------ 2) 准备部署目录
 if (-not $inPlace) {
     Write-Step "准备干净的部署目录 $OutDir"
 
     if (Test-Path -LiteralPath $OutDir) {
-        # 保护：不是「已经部署过的目录」而且里面还有东西，就先拒绝，免得误删用户自己的数据。
         if (-not (Test-Path -LiteralPath (Join-Path $OutDir 'lemon.exe')) -and -not $Force) {
             $count = @(Get-ChildItem -LiteralPath $OutDir -Force -ErrorAction SilentlyContinue).Count
 
@@ -189,16 +181,12 @@ if (-not $inPlace) {
 
 $exe = Join-Path $OutDir 'lemon.exe'
 
-# ------------------------------------------------------------------ 3) windeployqt
 Write-Step '部署 Qt 运行库（windeployqt）'
 
 $windeployqt = Join-Path $QtDir 'bin\windeployqt.exe'
 
 if (-not (Test-Path -LiteralPath $windeployqt)) { throw "找不到 windeployqt：$windeployqt" }
 
-# 默认按 windeployqt 的完整输出铺（原版发布包就是这个样子：所有插件 + Qt 自带的
-# qt_*.qm 翻译 + opengl32sw / D3Dcompiler），这样发布目录的形态跟原版一致。
-# 想只要最小体积就加 -TrimQt，那时会统一删掉用不到的插件与大块头。
 $deployArgs = @('--release', '--compiler-runtime', '--no-quick-import')
 
 if ($buildType -eq 'Debug') {
@@ -211,7 +199,6 @@ if ($buildType -eq 'Debug') {
 
 if ($LASTEXITCODE -ne 0) { throw "windeployqt 失败（exit $LASTEXITCODE）" }
 
-# ------------------------------------------------------------------ 4) 题面模板 + LICENSE
 if (-not $NoTemplates) {
     Write-Step '题面模板'
 
@@ -235,7 +222,6 @@ if (Test-Path -LiteralPath $license) {
     Write-Host '  + LICENSE'
 }
 
-# ------------------------------------------------------------------ 5) 删掉用不到的文件
 $removed = New-Object System.Collections.Generic.List[string]
 $outRoot = (Resolve-Path -LiteralPath $OutDir).Path.TrimEnd('\')
 
@@ -252,14 +238,11 @@ if ($KeepEverything) {
 } else {
     Write-Step '删掉用不到的文件'
 
-    # 5.1 调试 / 打包残留：Release 发布包里本来就不该有这些（原版也没有）
     foreach ($pattern in 'vc_redist*.exe', 'qtdiag*.exe', '*.pdb', '*.ilk', '*.exp', '*.lib', '*.prl') {
         Get-ChildItem -Path $OutDir -Filter $pattern -File -ErrorAction SilentlyContinue |
             ForEach-Object { Remove-Junk $_.FullName }
     }
 
-    # 5.2 用不到的大块头与 Qt 组件：默认保留（发布目录的形态与原版一致），
-    #     只有 -TrimQt 时才删成最小体积。
     if ($TrimQt) {
         foreach ($pattern in 'opengl32sw.dll', 'D3Dcompiler_*.dll', 'd3dcompiler_*.dll', 'libEGL.dll',
             'libGLESv2.dll') {
@@ -267,7 +250,6 @@ if ($KeepEverything) {
                 ForEach-Object { Remove-Junk $_.FullName }
         }
 
-        # Qt 插件目录：只留真正用到的几个
         $allowedPluginDirs = @('platforms', 'styles', 'iconengines', 'imageformats', 'translations')
         $pluginDirs = @('tls', 'networkinformation', 'generic', 'scenegraph', 'qmltooling', 'qml',
             'assetimporters', 'virtualkeyboard', 'texttospeech', 'geometryloaders', 'renderers',
@@ -279,8 +261,6 @@ if ($KeepEverything) {
             Remove-Junk (Join-Path $OutDir $dir)
         }
 
-        # 图片插件：程序只画自己资源里的 SVG（PNG 是 QtGui 内置的），
-        # 不读用户的 gif / jpeg / ico。
         $imageDir = Join-Path $OutDir 'imageformats'
 
         if (Test-Path -LiteralPath $imageDir) {
@@ -288,8 +268,6 @@ if ($KeepEverything) {
                 ForEach-Object { Remove-Junk $_.FullName }
         }
 
-        # Qt 自带翻译：界面语言用的是程序内嵌的 zh_CN / zh_TW / en_US，
-        # 其余几十种语言的 qt_*.qm 都没用。
         $translationDir = Join-Path $OutDir 'translations'
 
         if (Test-Path -LiteralPath $translationDir) {
@@ -328,13 +306,10 @@ if ($KeepEverything) {
 
         foreach ($item in ($removed | Sort-Object)) { Write-Dim "    - $item" }
 
-        # 把中间产物连同 CMakeCache / build.ninja 一起删了，构建系统也就没了；
-        # 这里只 configure 一次（不编译），让 cmake --build / ninja 立刻能用。
         if ($inPlace -and (Test-Path -LiteralPath $CmakeBin)) {
             Write-Step '重新生成构建系统（只 configure，不编译）'
 
             $savedCmakePath = $env:Path
-            # ToolchainBin 在前，保证选中的 g++ 和 Qt 预编译库是同一套（见 build.ps1）。
             $env:Path = $ToolchainBin + ';' + (Split-Path $CmakeBin -Parent) + ';' + $env:Path
 
             try {
@@ -353,7 +328,6 @@ if ($KeepEverything) {
     }
 }
 
-# ------------------------------------------------------------------ 6) 自检
 $selfTestOk = $false
 
 if (-not $SkipSelfTest) {
@@ -364,7 +338,6 @@ if (-not $SkipSelfTest) {
     $savedCwd = (Get-Location).Path
 
     try {
-        # 只留系统目录：这样跑起来就不是靠 PATH 里的 Qt，而是靠旁边的 DLL 与插件。
         $env:Path = "$env:SystemRoot\system32;$env:SystemRoot"
         Set-Location $OutDir
 
@@ -396,7 +369,6 @@ if (-not $SkipSelfTest) {
     $selfTestOk = $true
 }
 
-# ------------------------------------------------------------------ 7) 结果
 Write-Step '结果'
 
 $runtime = @()

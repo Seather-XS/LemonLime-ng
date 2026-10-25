@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 #include "base/LemonType.hpp"
 #include <QDataStream>
 #include <QDateTime>
@@ -18,29 +17,23 @@
 class Contestant : public QObject {
 	Q_OBJECT
   public:
-	/// 选手的比赛日级判定状态（违规检测 / 命名限制，见 gengen-tuack 语义）。
 	enum DisqualifyState {
-		NotDisqualified,      // 正常
-		ViolationDisqualified, // 违规：所有试题 0 分、总分 -1
-		NamingDisqualified     // 命名不合规：所有试题 0 分、总分 0
+		NotDisqualified,
+		ViolationDisqualified,
+		NamingDisqualified     
 	};
 
 	explicit Contestant(QObject *parent = nullptr);
 
 	const QString &getContestantName() const;
 	const QString &getRegion() const;
-	/// 选手代码文件夹（未启用赛区时为 source/<选手>，启用时为 source/<赛区>/<选手>）。
 	QString getSourceFolder() const;
 	DisqualifyState getDisqualifyState() const;
 	const QString &getDisqualifyMessage() const;
 	bool isDisqualified() const;
-	/// 当前成绩是否来自「忽略限制重测」（这类成绩不再参与违规 / 命名检查）。
 	bool isIgnoreRulesJudged() const;
-	/// 判定取消时的统一短文案（界面只写这一句，详情放在 (...) 里）。
 	static QString disqualifiedText();
-	/// 详情标题：违规 / 命名不符合限制。
 	QString getDisqualifyTitle() const;
-	/// 详情弹窗内容（已 HTML 转义）。
 	QString getDisqualifyHtml() const;
 	bool getCheckJudged(int) const;
 	CompileState getCompileState(int) const;
@@ -95,7 +88,6 @@ class Contestant : public QObject {
 	QList<QList<QList<qint64>>> memoryUsed;
 	QDateTime judgingTime;
 
-	// QList<TaskResult> taskResults;
   signals:
 
   public slots:

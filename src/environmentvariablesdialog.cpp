@@ -9,9 +9,7 @@
 
 #include "environmentvariablesdialog.h"
 #include "ui_environmentvariablesdialog.h"
-//
 #include "editvariabledialog.h"
-//
 #include <QMessageBox>
 
 EnvironmentVariablesDialog::EnvironmentVariablesDialog(QWidget *parent)

@@ -9,7 +9,6 @@
 
 #include "lemon.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
-//
 #include "base/LemonBase.hpp"
 #include "base/LemonBaseApplication.hpp"
 #include "base/LemonLog.hpp"
@@ -29,7 +28,6 @@
 #include "spdlog/sinks/daily_file_sink.h"
 #include "statementeditwidget.h"
 #include "statisticsbrowser.h"
-//
 #include <QApplication>
 #include <QAction>
 #include <QComboBox>
@@ -61,8 +59,6 @@
 #define LEMON_MODULE_NAME "Main"
 
 namespace {
-	/// 比赛日文件旁边的工程文件（contest.conf）：用来拿「比赛标题 / 比赛日标题」。
-	/// 找不到时两个参数保持空串（模板里的占位符会退回比赛日名）。
 	void readProjectContext(const QString &dayFile, QString &projectTitle, QString &dayTitle) {
 		const QFileInfo dayInfo(dayFile);
 		const QString base = dayInfo.completeBaseName();
@@ -94,7 +90,6 @@ namespace {
 		}
 	}
 
-	/// 界面「题面」选项卡会导出成什么文件名：比赛日里存的模板 + 占位符替换。
 	QString resolvedStatementFileName(const QString &dayFile, Contest &contest) {
 		QString projectTitle;
 		QString dayTitle;
@@ -105,7 +100,7 @@ namespace {
 		                                              contestTitle) +
 		       QStringLiteral(".pdf");
 	}
-} // namespace
+} 
 
 void initLogger() {
 	auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -113,13 +108,11 @@ void initLogger() {
 	QDir logDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + QDir::separator() +
 	            "logs");
 	logDir.mkpath(".");
-	// retain last 30 days logs
 	auto file_sink = std::make_shared<spdlog::sinks::daily_file_sink_mt>(
 	    (logDir.path() + QDir::separator() + "lemonlime-log.txt").toStdString(), 0, 0, false, 30);
 	file_sink->set_level(spdlog::level::trace);
 	Lemon::base::logger =
 	    std::make_shared<spdlog::logger>(spdlog::logger("lemonlime", {console_sink, file_sink}));
-	// 每条日志立即落盘：万一崩溃，日志里能看到最后做了什么
 	Lemon::base::logger->flush_on(spdlog::level::trace);
 	spdlog::flush_every(std::chrono::seconds(5));
 }
@@ -130,15 +123,12 @@ int main(int argc, char *argv[]) {
 
 	initLogger();
 
-	// 隐藏入口：命令行直接构建题面 PDF（图形界面里的「题面 -> 导出 PDF」用的是同一套引擎）。
-	// 用法：lemon.exe --build-statement <statement.md> <输出前缀> <ccpc|noi|noi new>
 	if (argc >= 5 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--build-statement")) {
 		QCoreApplication app(argc, argv);
 		StatementBuilder builder;
 		builder.setSourceFile(QString::fromLocal8Bit(argv[2]));
 		builder.setOutputBase(QString::fromLocal8Bit(argv[3]));
 		builder.setTemplate(QString::fromLocal8Bit(argv[4]));
-		// 图形子系统程序看不到控制台输出，这里把日志写到输出旁边的文件里。
 		QFile logFile(QString::fromLocal8Bit(argv[3]) + QStringLiteral(".buildlog.txt"));
 		logFile.open(QIODevice::WriteOnly | QIODevice::Text);
 		QTextStream logStream(&logFile);
@@ -153,10 +143,6 @@ int main(int argc, char *argv[]) {
 		return ok ? 0 : 1;
 	}
 
-	// 隐藏入口：命令行导出某个比赛日的成绩表（显示用的表格 / HTML / CSV），
-	// 便于批量导出，也方便自动化验证列结构。
-	// 用法：lemon.exe --export-score <比赛日.cdf> <输出前缀>
-	//   生成 <前缀>.html、<前缀>.csv，以及列结构报告 <前缀>.columns.txt
 	if (argc >= 4 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--export-score")) {
 		QApplication app(argc, argv);
 		const QString dayFile = QString::fromLocal8Bit(argv[2]);
@@ -170,8 +156,6 @@ int main(int argc, char *argv[]) {
 		}
 
 		Settings settings;
-		// Settings 的构造函数不会读配置，而下面 refreshViewer() 要用到颜色主题，
-		// 必须先 loadSettings()，否则 colorThemeList 是空的。
 		settings.loadSettings();
 		Contest contest(nullptr);
 		contest.setSettings(&settings);
@@ -181,7 +165,6 @@ int main(int argc, char *argv[]) {
 			return 3;
 		}
 
-		// 直接把界面上那张成绩表的列结构打印出来
 		QStringList report;
 		report << QStringLiteral("regions enabled: %1").arg(contest.getRegionEnabled() ? 1 : 0);
 		{
@@ -218,11 +201,6 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	// 隐藏入口：命令行「导出成绩 / 导出统计」到默认位置（比赛日目录下的 reports/），
-	// 和界面上那两个导出走的是同一段逻辑，方便自动化验证导出结果。
-	// 用法：lemon.exe --export-reports <比赛日.cdf>
-	//   生成 <比赛日目录>/reports/result.html、statistics.html；
-	//   启用赛区时额外生成 result-<赛区>.html、statistics-<赛区>.html
 	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--export-reports")) {
 		QApplication app(argc, argv);
 		const QString dayFile = QString::fromLocal8Bit(argv[2]);
@@ -243,18 +221,12 @@ int main(int argc, char *argv[]) {
 			return 3;
 		}
 
-		// exportResult() / exportStatistics() 固定在「当前工作目录」的 reports/ 下导出，
-		// 图形界面是在打开比赛日时把工作目录切过去的，这里手动切一下。
 		QDir::setCurrent(QFileInfo(dayFile).absolutePath());
 		ExportUtil::exportResult(nullptr, &contest);
 		StatisticsBrowser::exportStatistics(nullptr, &contest);
 		return 0;
 	}
 
-	// 隐藏入口：命令行跑一遍评测（与界面「重测」同一段逻辑）。
-	// 用法：lemon.exe --judge-day <比赛日.cdf> [--contestant <选手名>] [--task <题目标题>] [--rules]
-	// 默认不查违规 / 命名规则（选手目录名往往不合规范，直接测更方便）；加 --rules 按规则查，
-	// 被取消测试的选手也会像界面那样上报它跳过的工时。
 	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--judge-day")) {
 		QApplication app(argc, argv);
 		const QString dayFile = QString::fromLocal8Bit(argv[2]);
@@ -311,14 +283,12 @@ int main(int argc, char *argv[]) {
 		}
 
 		LOG("judge-day: contestants", lists.size());
-		// 被取消测试的选手：记下上报的进度，方便对照「进度条该跳过多少」。
 		QObject::connect(&contest, &Contest::contestantSkipped,
 		                 [](const QString &name, const QString &, const QString &, int progress) {
 			                 LOG("judge-day: skipped", name, "progress", progress);
 		                 });
 		contest.judge(lists, ignoreRules);
 
-		// 每道题的结果打一行日志：命令行跑评测时不用开界面就能看到判定（自检也靠它）。
 		for (auto *contestant : contest.getContestantList()) {
 			for (int i = 0; i < contest.getTaskList().size(); i++) {
 				if (! onlyTask.isEmpty() && contest.getTask(i)->getProblemTitle() != onlyTask)
@@ -347,12 +317,6 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	// 隐藏入口：验证「选手的测试被取消时，后台成绩表立刻变样」。
-	// 用法：lemon.exe --check-live-skip <比赛日.cdf>
-	//   先把成绩表刷成「谁都没违规」的样子（把所有人的取消状态清掉再刷新），
-	//   然后按规则评测：contestantSkipped 发出的那一刻立刻读一遍表格里那一格的背景色和
-	//   悬停提示，确认表格已经变成「测试被取消」的样子（而不是等下一个正常选手测完）。
-	//   报告写到 <比赛日目录>/live-skip-check.txt，全部符合预期返回 0。
 	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--check-live-skip")) {
 		QApplication app(argc, argv);
 		const QString dayFile = QString::fromLocal8Bit(argv[2]);
@@ -382,7 +346,6 @@ int main(int argc, char *argv[]) {
 		for (int i = 0; i < contest.getContestantList().size(); i++)
 			rowOf[contest.getContestantList()[i]->getContestantName()] = i;
 
-		// 先把所有人当普通人，这样「测试前」的成绩表是正常颜色。
 		for (auto *contestant : contest.getContestantList())
 			contestant->setDisqualifyState(Contestant::NotDisqualified, QString());
 
@@ -444,7 +407,7 @@ int main(int argc, char *argv[]) {
 				lists.append({contestant->getContestantName(), tasks});
 		}
 
-		contest.judge(lists, /*ignoreRules=*/false);
+		contest.judge(lists, false);
 
 		report.prepend(QStringLiteral("skipped=%1 stale=%2").arg(skipped).arg(stale));
 
@@ -457,21 +420,12 @@ int main(int argc, char *argv[]) {
 
 		LOG("check-live-skip: skipped", skipped, "stale", stale);
 
-		// 一个被跳过的选手都没有（规则没生效）也算失败：那这次验证什么也没验到。
 		if (skipped == 0 || stale != 0)
 			return 1;
 
 		return 0;
 	}
 
-	// 隐藏入口：命令行把比赛日打包成 .zip（与界面「导出」选项卡同一段逻辑）。
-	// 用法：lemon.exe --export-package <比赛日.cdf> [--kind contestant|testdata] [--wrap] [--nested]
-	//        [--no-per-task] [--no-structure] [--samples] [--password <密码>]
-	//        [--statement <statement 下的文件名>] ...
-	//   生成 <比赛日目录>/dist/export/<比赛日名>.zip
-	//   --statement 只在选手目录包里有效，可以重复写多个（一个都不给时用比赛日里存的模板
-	//   算出来的文件名）；不想要题面就加 --no-statement。
-	//   加密固定用 AES-256（WinZip AES / AE-2）。
 	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--export-package")) {
 		QApplication app(argc, argv);
 		const QString dayFile = QString::fromLocal8Bit(argv[2]);
@@ -544,10 +498,7 @@ int main(int argc, char *argv[]) {
 		builder.setKeepStructure(structure);
 		builder.setIncludeSamples(samples);
 		builder.setPassword(password);
-		// 加密固定用推荐的 WinZip AES-256（AE-2）。
 		builder.setEncryptionMethod(PackageBuilder::Aes256Encryption);
-		// 没指定题面文件时用「比赛日文件里存的模板 + 比赛日上下文」算出来的名字；
-		// --no-statement 或一个 --statement 都不给之外的写法都按原样传进去（可以给多个）。
 		builder.setStatementFiles(statementGiven ? statements
 		                                         : QStringList{resolvedStatementFileName(dayFile, contest)});
 		builder.setOutputFile(builder.defaultOutputFile());
@@ -568,9 +519,6 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	// 隐藏入口：算出「题面」选项卡会导出成什么文件名（不真的编译）。
-	// 用法：lemon.exe --pdf-name <比赛日.cdf>
-	//   把模板与替完占位符的名字写到 <比赛日目录>/statement-name.txt，供脚本核对。
 	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--pdf-name")) {
 		QApplication app(argc, argv);
 		const QString dayFile = QString::fromLocal8Bit(argv[2]);
@@ -609,11 +557,6 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	// 隐藏入口：CCF 规范相关判定逻辑自检（不需要比赛数据）。
-	// 用法：lemon.exe --check-ccf <报告文件>
-	//   检查《关于NOI系列赛编程语言使用限制的规定》里评测系统能管的部分：
-	//   多源文件的后缀选取顺序（编程通则 1）、违规默认规则覆盖严禁清单（编程通则 4）、
-	//   程序必须返回 0（编程通则 3，真的跑一个进程验证）。
 	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--check-ccf")) {
 		QApplication app(argc, argv);
 		QStringList report;
@@ -623,7 +566,6 @@ int main(int argc, char *argv[]) {
 			report << (QStringLiteral("FAIL ") + line);
 		};
 
-		// 1) 通用设置：默认要求 return 0
 		{
 			Settings settings;
 			report << QStringLiteral("require return zero (default): %1")
@@ -633,10 +575,7 @@ int main(int argc, char *argv[]) {
 				fail(QStringLiteral("the CCF rule 'main must return 0' is off by default"));
 		}
 
-		// 2) 编程通则 1：源文件的选取顺序来自**编译器自己声明的后缀列表**，
-		//    跨语言则是编译器列表的顺序（gcc 排在 g++ 前面 → .c 优先于 .cpp）。
 		{
-			// 一个编译器声明了多个后缀（g++ 默认就是 cpp;cc;cxx）时按声明顺序取
 			const QStringList gpp{QStringLiteral("cpp"), QStringLiteral("cc"), QStringLiteral("cxx")};
 			const QStringList files{QStringLiteral("cake.cxx"), QStringLiteral("cake.cc"),
 			                        QStringLiteral("cake.cpp")};
@@ -650,7 +589,6 @@ int main(int argc, char *argv[]) {
 			                           QStringLiteral("cake.cxx")})
 				fail(QStringLiteral("the compiler's own suffix order is not respected"));
 
-			// gcc 只认 .c、g++ 认 cpp;cc;cxx：编译器列表 [gcc, g++] 就是 .c → .cpp 的优先级
 			const QStringList cOnly{QStringLiteral("c")};
 			QString picked;
 			QString pickedBy;
@@ -659,7 +597,6 @@ int main(int argc, char *argv[]) {
 			    {QStringLiteral("fpc"), {QStringLiteral("pas"), QStringLiteral("pp")}}};
 
 			for (const auto &compiler : compilers) {
-				// 只认这个编译器声明过的后缀：先看有没有能匹配的候选文件
 				const QString candidate =
 				    TaskJudger::orderSourceFiles(compiler.second, files + QStringList{QStringLiteral("cake.c"),
 				                                                                      QStringLiteral("cake.pas")})
@@ -678,12 +615,10 @@ int main(int argc, char *argv[]) {
 			if (picked != QStringLiteral("cake.c"))
 				fail(QStringLiteral("the compiler list order does not give .c priority over .cpp"));
 
-			// 后缀不在任何编译器声明里就排最后
 			if (TaskJudger::suffixRank(gpp, QStringLiteral("cake.py")) != gpp.size())
 				fail(QStringLiteral("an unknown suffix must rank last"));
 		}
 
-		// 3) 编程通则 4：默认违规规则要覆盖严禁的操作（网络 / 进程 / 线程 / 汇编 / 编译选项）
 		{
 			const QVector<ViolationRule> rules = Violation::defaultRules();
 			QStringList names;
@@ -706,7 +641,6 @@ int main(int argc, char *argv[]) {
 				}
 			}
 
-			// 真命中：调用 system() / 起线程 / 访问网络
 			const QString code = QStringLiteral("int main() {\n"
 			                                    "  system(\"pause\");\n"
 			                                    "  pthread_create(0, 0, 0, 0);\n"
@@ -726,7 +660,6 @@ int main(int argc, char *argv[]) {
 			    ! hitNames.contains(QStringLiteral("socket")))
 				fail(QStringLiteral("the default rules did not catch the CCF forbidden calls"));
 
-			// 不误伤：注释里的名字不算；普通函数名（connect）不在清单里
 			const QString clean = QStringLiteral("// system(\n"
 			                                     "int connect(int a, int b) { return a + b; }\n"
 			                                     "int main() { return connect(1, 2) - 3; }\n");
@@ -736,8 +669,6 @@ int main(int argc, char *argv[]) {
 			if (! cleanHits.isEmpty())
 				fail(QStringLiteral("the default rules flag innocent code"));
 
-			// 默认清单按编译器所属语言从内置命令表里读取：gcc/g++ → C/C++，fpc → Pascal，
-			// fbc → FreeBASIC，jdk → Java，python → Python。
 			{
 				const auto languageOf = [](const QString &name, const QStringList &extensions) {
 					return Violation::languageNameFor(name, extensions);
@@ -764,7 +695,6 @@ int main(int argc, char *argv[]) {
 				if (languageOf(QString(), {QStringLiteral("pas")}) != QStringLiteral("Free Pascal"))
 					fail(QStringLiteral("the .pas extension is not mapped to the Pascal command list"));
 
-				// 只给后缀（自定义编译器名）也要认得出语言
 				if (languageOf(QStringLiteral("my-own-cc"), {QStringLiteral("cpp")}) != QStringLiteral("C/C++"))
 					fail(QStringLiteral("a custom compiler with .cpp is not mapped to C/C++"));
 
@@ -780,7 +710,6 @@ int main(int argc, char *argv[]) {
 					fail(QStringLiteral("the Java command list has no ProcessBuilder entry"));
 			}
 
-			// 按语言分开后，Python 用自己的默认清单（字符串规则为主）。
 			const QVector<ViolationRule> pythonRules =
 			    Violation::defaultRulesFor(QStringLiteral("python"), QStringList{QStringLiteral("py")});
 			const QString pythonCode = QStringLiteral("import subprocess\n"
@@ -798,7 +727,6 @@ int main(int argc, char *argv[]) {
 			if (! pythonHits.contains(QStringLiteral("subprocess")))
 				fail(QStringLiteral("the python default rules do not cover subprocess"));
 
-			// re.compile( 是正常用法：成员访问不算命令，不能误伤。
 			if (pythonHits.contains(QStringLiteral("compile")))
 				fail(QStringLiteral("the python default rules flag re.compile()"));
 
@@ -806,7 +734,6 @@ int main(int argc, char *argv[]) {
 				fail(QStringLiteral("non-python compilers did not get the C/C++ default rules"));
 		}
 
-		// 4) 编程通则 3：程序必须以 0 退出（真的跑一个进程看结果）
 		{
 			const QString cmd = QStandardPaths::findExecutable(QStringLiteral("cmd"));
 
@@ -861,8 +788,6 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		// 5) 解释型语言（Python）里的「返回 0」：看解释器进程的退出码。
-		//    脚本正常跑完 → 0；未捕获异常 / sys.exit(非 0) → 非 0 → 运行时错误。
 		{
 			QString python = QStandardPaths::findExecutable(QStringLiteral("python"));
 
@@ -886,11 +811,8 @@ int main(int argc, char *argv[]) {
 
 					return file.write(body.toUtf8()) > 0;
 				};
-				// 正常跑完（Python 没写 return 0 也天生是 0）
 				writeScript(good, QStringLiteral("print(1 + 1)\n"));
-				// 未捕获异常（ZeroDivisionError）→ 解释器退出码 1
 				writeScript(exception, QStringLiteral("print(1 // 0)\n"));
-				// 显式退出：写 0 就是「返回 0」，非 0 就是没正常结束
 				writeScript(exitTwo, QStringLiteral("import sys\nsys.exit(2)\n"));
 
 				const auto runScript = [&](const QString &script) {
@@ -946,14 +868,8 @@ int main(int argc, char *argv[]) {
 		return problems == 0 ? 0 : 1;
 	}
 
-	// 隐藏入口：检查「题面」选项卡的两件事（不编译 PDF）。
-	// 用法：lemon.exe --check-statement-ui <比赛日.cdf>
-	//   1) 工具条上「导出 PDF」「打开 PDF」确实只剩一个按钮；
-	//   2) 在文件名框里写模板，会存进比赛日，并且算出来的名字与占位符一致。
-	//   结果写到 <比赛日目录>/statement-ui-check.txt，全部符合预期返回 0。
 	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--check-statement-ui")) {
 		QApplication app(argc, argv);
-		// 先换成绝对路径：下面会把工作目录切到比赛日目录，相对路径就不能再用了。
 		const QFileInfo dayInfo(QFileInfo(QString::fromLocal8Bit(argv[2])).absoluteFilePath());
 		const QString dayFile = dayInfo.absoluteFilePath();
 		QFile day(dayFile);
@@ -979,14 +895,12 @@ int main(int argc, char *argv[]) {
 		readProjectContext(dayFile, projectTitle, dayTitle);
 
 		StatementEditWidget widget;
-		// 与 loadDay() 的口径一致：没有工程时，比赛标题就是比赛日里的 contestTitle。
 		widget.setDayContext(&contest, QFileInfo(dayFile).completeBaseName(), dayTitle,
 		                     projectTitle.isEmpty() ? contest.getContestTitle() : projectTitle);
 
 		QStringList report;
 		int problems = 0;
 
-		// 1) 工具条上只能有一个提到 PDF 的按钮（「导出 PDF」与「打开 PDF」已经并成一个）。
 		QStringList pdfButtons;
 
 		for (auto *button : widget.findChildren<QPushButton *>()) {
@@ -1002,7 +916,6 @@ int main(int argc, char *argv[]) {
 		if (pdfButtons.size() != 1)
 			problems++;
 
-		// 2) 在文件名框里写模板：要存进比赛日，并且按占位符算出名字。
 		QLineEdit *nameEdit = nullptr;
 
 		for (auto *edit : widget.findChildren<QLineEdit *>()) {
@@ -1017,7 +930,6 @@ int main(int argc, char *argv[]) {
 		    Lemon::common::ResolveStatementPdfName(pattern, dayName, dayTitle, contestTitle) +
 		    QStringLiteral(".pdf");
 
-		// 预览是异步换文件的（去抖 200ms）：跑一小段事件循环再读状态。
 		PdfPreviewWidget *preview = widget.findChild<PdfPreviewWidget *>();
 		const auto settle = [] {
 			QEventLoop loop;
@@ -1043,8 +955,6 @@ int main(int argc, char *argv[]) {
 			if (contest.getStatementPdfName() != pattern || got != expected)
 				problems++;
 
-			// 文件名改了，预览就要指向新名字对应的那个文件（文件还不存在时，预览会
-			// 清空并在信息行里写出它在等哪个文件，下面单独查）。
 			const QString expectedPath = Settings::statementPath() + expected;
 			const bool expectedExists = QFileInfo::exists(expectedPath);
 
@@ -1059,7 +969,6 @@ int main(int argc, char *argv[]) {
 				report << QStringLiteral("preview did not switch to %1").arg(expected);
 			}
 
-			// 名字对应的 PDF 不存在时：清空预览，并在信息行写清楚在等哪个文件。
 			const QString missing = QStringLiteral("nope-day1.pdf");
 			nameEdit->setText(QStringLiteral("nope-<day>"));
 			settle();
@@ -1077,8 +986,6 @@ int main(int argc, char *argv[]) {
 			settle();
 		}
 
-		// 2b) 预览清晰度：按「预览窗宽度 × 设备像素比 + 一点超采样」渲染，
-		//     页图按 css 宽度显示（像素比 = 图片宽 ÷ 显示宽），Qt 不再放大它。
 		{
 			widget.resize(1400, 900);
 			widget.show();
@@ -1095,12 +1002,10 @@ int main(int argc, char *argv[]) {
 				              .arg(px)
 				              .arg(preview->devicePixelRatioF());
 
-				// 出图必须比显示尺寸更细（原来是按 72dpi 出图、1:1 贴上去，缩放屏上一放大就糊）
 				if (px <= css || px < 640)
 					problems++;
 
-				// 页图按 css 宽显示：像素比 = 图片宽 ÷ css 宽，Qt 不会再去插值放大
-				QPixmap page(1500, 2121); // 假装是一张 A4 @ ~180dpi 的渲染结果
+				QPixmap page(1500, 2121); 
 				PdfPreviewWidget::fitPagePixmap(page, 600);
 				const double dpr = page.devicePixelRatio();
 				report << QStringLiteral("page pixmap: dpr=%1 css=%2")
@@ -1110,7 +1015,6 @@ int main(int argc, char *argv[]) {
 				if (qAbs(dpr - 2.5) > 0.01 || qAbs(page.deviceIndependentSize().width() - 600.0) > 0.01)
 					problems++;
 
-				// 真有 PDF、又装了渲染器的话，等它渲染完，检查真的页图是不是也按新规则贴上去的
 				const bool canRender =
 				    ! QStandardPaths::findExecutable(QStringLiteral("pdftocairo")).isEmpty() ||
 				    ! QStandardPaths::findExecutable(QStringLiteral("pdftoppm")).isEmpty();
@@ -1148,7 +1052,6 @@ int main(int argc, char *argv[]) {
 					              .arg(pageCss, 0, 'f', 0)
 					              .arg(preview->pageWidthCss());
 
-					// 页图必须比显示尺寸更细（dpr > 1），显示宽度就是预览窗宽度（允许滚动条之类的几像素误差）
 					if (pages == 0 || pageDpr <= 1.0 ||
 					    qAbs(pageCss - preview->pageWidthCss()) > preview->pageWidthCss() * 0.05)
 						problems++;
@@ -1158,7 +1061,6 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		// 3) 导出选项卡里的「题面文件」列表：列 statement/ 下的文件，默认勾选模板算出的那个。
 		{
 			ExportWidget exportWidget;
 			exportWidget.setDayFile(dayFile);
@@ -1182,9 +1084,7 @@ int main(int argc, char *argv[]) {
 			report << QStringLiteral("statement list: %1 (checked: %2)")
 			              .arg(items.join(QStringLiteral(", ")), checked.join(QStringLiteral(", ")));
 
-			// 默认勾选的就是题面选项卡算出来的那个名字（也就是这里传进去的名字）。
 			const QString expected = widget.pdfFileName();
-			// 默认题面还没导出时列表里会有个「… (missing)」的条目，也算提供了。
 			const auto matchesExpected = [&expected](const QString &text) {
 				return text == expected || text.startsWith(expected + QStringLiteral(" ("));
 			};
@@ -1222,11 +1122,6 @@ int main(int argc, char *argv[]) {
 		return problems == 0 ? 0 : 1;
 	}
 
-	// 隐藏入口：发布包自检（不需要任何比赛数据），给打包脚本用。
-	// 用法：lemon.exe --self-test <报告文件>
-	//   检查发布目录里该有的东西：Qt 插件（平台 / SVG 图标）、题面模板、内嵌翻译、
-	//   并真的把主窗口建一遍（菜单 / 工具条上的 SVG 图标全都要经 iconengines/qsvgicon 加载）。
-	//   全部正常返回 0，否则返回 1（报告里写着 FAIL 的行）。
 	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--self-test")) {
 		QApplication app(argc, argv);
 		Q_INIT_RESOURCE(resource);
@@ -1245,7 +1140,6 @@ int main(int argc, char *argv[]) {
 		if (QGuiApplication::platformName().isEmpty())
 			fail(QStringLiteral("platforms/qwindows.dll 没加载起来（平台插件缺失）"));
 
-		// SVG 图标：图片插件（imageformats/qsvg）与图标引擎（iconengines/qsvgicon）缺一不可。
 		QStringList formats;
 
 		for (const QByteArray &format : QImageReader::supportedImageFormats())
@@ -1272,21 +1166,18 @@ int main(int argc, char *argv[]) {
 		if (loaded != icons.size())
 			fail(QStringLiteral("有图标加载不出来（iconengines/qsvgicon.dll 或资源缺失）"));
 
-		// 题面模板：PDF 导出要用，发布时必须放在 lemon.exe 旁边。
 		const QString templates = StatementBuilder::templateRoot();
 		report << QStringLiteral("statement templates=%1").arg(templates);
 
 		if (templates.isEmpty())
 			fail(QStringLiteral("找不到题面模板 statement-templates/"));
 
-		// 内嵌翻译（LEMON_EMBED_TRANSLATIONS）。
 		const QStringList languages = QDir(QStringLiteral(":/translation/")).entryList({QStringLiteral("*.qm")});
 		report << QStringLiteral("embedded translations=%1").arg(languages.join(QChar(',')));
 
 		if (languages.isEmpty())
 			fail(QStringLiteral("没有内嵌翻译"));
 
-		// 主窗口：菜单 / 工具条 / 各种对话框上的图标都在这时候加载。
 		{
 			LemonLime window;
 			const int actions = window.findChildren<QAction *>().size();
@@ -1321,7 +1212,6 @@ int main(int argc, char *argv[]) {
 	}
 
 #ifdef Q_OS_LINUX
-	// fonts.setFamily("Noto Sans CJK SC");
 #endif
 #ifdef Q_OS_WIN32
 	QFont fonts;
@@ -1330,7 +1220,6 @@ int main(int argc, char *argv[]) {
 	SingleApplication::setFont(fonts);
 #endif
 #ifdef Q_OS_MAC
-	// fonts.setFamily("PingFangSC-Regular");
 #endif
 	Q_INIT_RESOURCE(resource);
 	QPixmap pixmap(":/logo/splash2.png");

@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 
 #include <QWidget>
 
@@ -33,7 +32,7 @@ class TaskEditWidget : public QWidget {
 	Ui::TaskEditWidget *ui;
 	Settings *settings{};
 	Task *editTask;
-	bool loadingTask{false}; ///< 正在把 Task 的值刷进控件，此时不反向写回
+	bool loadingTask{false}; 
 	void refreshWidgetState();
 	void addSourceFiles(const QString &, const QString &);
 	void addGraderFiles(const QString &, const QString &);

@@ -6,10 +6,8 @@
  */
 
 #pragma once
-//
 
 #include <base/LemonBase.hpp>
-//
 #include <QJsonObject>
 
 class Compiler;
@@ -42,8 +40,6 @@ namespace Lemon::base::config {
 	class LemonConfigUI {
 	  private:
 		QString language = "en_US";
-		// Prepare for theme setting
-		// QString theme = ;
 	  public:
 		int read(const QJsonObject &json);
 		void write(QJsonObject &json) const;
@@ -63,4 +59,4 @@ namespace Lemon::base::config {
 		bool saveConfig(SaveFormat saveFormat) const;
 	};
 
-} // namespace Lemon::base::config
+} 

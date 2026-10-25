@@ -5,14 +5,12 @@
  */
 
 #include "packagebuilder.h"
-//
 #include "base/LemonUtils.hpp"
 #include "base/settings.h"
 #include "core/contest.h"
 #include "core/contestant.h"
 #include "core/task.h"
 #include "core/testcase.h"
-//
 #include <QBuffer>
 #include <QCryptographicHash>
 #include <QDateTime>
@@ -31,9 +29,6 @@
 #endif
 
 namespace {
-	// ------------------------------------------------------------------
-	// CRC32 / deflate
-	// ------------------------------------------------------------------
 	const quint32 *crcTable() {
 		static quint32 table[256];
 		static bool ready = false;
@@ -54,7 +49,6 @@ namespace {
 		return table;
 	}
 
-	/// 标准 CRC32（含首尾取反），zip 里记录的就是它。
 	quint32 crc32Of(const QByteArray &data) {
 		const quint32 *table = crcTable();
 		quint32 crc = 0xFFFFFFFFu;
@@ -65,12 +59,10 @@ namespace {
 		return crc ^ 0xFFFFFFFFu;
 	}
 
-	/// ZipCrypto 的密钥更新用的 CRC32：不取反，只按表推进。
 	quint32 crc32Step(quint32 crc, quint32 value) {
 		return crcTable()[(crc ^ value) & 0xFFu] ^ (crc >> 8);
 	}
 
-	/// 原始 deflate 流（不带头尾）。没有 zlib 时返回空，调用方会退化成不压缩（Store）。
 	QByteArray rawDeflate(const QByteArray &data) {
 #ifdef LEMON_HAVE_ZLIB
 		if (data.isEmpty())
@@ -110,9 +102,6 @@ namespace {
 #endif
 	}
 
-	// ------------------------------------------------------------------
-	// AES-256 分组加密（FIPS-197，只做加密）与 WinZip AES / AE-2 需要的密钥派生
-	// ------------------------------------------------------------------
 	const unsigned char AES_SBOX[256] = {
 	    0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
 	    0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
@@ -131,7 +120,6 @@ namespace {
 	    0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
 	    0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16};
 
-	/// AES-256 只用于压缩包条目：只实现加密方向，CTR 模式也不需要解密。
 	class Aes256 {
 	  public:
 		explicit Aes256(const QByteArray &key) { expandKey(key); }
@@ -180,7 +168,6 @@ namespace {
 			for (int i = 0; i < keyBytes; i++)
 				roundKeys[i] = static_cast<unsigned char>(key.at(i));
 
-			// AES-256：8 个 32 位字，共 60 个字（15 组轮密钥）。
 			const int totalWords = 60;
 			static const unsigned char rcon[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 
@@ -209,7 +196,6 @@ namespace {
 				state[i] = AES_SBOX[state[i]];
 		}
 
-		/// 状态按列存放：state[column * 4 + row]。
 		static void shiftRows(unsigned char state[16]) {
 			for (int row = 1; row < 4; row++) {
 				unsigned char tmp[4];
@@ -244,14 +230,12 @@ namespace {
 		unsigned char roundKeys[240]{};
 	};
 
-	/// WinZip AES 的计数器：16 字节小端整数，第一块从 1 开始。
 	void advanceCounter(unsigned char counter[16]) {
 		for (int i = 0; i < 16; i++)
 			if (++counter[i] != 0)
 				break;
 	}
 
-	/// AES-CTR：WinZip AES 用「计数器块加密后异或明文」，加解密同一个函数。
 	QByteArray aesCtrCrypt(const QByteArray &key, const QByteArray &data) {
 		Aes256 aes(key);
 		unsigned char counter[16] = {0};
@@ -279,7 +263,6 @@ namespace {
 		QByteArray innerPad(blockSize, '\0');
 		QByteArray outerPad(blockSize, '\0');
 
-		// 密钥不足一个分组时补 0；不能用 QByteArray::resize() 扩容，多出来的字节不保证是 0。
 		for (int i = 0; i < blockSize; i++) {
 			const char byte = i < shortKey.size() ? shortKey.at(i) : '\0';
 			innerPad[i] = char(static_cast<unsigned char>(byte) ^ 0x36);
@@ -290,7 +273,6 @@ namespace {
 		return QCryptographicHash::hash(outerPad + inner, QCryptographicHash::Sha1);
 	}
 
-	/// PBKDF2-HMAC-SHA1（RFC 2898）：WinZip AES 规定 1000 轮。
 	QByteArray pbkdf2Sha1(const QByteArray &password, const QByteArray &salt, int iterations,
 	                      int keyLength) {
 		QByteArray result;
@@ -319,7 +301,6 @@ namespace {
 		return result.left(keyLength);
 	}
 
-	/// 小端整数（zip 的 extra field 用）。
 	QByteArray littleEndian16(quint16 value) {
 		QByteArray bytes(2, '\0');
 		bytes[0] = char(value & 0xFFu);
@@ -327,9 +308,6 @@ namespace {
 		return bytes;
 	}
 
-	// ------------------------------------------------------------------
-	// ZIP 写入器：不加密走 Qt 的 QZipWriter，加密自己写（QZipWriter 不支持加密）
-	// ------------------------------------------------------------------
 	class ArchiveWriter {
 	  public:
 		virtual ~ArchiveWriter() = default;
@@ -361,8 +339,6 @@ namespace {
 		QZipWriter writer;
 	};
 
-	/// 加密的 zip 写入器：AES-256（WinZip AES / AE-2，默认）或传统 ZipCrypto（仅兼容）。
-	/// 文件名照旧，文件内容先 deflate 再加密。
 	class EncryptedArchiveWriter : public ArchiveWriter {
 	  public:
 		enum class Method { Aes256, ZipCrypto };
@@ -390,7 +366,6 @@ namespace {
 			if (! name.endsWith('/'))
 				name.append('/');
 
-			// 目录条目不加密，只记一个以 / 结尾的空条目
 			writeLocalHeader(name, 0, 0, 0, {}, 0, 0x0800, {}, 20);
 
 			Entry entry;
@@ -407,7 +382,6 @@ namespace {
 			QByteArray payload = rawDeflate(data);
 			quint16 method = 8;
 
-			// 压不小就直接存原始数据
 			if (payload.isEmpty() || payload.size() >= data.size()) {
 				payload = data;
 				method = 0;
@@ -419,14 +393,11 @@ namespace {
 			quint16 version = 20;
 
 			if (this->method == Method::Aes256) {
-				// WinZip AES / AE-2：salt + 2 字节校验值 + 密文 + 10 字节 HMAC-SHA1。
-				// CRC 在 AE-2 里固定写 0（完整性由 HMAC 保证）。
 				QByteArray salt(16, '\0');
 
 				for (char &byte : salt)
 					byte = char(QRandomGenerator::global()->bounded(256));
 
-				// 66 = 32 字节 AES 密钥 + 32 字节 HMAC 密钥 + 2 字节密码校验值
 				const QByteArray derived = pbkdf2Sha1(password, salt, 1000, 66);
 				const QByteArray aesKey = derived.left(32);
 				const QByteArray macKey = derived.mid(32, 32);
@@ -434,20 +405,16 @@ namespace {
 				const QByteArray encrypted = aesCtrCrypt(aesKey, payload);
 				const QByteArray auth = hmacSha1(macKey, encrypted).left(10);
 
-				// 自检：同一把密钥异或回去必须还原出压缩后的明文，HMAC 也要对得上。
-				// 宁可在这里报错，也不要悄悄写出一个打不开的包。
 				if (aesCtrCrypt(aesKey, encrypted) != payload || ! hmacSha1(macKey, encrypted).startsWith(auth))
 					selfCheckFailed = true;
 
 				body = salt + verifier + encrypted + auth;
-				// extra field 0x9901：版本 AE-2、厂商 "AE"、强度 3（AES-256）、真实压缩方式
 				extra = littleEndian16(0x9901) + littleEndian16(7) + littleEndian16(2) + QByteArray("AE", 2) +
 				        QByteArray(1, char(0x03)) + littleEndian16(method);
 				storedCrc = 0;
 				version = 51;
-				method = 99; // AES
+				method = 99; 
 			} else {
-				// 12 字节加密头：前 11 字节随机，最后一字节是 CRC 高位，解压时用它校验密码
 				QByteArray header(12, '\0');
 
 				for (int i = 0; i < 11; i++)
@@ -456,16 +423,10 @@ namespace {
 				header[11] = char((crc >> 24) & 0xFFu);
 
 				ZipCrypto crypto(password);
-				// 注意：必须严格先加密 12 字节头、再加密内容（密钥流是连续的）。
-				// 不能写成 crypto.encrypt(header) + crypto.encrypt(payload)：两个操作数的求值顺序未定义，
-				// 一旦先算后面那个，头部就会用错密钥流，解压时会被判成「密码错误」。
 				QByteArray encrypted = crypto.encrypt(header);
 				encrypted.append(crypto.encrypt(payload));
 				body = encrypted;
 
-				// 自检：拿同一个密码把刚写出的 12 字节头解回来，最后一字节必须等于 CRC 高位。
-				// 这里曾经出过「头与正文用错密钥流」的 bug：包能正常生成，解压时却一律报
-				// 「密码错误」。就地验一下，宁可报错，也不要悄悄给出一个打不开的包。
 				if (ZipCrypto(password).decrypt(encrypted.left(12)).at(11) != char((crc >> 24) & 0xFFu))
 					selfCheckFailed = true;
 			}
@@ -497,8 +458,8 @@ namespace {
 
 			for (const Entry &entry : entries) {
 				writeU32(0x02014b50);
-				writeU16(entry.versionNeeded); // version made by
-				writeU16(entry.versionNeeded); // version needed
+				writeU16(entry.versionNeeded);
+				writeU16(entry.versionNeeded); 
 				writeU16(entry.flags);
 				writeU16(entry.method);
 				writeU16(dosTime);
@@ -507,10 +468,10 @@ namespace {
 				writeU32(entry.compressedSize);
 				writeU32(entry.uncompressedSize);
 				writeU16(quint16(entry.name.size()));
-				writeU16(quint16(entry.extra.size())); // extra
-				writeU16(0); // comment
-				writeU16(0); // disk
-				writeU16(0); // internal attributes
+				writeU16(quint16(entry.extra.size()));
+				writeU16(0);
+				writeU16(0);
+				writeU16(0); 
 				writeU32(entry.isDirectory ? 0x10u : 0x0u);
 				writeU32(entry.offset);
 				out->write(entry.name);
@@ -525,7 +486,7 @@ namespace {
 			writeU16(quint16(entries.size()));
 			writeU32(centralSize);
 			writeU32(centralStart);
-			writeU16(0); // comment length
+			writeU16(0); 
 
 			if (auto *file = qobject_cast<QFileDevice *>(out)) {
 				if (file->error() != QFileDevice::NoError) {
@@ -538,7 +499,6 @@ namespace {
 		}
 
 	  private:
-		/// 加密 + UTF-8 文件名
 		static quint16 entryFlags() { return 0x0001 | 0x0800; }
 
 		static quint16 dosTimeStamp() {
@@ -567,7 +527,7 @@ namespace {
 		                      quint16 flags, const QByteArray &extra, quint16 version) {
 			lastOffset = quint32(out->pos());
 			writeU32(0x04034b50);
-			writeU16(version); // version needed
+			writeU16(version); 
 			writeU16(flags);
 			writeU16(method);
 			writeU16(dosTime);
@@ -582,7 +542,6 @@ namespace {
 			out->write(body);
 		}
 
-		/// ZipCrypto：三个 32 位密钥 + 一个字节流密码。
 		class ZipCrypto {
 		  public:
 			explicit ZipCrypto(const QByteArray &password) {
@@ -602,8 +561,6 @@ namespace {
 				return out;
 			}
 
-			/// 解密：密文 ^ 同一个密钥流 = 明文，密钥同样用明文字节推进。
-			/// （自检用；写出来的包是给外面的工具解的，这里只验自己写对没有。）
 			QByteArray decrypt(const QByteArray &data) {
 				QByteArray out = data;
 
@@ -640,7 +597,6 @@ namespace {
 		quint16 dosDate;
 		quint32 lastOffset{};
 		QList<Entry> entries;
-		/// 加密自检没过（见 addFile()），finish() 会直接报错。
 		bool selfCheckFailed{false};
 	};
 
@@ -649,14 +605,12 @@ namespace {
 		if (password.isEmpty())
 			return std::make_unique<QtArchiveWriter>(device);
 
-		// 默认用 AES-256；只有明确选了兼容模式才用老式 ZipCrypto。
 		const auto writerMethod = method == PackageBuilder::ZipCryptoEncryption
 		                              ? EncryptedArchiveWriter::Method::ZipCrypto
 		                              : EncryptedArchiveWriter::Method::Aes256;
 		return std::make_unique<EncryptedArchiveWriter>(device, password, writerMethod);
 	}
 
-	/// 把一批条目写进压缩包（内容全靠 sourcePath 现读）。
 	bool writeItems(ArchiveWriter *writer, const QList<PackageBuilder::Item> &items, QString *error,
 	                int *fileCount, int *dirCount) {
 		for (const PackageBuilder::Item &item : items) {
@@ -681,7 +635,7 @@ namespace {
 
 		return true;
 	}
-} // namespace
+} 
 
 PackageBuilder::PackageBuilder(QObject *parent) : QObject(parent) {}
 
@@ -698,9 +652,6 @@ auto PackageBuilder::kindAt(int index) -> Kind {
 	return static_cast<Kind>(index);
 }
 
-// 下面这些 setter 都不清缓存：缓存是按「输入签名」存的，
-// 改了哪个选项，只是对应不上旧键而已，别的键仍然有效 —— 这正是来回切包类型能秒开的原因。
-
 void PackageBuilder::setKind(Kind kind) { packageKind = kind; }
 
 void PackageBuilder::setDayFile(const QString &fileName) {
@@ -716,7 +667,6 @@ void PackageBuilder::setContest(Contest *value) {
 	if (contest == value)
 		return;
 
-	// 换了比赛就丢掉旧结果（同一个比赛内的增删题/选手由签名里的数量覆盖）。
 	contest = value;
 	clearCache();
 }
@@ -734,7 +684,6 @@ void PackageBuilder::setKeepStructure(bool value) { structure = value; }
 void PackageBuilder::setIncludeSamples(bool value) {
 	samples = value;
 
-	// 样例数据必须保留结构，否则 data/ 与 down/ 里的同名文件会撞在一起。
 	if (value && ! structure)
 		structure = true;
 }
@@ -743,7 +692,6 @@ void PackageBuilder::setStatementFiles(const QStringList &values) {
 	statements.clear();
 
 	for (const QString &value : values) {
-		// 只取文件名部分，免得传进来的路径把题面放到 statement/ 外面去。
 		const QString name = QFileInfo(value.trimmed()).fileName();
 
 		if (! name.isEmpty() && ! statements.contains(name))
@@ -761,9 +709,6 @@ void PackageBuilder::clearCache() {
 	taskFileCache.clear();
 }
 
-// 输入签名：只要这些没变，算出来的计划就一样。
-// 除了包类型和各个选项，还要带上比赛日目录 / 比赛日名（套层目录名、内层包名都用它），
-// 以及试题 / 选手数量，这样增删了题或选手也会自动换键。
 auto PackageBuilder::inputKey() const -> QString {
 	const QStringList parts{
 	    QString::number(int(packageKind)),
@@ -783,11 +728,9 @@ auto PackageBuilder::inputKey() const -> QString {
 }
 
 auto PackageBuilder::innerArchiveName() const -> QString {
-	// 选手目录：整包内容全放进一个固定叫 down.zip 的内层包。
 	if (packageKind == ContestantPackage)
 		return QStringLiteral("down.zip");
 
-	// 测试数据 / 选手代码（没有赛区时）：内层包与比赛日文件同名。
 	return Lemon::common::FileNameSafePart(dayName(), QStringLiteral("day")) + QStringLiteral(".zip");
 }
 
@@ -811,8 +754,6 @@ auto PackageBuilder::dayName() const -> QString {
 }
 
 auto PackageBuilder::defaultOutputFile() const -> QString {
-	// 三个包各有固定名字，免得互相撞名：
-	// 选手目录 = <比赛日>.zip，测试数据 = evaldata.zip，选手代码 = answers.zip。
 	QString name;
 
 	switch (packageKind) {
@@ -834,7 +775,6 @@ auto PackageBuilder::defaultOutputFile() const -> QString {
 	return QDir(dir).absoluteFilePath(Settings::exportPath() + name + QStringLiteral(".zip"));
 }
 
-// down 目录里的文件：只取本层，不递归子目录。
 auto PackageBuilder::collectDownFiles(const QString &taskName) -> QList<QPair<QString, QString>> {
 	QList<QPair<QString, QString>> files;
 
@@ -859,14 +799,12 @@ auto PackageBuilder::collectDownFiles(const QString &taskName) -> QList<QPair<QS
 	return files;
 }
 
-// 选手目录：每道题一个子目录（放 down 里的文件），题面 PDF 放根目录。
 auto PackageBuilder::collectContestantPackage(QList<Item> &items) -> bool {
 	if (! contest) {
 		error = tr("No contest");
 		return false;
 	}
 
-	// 选「套一层目录」时，所有内容都放进与比赛日文件同名的目录里。
 	const QString prefix =
 	    wrap ? Lemon::common::FileNameSafePart(dayName(), QStringLiteral("day")) + QChar('/') : QString();
 
@@ -877,7 +815,6 @@ auto PackageBuilder::collectContestantPackage(QList<Item> &items) -> bool {
 		items.append(folder);
 	}
 
-	// 题面：放在压缩包根目录，可以是 0 个到任意多个，名字就是 statement/ 下的文件名。
 	for (const QString &statementName : statementFiles()) {
 		const QString pdf = QDir(dayRoot()).absoluteFilePath(Settings::statementPath() + statementName);
 
@@ -887,7 +824,6 @@ auto PackageBuilder::collectContestantPackage(QList<Item> &items) -> bool {
 			item.sourcePath = pdf;
 			items.append(item);
 		} else {
-			// 缺题面照样能打包，只是提醒一句（界面会弹窗再确认一次）。
 			emit logMessage(tr("Statement file not found: %1").arg(QDir::toNativeSeparators(pdf)));
 		}
 	}
@@ -899,7 +835,6 @@ auto PackageBuilder::collectContestantPackage(QList<Item> &items) -> bool {
 		const QString folder = prefix + Lemon::common::FileNameSafePart(taskName, QStringLiteral("task"));
 		const QList<QPair<QString, QString>> files = collectDownFiles(taskName);
 
-		// 目录条目：就算 down 里没文件也建出来，包结构保持一致。
 		Item dir;
 		dir.archivePath = folder;
 		dir.isDirectory = true;
@@ -918,9 +853,6 @@ auto PackageBuilder::collectContestantPackage(QList<Item> &items) -> bool {
 	return true;
 }
 
-// 一道题要带上的 graders/ 文件，与评测时实际拷进工作目录的保持一一对应：
-//   交互题：交互库 + 主交互程序；通信题：通信库；使用 SPJ（Lemon / testlib 校验器）：校验器源码。
-// 传统题 / 提交答案题不需要 graders/ 里的任何东西。
 auto PackageBuilder::graderFilesForTask(const Task *task, bool quiet) -> QList<QPair<QString, QString>> {
 	QList<QPair<QString, QString>> files;
 
@@ -948,12 +880,10 @@ auto PackageBuilder::graderFilesForTask(const Task *task, bool quiet) -> QList<Q
 			break;
 	}
 
-	// 用了校验器的题目，把校验器源码一并带上（编译好的可执行文件不导出）。
 	if (task->getComparisonMode() == Task::LemonSpecialJudgeMode ||
 	    task->getComparisonMode() == Task::TestlibSpecialJudgeMode)
 		wanted << task->getSpecialJudge();
 
-	// gradersPath() 是相对 dataPath() 的，和评测时找交互库 / 校验器的方式保持一致。
 	const QDir graders(QDir(dayRoot()).absoluteFilePath(Settings::dataPath() +
 	                                                    Settings::gradersPath(taskName)));
 	QSet<QString> seen;
@@ -962,7 +892,6 @@ auto PackageBuilder::graderFilesForTask(const Task *task, bool quiet) -> QList<Q
 		if (path.trimmed().isEmpty())
 			continue;
 
-		// 工程里存的各种写法（可能是 <题>/graders/x、也可能只是 x）都按文件名到 graders/ 下找。
 		const QString name = QFileInfo(path).fileName();
 
 		if (name.isEmpty() || seen.contains(name))
@@ -985,8 +914,6 @@ auto PackageBuilder::graderFilesForTask(const Task *task, bool quiet) -> QList<Q
 	return files;
 }
 
-// 与打包范围有关的题目配置：题型、判题方式、交互库 / 通信库 / 校验器的路径。
-// 改了这些，题目要带的文件就变了，缓存键也得跟着变。
 auto PackageBuilder::taskConfigKey(const Task *task) -> QString {
 	if (! task)
 		return {};
@@ -1001,8 +928,6 @@ auto PackageBuilder::taskConfigKey(const Task *task) -> QString {
 }
 
 namespace {
-	/// .cdf 里存的是相对 `problem/` 的测试数据路径（形如 `<题>/data/sub/1.in`）；
-	/// 取出 `problem/<题>/data/` 之后的部分，就是相对 data/ 的路径（`sub/1.in`）。
 	QString dataPathRelativeToTask(const Task *task, const QString &stored) {
 		const QString taskName = task->getDirectoryName();
 		const QString path = QDir::fromNativeSeparators(stored);
@@ -1016,7 +941,6 @@ namespace {
 		if (at >= 0)
 			return path.mid(at + marker.size());
 
-		// 老工程可能只存了 `<题>/<文件>`，甚至只有文件名；都按 data/ 下的文件处理。
 		QString rest = path;
 		const QString taskPrefix = taskName + QChar('/');
 
@@ -1026,14 +950,12 @@ namespace {
 		if (rest.startsWith(QStringLiteral("data/")))
 			rest = rest.mid(5);
 
-		// 兜底：绝对路径只取文件名。
 		if (rest.startsWith(QChar('/')) || rest.contains(QChar(':')))
 			rest = QFileInfo(rest).fileName();
 
 		return rest;
 	}
 
-	/// 一道题所有测试点引用到的数据文件（相对 `<题>/data/`，去重并按字典序）。
 	QStringList referencedDataFiles(const Task *task) {
 		QSet<QString> used;
 
@@ -1060,12 +982,8 @@ namespace {
 		std::sort(result.begin(), result.end());
 		return result;
 	}
-} // namespace
+} 
 
-// 测试数据包：一道题要打包的文件（相对题目录的路径, 磁盘路径）。
-// data/ 只带测试点真正引用到的输入 / 输出文件（这些路径就记在 .cdf 里，出题人丢在 data/
-// 里但没挂到测试点上的中间产物不导出）；graders/ 只带评测真正用得上的那几个文件
-// （见 graderFilesForTask）；down/（样例数据）只有勾了才带上；gen/、tests/ 这类中间产物不导出。
 auto PackageBuilder::collectTestDataFiles(const Task *task, bool quiet) -> QList<QPair<QString, QString>> {
 	QList<QPair<QString, QString>> files;
 
@@ -1074,11 +992,8 @@ auto PackageBuilder::collectTestDataFiles(const Task *task, bool quiet) -> QList
 
 	const QString taskName = task->getDirectoryName();
 
-	// data/ 下真正被测试点引用的文件（相对 <题>/data/）。
 	const QStringList usedData = referencedDataFiles(task);
 
-	// 缓存键带上「保留结构 / 样例数据」、题目配置、比赛日与被引用的数据文件：
-	// 重名检查和收集计划共用同一次扫描。
 	const QString cacheKey = taskName + QChar('|') + (structure ? QChar('1') : QChar('0')) +
 	                         (samples ? QChar('1') : QChar('0')) + QChar('|') + taskConfigKey(task) +
 	                         QChar('|') + dayRoot() + QChar('|') + usedData.join(QChar('\n'));
@@ -1108,16 +1023,12 @@ auto PackageBuilder::collectTestDataFiles(const Task *task, bool quiet) -> QList
 			continue;
 		}
 
-		// 保留结构时照搬 data/ 下的相对路径（子目录也带上）；不保留时只留文件名
-		// （撞名会被跳过并记日志）。
 		const QString archiveRelative =
 		    structure ? QStringLiteral("data") + QChar('/') + relative : QFileInfo(relative).fileName();
 		files.append({archiveRelative, diskPath});
 	}
 
 	if (samples) {
-		// 样例数据只收 down/ 本层的文件：down/ 里的子目录（例如按测试点分的子目录）
-		// 是出题人自己的中间产物，不往包里带。
 		const QDir downDir(taskRoot + QStringLiteral("down"));
 
 		if (downDir.exists()) {
@@ -1132,7 +1043,6 @@ auto PackageBuilder::collectTestDataFiles(const Task *task, bool quiet) -> QList
 		}
 	}
 
-	// graders/：只要评测用得上的那几个文件（交互库 / 通信库 / 校验器源码）。
 	for (const auto &file : graderFilesForTask(task, quiet)) {
 		const QString relative =
 		    structure ? QStringLiteral("graders") + QChar('/') + file.first : file.first;
@@ -1151,7 +1061,6 @@ auto PackageBuilder::collectTestDataFiles(const Task *task, bool quiet) -> QList
 	return files;
 }
 
-// 各题的文件是否重名：重名的话「各题单独一个目录」就不能关。
 auto PackageBuilder::hasDuplicateTaskFiles() -> bool {
 	const QString key = inputKey();
 
@@ -1184,7 +1093,6 @@ auto PackageBuilder::hasDuplicateTaskFiles() -> bool {
 	return duplicated;
 }
 
-// 测试数据：每题的 data/ / graders/（可选 down/），按开关决定是否保留结构与是否分题目录。
 auto PackageBuilder::collectTestDataPackage(QList<Item> &items) -> bool {
 	if (! contest) {
 		error = tr("No contest");
@@ -1218,7 +1126,6 @@ auto PackageBuilder::collectTestDataPackage(QList<Item> &items) -> bool {
 
 	for (auto *task : taskList) {
 		const QString taskName = task->getDirectoryName();
-		// 分摊到公共目录时（关掉「每道题单独一个目录」），文件直接放在套层目录/根下。
 		const QString base = perTask ? prefix + Lemon::common::FileNameSafePart(taskName, QStringLiteral("task")) +
 		                                  QChar('/')
 		                            : prefix;
@@ -1256,10 +1163,6 @@ auto PackageBuilder::collectTestDataPackage(QList<Item> &items) -> bool {
 	return true;
 }
 
-// 选手代码：每位选手一个目录，里面是他全部题目的源代码。
-// 启用赛区时按赛区分组，可以同时给每个赛区建同名文件夹、同名内层压缩包（外层固定 answers.zip）；
-// 套层打开时，赛区这一层放在「与比赛日同名」的目录里：answers.zip/<比赛日>/<赛区>/<选手>/…
-// 没启用赛区（或选手没填赛区）时，整体就当成一组，与其它包一样：套层 = <比赛日>/。
 auto PackageBuilder::collectAnswersPackage(Plan &plan) -> bool {
 	if (! contest) {
 		error = tr("No contest");
@@ -1269,7 +1172,6 @@ auto PackageBuilder::collectAnswersPackage(Plan &plan) -> bool {
 	const bool byRegion = contest->getRegionEnabled();
 	const QString dayFolder = Lemon::common::FileNameSafePart(dayName(), QStringLiteral("day"));
 
-	// 组的 key 就是赛区名；未启用赛区时整场算一组（key 为空）。
 	QMap<QString, QList<Contestant *>> groups;
 
 	for (auto *contestant : contest->getContestantList())
@@ -1280,7 +1182,6 @@ auto PackageBuilder::collectAnswersPackage(Plan &plan) -> bool {
 		return false;
 	}
 
-	// 先按组收集条目（路径相对该组）。
 	QMap<QString, QList<Item>> grouped;
 
 	for (auto it = groups.begin(); it != groups.end(); ++it) {
@@ -1312,7 +1213,6 @@ auto PackageBuilder::collectAnswersPackage(Plan &plan) -> bool {
 		grouped.insert(it.key(), groupItems);
 	}
 
-	// 没有赛区：跟其它包一样，整场内容（套层打开时套一层 <比赛日>/）。
 	if (! byRegion) {
 		QList<Item> content = grouped.value(QString());
 
@@ -1337,7 +1237,6 @@ auto PackageBuilder::collectAnswersPackage(Plan &plan) -> bool {
 		return true;
 	}
 
-	// 启用赛区：套层时先建「与比赛日同名」的目录，再在每个赛区下面建同名目录。
 	const QString dayPrefix = wrap ? dayFolder + QChar('/') : QString();
 
 	if (wrap) {
@@ -1352,14 +1251,12 @@ auto PackageBuilder::collectAnswersPackage(Plan &plan) -> bool {
 
 	for (auto it = grouped.begin(); it != grouped.end(); ++it) {
 		const QString region = it.key();
-		// 没填赛区的选手不额外建一层目录，直接放在 <比赛日>/ 下。
 		const QString label =
 		    region.isEmpty() ? dayFolder : Lemon::common::FileNameSafePart(region, QStringLiteral("region"));
 		const QString base = dayPrefix + (region.isEmpty() ? QString() : label + QChar('/'));
 		const QList<Item> groupItems = it.value();
 		int count = 0;
 
-		// 赛区同名文件夹是强制的：启用赛区时每个赛区一定单独一层目录。
 		if (! region.isEmpty() && ! dirs.contains(dayPrefix + label)) {
 			const QString folderPath = dayPrefix + label;
 			dirs.insert(folderPath);
@@ -1383,7 +1280,6 @@ auto PackageBuilder::collectAnswersPackage(Plan &plan) -> bool {
 			++count;
 		}
 
-		// 内层压缩包：每个赛区一个与赛区同名的 zip（套层时放在 <比赛日>/ 下）。
 		if (nested) {
 			plan.archives.append({dayPrefix + label + QStringLiteral(".zip"), groupItems});
 			count += groupItems.size();
@@ -1398,8 +1294,6 @@ auto PackageBuilder::collectAnswersPackage(Plan &plan) -> bool {
 auto PackageBuilder::collectItems() -> Plan {
 	error.clear();
 
-	// 同样的输入（包类型 + 选项 + 比赛日）直接给上次的结果，
-	// 这样在选项卡里来回切换、把选项改回原样都不会再扫一遍磁盘。
 	const QString key = inputKey();
 
 	if (planCache.contains(key))
@@ -1420,8 +1314,6 @@ auto PackageBuilder::collectItems() -> Plan {
 				return plan;
 			}
 
-			// 选了内层压缩包：整包内容都在内层包里（选手目录固定叫 down.zip，
-			// 测试数据与比赛日文件同名）；否则内容直接放外层。
 			if (nested)
 				plan.archives.append({innerArchiveName(), content});
 			else
@@ -1440,7 +1332,6 @@ auto PackageBuilder::collectItems() -> Plan {
 			break;
 	}
 
-	// 只留最近几份，别无限涨。
 	if (planCache.size() > 8)
 		planCache.clear();
 
@@ -1451,7 +1342,6 @@ auto PackageBuilder::collectItems() -> Plan {
 auto PackageBuilder::build() -> bool {
 	error.clear();
 
-	// 真正打包前重新读一遍磁盘，避免用的是界面预览时的旧清单。
 	clearCache();
 
 	const Plan plan = collectItems();
@@ -1492,7 +1382,6 @@ auto PackageBuilder::build() -> bool {
 	if (! writeItems(writer.get(), plan.items, &error, &fileCount, &dirCount))
 		return false;
 
-	// 内层压缩包：每个先在内存里打一份（同样受密码保护），再作为一项放进外层。
 	for (const NestedArchive &archive : plan.archives) {
 		QBuffer buffer;
 		buffer.open(QIODevice::WriteOnly);

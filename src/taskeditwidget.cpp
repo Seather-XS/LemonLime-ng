@@ -9,7 +9,6 @@
 
 #include "taskeditwidget.h"
 #include "ui_taskeditwidget.h"
-//
 #include "base/compiler.h"
 #include "base/settings.h"
 #include "core/task.h"
@@ -24,13 +23,10 @@ TaskEditWidget::TaskEditWidget(QWidget *parent) : QWidget(parent), ui(new Ui::Ta
 	comparisonModes << int(Task::IgnoreSpacesMode) << int(Task::TestlibSpecialJudgeMode);
 	connect(this, &TaskEditWidget::dataPathChanged, ui->interactorPath, &FileLineEdit::refreshFileList);
 	connect(this, &TaskEditWidget::dataPathChanged, ui->graderPath, &FileLineEdit::refreshFileList);
-	// 换比赛日后，校验器（testlib）的候选 .cpp 也要跟着换。
 	connect(this, &TaskEditWidget::dataPathChanged, this, &TaskEditWidget::refreshGraderRoots);
-	// 校验器只支持 .cpp：把限制写在悬浮提示里，免得用户找不到选项时摸不着头。
 	ui->testlibSpecialJudge->setToolTip(
 	    tr("Only .cpp files can be the checker; it is compiled once before judging."));
 	ui->sourceFileName->setValidator(new QRegularExpressionValidator(QRegularExpression("\\w+"), this));
-	// 试题创建后文件名不再允许更改（只读），但保留正常外观以便查看/复制。
 	ui->sourceFileName->setReadOnly(true);
 	ui->inputFileName->setValidator(
 	    new QRegularExpressionValidator(QRegularExpression(R"((\w+)(\.\w+)?)"), this));
@@ -41,7 +37,6 @@ TaskEditWidget::TaskEditWidget(QWidget *parent) : QWidget(parent), ui(new Ui::Ta
 	ui->answerFileExtension->setValidator(new QRegularExpressionValidator(QRegularExpression("\\w+"), this));
 	ui->sourceFilesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	ui->graderFilesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-	// ui->interactionButton->setVisible(false); //rebuilding interaction, remove it temporarily
 	connect(ui->problemTitle, &QLineEdit::textChanged, this, &TaskEditWidget::problemTitleChanged);
 	connect(ui->traditionalButton, &QRadioButton::toggled, this, &TaskEditWidget::setToTraditional);
 	connect(ui->answersOnlyButton, &QRadioButton::toggled, this, &TaskEditWidget::setToAnswersOnly);
@@ -105,7 +100,6 @@ void TaskEditWidget::setEditTask(Task *task) {
 	connect(editTask, &Task::compilerConfigurationRefreshed, this,
 	        &TaskEditWidget::refreshCompilerConfiguration);
 	ui->problemTitle->setText(editTask->getProblemTitle());
-	// 文件名不可编辑，这里只是把值刷上去，不触发写回。
 	loadingTask = true;
 	ui->sourceFileName->setText(editTask->getSourceFileName());
 
@@ -117,18 +111,12 @@ void TaskEditWidget::setEditTask(Task *task) {
 	ui->inputFileName->setText(editTask->getInputFileName());
 	ui->outputFileName->setText(editTask->getOutputFileName());
 	refreshComparisonMode(int(editTask->getComparisonMode()));
-	// 校验器的可执行文件由 refreshGraderRoots() 列成下拉框并选中。
 	ui->interactorPath->setText(editTask->getInteractor());
 	ui->interactorName->setText(editTask->getInteractorName());
 	ui->graderPath->setText(editTask->getGrader());
-	// 交互库与主接口程序只能从 <题>/graders/ 中选取
 	refreshGraderRoots();
 	ui->standardInputCheck->setChecked(editTask->getStandardInputCheck());
 	ui->standardOutputCheck->setChecked(editTask->getStandardOutputCheck());
-	// ui->interactorPathLabel->setVisible(editTask->getTaskType() == Task::Interaction);
-	// ui->interactorPath->setVisible(editTask->getTaskType() == Task::Interaction);
-	// ui->graderPathLabel->setVisible(editTask->getTaskType() == Task::Interaction);
-	// ui->graderPath->setVisible(editTask->getTaskType() == Task::Interaction);
 	ui->answerFileExtension->setText(editTask->getAnswerFileExtension());
 	refreshCompilerConfiguration();
 
@@ -160,7 +148,6 @@ void TaskEditWidget::refreshWidgetState() {
 	ui->graderPath->setVisible(types == Task::Interaction);
 	ui->interactorNameLabel->setVisible(types == Task::Interaction);
 	ui->interactorName->setVisible(types == Task::Interaction);
-	// ui->comparisonSetting->setVisible(types != Task::Interaction);
 	ui->sourceFileName->setEnabled(true);
 	ui->sourceFileNameLabel->setEnabled(types == Task::Traditional || types == Task::Interaction ||
 	                                    types == Task::AnswersOnly || types == Task::Communication ||
@@ -200,7 +187,6 @@ void TaskEditWidget::refreshWidgetState() {
 	                                   types == Task::Communication || types == Task::CommunicationExec);
 	ui->configurationSelect->setVisible(types == Task::Traditional || types == Task::Interaction ||
 	                                    types == Task::Communication || types == Task::CommunicationExec);
-	// ui->comparisonMode->setEnabled(types == Task::Traditional || types == Task::AnswersOnly);
 	ui->answerFileExtension->setVisible(types == Task::AnswersOnly);
 	ui->answerFileExtensionLabel->setVisible(types == Task::AnswersOnly);
 	refreshComparisonSettingPage();
@@ -230,8 +216,6 @@ void TaskEditWidget::setToTraditional(bool check) {
 		return;
 
 	editTask->setTaskType(Task::Traditional);
-	// editTask->setStandardOutputCheck(false); //fix stdout not save
-	// ui->standardOutputCheck->setCheckState(Qt::Unchecked);
 	refreshWidgetState();
 }
 
@@ -240,8 +224,6 @@ void TaskEditWidget::setToAnswersOnly(bool check) {
 		return;
 
 	editTask->setTaskType(Task::AnswersOnly);
-	// editTask->setStandardOutputCheck(false);
-	// ui->standardOutputCheck->setCheckState(Qt::Unchecked);
 	refreshWidgetState();
 }
 
@@ -250,14 +232,11 @@ void TaskEditWidget::setToInteraction(bool check) {
 		return;
 
 	editTask->setTaskType(Task::Interaction);
-	// 交互题：自动生成 graders/<题>.h 与 <题>_grader.cpp 并填好三个交互参数。
 	editTask->prepareInteraction();
 	ui->interactorPath->setText(editTask->getInteractor());
 	ui->interactorName->setText(editTask->getInteractorName());
 	ui->graderPath->setText(editTask->getGrader());
 	refreshGraderRoots();
-	// editTask->setStandardOutputCheck(true);
-	// ui->standardOutputCheck->setCheckState(Qt::Checked);
 	refreshWidgetState();
 }
 
@@ -331,11 +310,9 @@ void TaskEditWidget::comparisonModeChanged() {
 		return;
 
 	editTask->setComparisonMode(Task::ComparisonMode(comparisonModes.at(index)));
-	// 立刻切换「比较设置」那一行：选自定义校验器时要马上出现可执行文件的选择框。
 	refreshComparisonSettingPage();
 }
 
-// 只有自定义校验器（testlib）模式才需要选校验器可执行文件。
 void TaskEditWidget::refreshComparisonSettingPage() {
 	if (! editTask)
 		return;
@@ -371,8 +348,6 @@ void TaskEditWidget::interactorChanged(const QString &text) {
 	editTask->setInteractor(text);
 }
 
-// 交互库与主接口程序（grader.cpp）都只从 <题>/graders/ 读取：返回规范化后的相对路径，
-// 本来就在该目录里的原样返回。
 static QString toGradersPath(const QString &relative, const QString &taskName) {
 	const QString prefix = QDir::fromNativeSeparators(Settings::gradersPath(taskName));
 
@@ -382,8 +357,6 @@ static QString toGradersPath(const QString &relative, const QString &taskName) {
 	return Settings::graderFilePath(taskName, relative);
 }
 
-// 交互库与主接口程序的候选列表都限定到 <题>/graders/；
-// 旧工程里指向其它目录的路径则在 graders/ 下确有同名文件时归一到新位置。
 void TaskEditWidget::refreshGraderRoots() {
 	if (! editTask)
 		return;
@@ -412,8 +385,6 @@ void TaskEditWidget::refreshGraderRoots() {
 	adopt(editTask->getInteractor(), ui->interactorPath);
 	adopt(editTask->getGrader(), ui->graderPath);
 
-	// 自定义校验器（testlib）只认 <题>/graders/ 下的 .cpp 源码：把候选直接列成下拉框，
-	// 不再让人手填路径，也不接受现成的可执行文件。
 	{
 		const QString stored = editTask->getSpecialJudge();
 		QString normalized = stored;
@@ -430,14 +401,12 @@ void TaskEditWidget::refreshGraderRoots() {
 
 		const QDir graders(Settings::dataPath() + Settings::gradersPath(taskName));
 
-		// 校验器只能是 .cpp 源码：评测前先编译一次，之后（包括后续选手）复用这个可执行文件。
 		const QStringList candidates =
 		    graders.entryList({QStringLiteral("*.cpp")}, QDir::Files, QDir::Name);
 
 		for (const QString &name : candidates)
 			ui->testlibSpecialJudge->addItem(name, Settings::graderFilePath(taskName, name));
 
-		// graders/ 里一个 .cpp 都没有时给个提示项：空下拉框看起来像是界面坏了。
 		if (ui->testlibSpecialJudge->count() == 0)
 			ui->testlibSpecialJudge->addItem(tr("No .cpp checker found"), QString());
 
@@ -449,8 +418,6 @@ void TaskEditWidget::refreshGraderRoots() {
 			if (normalized != stored)
 				editTask->setSpecialJudge(normalized);
 		} else {
-			// 候选里没有它就说明这个文件已经不存在了（或不在 graders/ 下）：不留这种
-			// 点不出来的「幽灵」选项，直接把设置清掉，让用户重新选一个真实的 .cpp。
 			ui->testlibSpecialJudge->setCurrentIndex(-1);
 
 			if (! stored.isEmpty())
@@ -459,7 +426,6 @@ void TaskEditWidget::refreshGraderRoots() {
 	}
 }
 
-// 手填的路径也只会去 <题>/graders/ 找，这里把控件内容一并纠正过去。
 void TaskEditWidget::graderPathEditingFinished() {
 	if (! editTask)
 		return;

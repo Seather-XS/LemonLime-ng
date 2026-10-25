@@ -5,9 +5,7 @@
  */
 
 #include "idruledialog.h"
-//
 #include "admissionnaming.h"
-//
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QFormLayout>
@@ -24,7 +22,7 @@ namespace {
 
 		return values;
 	}
-} // namespace
+} 
 
 IdRuleDialog::IdRuleDialog(const AdmissionTable &table, const QString &section,
                            const AdmissionAssign::IdOptions &current, QWidget *parent)
@@ -45,7 +43,6 @@ IdRuleDialog::IdRuleDialog(const AdmissionTable &table, const QString &section,
 	groupsForm = new QFormLayout();
 	layout->addLayout(groupsForm);
 
-	// 预览放在只读文本框里：人数一多标签就把对话框撑爆了，这里让它自己滚。
 	preview = new QPlainTextEdit(this);
 	preview->setObjectName(QStringLiteral("previewText"));
 	preview->setReadOnly(true);
@@ -92,7 +89,6 @@ QComboBox *IdRuleDialog::makeSourceBox(const QString &key) {
 	const int index = box->findData(key);
 	box->setCurrentIndex(index < 0 ? 0 : index);
 
-	// 放在 setCurrentIndex 之后：免得构造时就触发一次
 	connect(box, qOverload<int>(&QComboBox::currentIndexChanged), this, &IdRuleDialog::updateState);
 	return box;
 }
@@ -101,7 +97,6 @@ void IdRuleDialog::syncGroups() {
 	const QString pattern = templateEdit->text();
 	const int chars = AdmissionNaming::groupCount(pattern, QStringLiteral("char"));
 
-	// 数字固定取行号，没有下拉；只有模板里写了 <char> 才有「字母取自」。
 	if (chars == charBoxes.size())
 		return;
 
@@ -137,7 +132,6 @@ void IdRuleDialog::updatePreview() {
 	const int nameColumn = table.columnIndex(QStringLiteral("姓名"));
 	QStringList lines;
 
-	// 全都列出来：预览是能滚的文本框，不用再截断，用户想看第 500 个号码也行。
 	for (int row = 0; row < ids.size(); ++row)
 		lines << QStringLiteral("%1. %2 → %3")
 		             .arg(row + 1)

@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 
 #include <QHeaderView>
 #include <QMessageBox>

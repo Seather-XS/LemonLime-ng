@@ -69,6 +69,5 @@ void JudgingController::stop() {
 	for (auto [taskJudger, thread] : runningTasks.toStdMap()) {
 		QMetaObject::invokeMethod(taskJudger, &TaskJudger::stop);
 	}
-	// emit judgeFinished();
 }
 void JudgingController::addTask(TaskJudger *taskJudger) { queuingTasks.push_back(taskJudger); }

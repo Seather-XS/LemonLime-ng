@@ -9,12 +9,10 @@
 
 #include "compilersettings.h"
 #include "ui_compilersettings.h"
-//
 #include "addcompilerwizard.h"
 #include "advancedcompilersettingsdialog.h"
 #include "base/compiler.h"
 #include "base/settings.h"
-//
 #include <QAction>
 #include <QMessageBox>
 
@@ -68,7 +66,6 @@ auto CompilerSettings::checkValid() -> bool {
 		compilerNames.append(i->getCompilerName());
 	}
 
-	// n^2?
 	for (int i = 0; i < compilerList.size(); i++) {
 		if (compilerNames.count(compilerNames[i]) > 1) {
 			ui->compilerList->setFocus();

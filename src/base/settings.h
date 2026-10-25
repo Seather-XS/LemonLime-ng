@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 
 #include "base/LemonType.hpp"
 #include <QColor>
@@ -63,10 +62,6 @@ class ColorTheme {
 
   private:
 	QString name;
-	// mxColor maxColor
-	// miColor minColor
-	// nfColor nofileColor
-	// ceColor compileErrorColor
 	hslTuple mxColor, miColor, nfColor, ceColor;
 	QColor colorNf, colorCe;
 	dddTuple grandComp, grandRate;
@@ -85,7 +80,6 @@ class Settings {
 	int getFileSizeLimit() const;
 	int getRejudgeTimes() const;
 	int getMaxJudgingThreads() const;
-	/// CCF 编程通则 3：选手程序应正常结束且主函数返回 0（非 0 → 运行时错误）。
 	bool getRequireReturnZero() const;
 	double getDefaultExtraTimeRatio() const;
 	const QString &getDefaultInputFileExtension() const;
@@ -147,24 +141,13 @@ class Settings {
 	static QString sourcePath();
 	static QString importPath();
 	static QString selfTestPath();
-	/// 题面目录：每个比赛日下的 `statement/`（固定放 statement.md 与 statement.pdf）。
 	static QString statementPath();
-	/// 导出目录：每个比赛日下的 `dist/reports/`（成绩单、统计）与 `dist/export/`（压缩包）。
 	static QString reportsPath();
 	static QString exportPath();
-	/// 建好 dist/reports/ 与 dist/export/，并清掉早期版本留在比赛日根目录的 reports/、export/。
 	static void ensureDistDirs();
-	/// 让资源管理器把比赛日目录按 problem / import / answers / statement / dist 排列。
-	/// 做法是在该目录写一个隐藏 + 系统的 desktop.ini，用 [LocalizedFileNames] 给这几个文件夹
-	/// 加上不可见的零宽空格前缀——只改「显示名」，真实路径完全不变；换台机器或系统不支持时
-	/// 最多退回原来的字母序，不会破坏任何东西。
 	static void ensureDayFolderOrdering(const QString &dayRoot);
-	/// 交互库 / 校验器只允许放在 <题>/graders/ 下，返回相对 dataPath() 的该目录（带结尾分隔符）。
 	static QString gradersPath(const QString &taskName);
-	/// <题>/graders/<文件>（相对 dataPath()），与工程中保存交互库路径的格式一致。
 	static QString graderFilePath(const QString &taskName, const QString &fileName);
-	/// 建立某个试题的标准子目录：problem/<题>/{data,down,graders,gen}；
-	/// 顺便清掉早期版本留下的 tests/ 目录。
 	static void ensureTaskDirs(const QString &taskName);
 
   private:

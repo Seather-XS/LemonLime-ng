@@ -9,7 +9,6 @@
 
 #include "editvariabledialog.h"
 #include "ui_editvariabledialog.h"
-//
 #include <QPushButton>
 
 EditVariableDialog::EditVariableDialog(QWidget *parent) : QDialog(parent), ui(new Ui::EditVariableDialog) {

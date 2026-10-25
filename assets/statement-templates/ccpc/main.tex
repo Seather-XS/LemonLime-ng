@@ -4,6 +4,7 @@
 \setlength{\intextsep}{0.5em}
 \usepackage{fontspec}
 \usepackage{xeCJK}
+\tracinglostchars=0
 \usepackage{CJKfntef}
 \usepackage{makecell}
 \usepackage{graphicx}
@@ -25,7 +26,6 @@
 \usepackage{stackengine}
 \usepackage{amssymb}
 \usepackage{fix-cm}
-\usepackage{needspace}
 \usepackage{tocloft}
 
 \definecolor{mylinkcolor}{HTML}{FF007F}
@@ -43,28 +43,27 @@
 \newcommand{\kaishu}[1]{{\CJKfamily{kai} #1}}
 
 \setmonofont{Consolas}
-\setCJKmonofont{SimSun}
+\setCJKmonofont{Consolas}
 
 \setlength{\parindent}{2em}
 \setlength{\headheight}{15pt}
 \setlist{
-    leftmargin=2em,
-    labelindent=0em,
+    leftmargin=2em, 
+    labelindent=1em,
+    labelwidth=0.5em,
     labelsep=0.5em,
-    labelwidth=1.5em,
     itemindent=0pt,
     listparindent=0pt,
-    topsep=0pt,
+    topsep=0em,
     partopsep=0pt,
     parsep=0pt,
     itemsep=0pt,
 }
-
-\setlist[1]{
+\setlist[itemize,enumerate,1]{
     leftmargin=3em,
     labelindent=2em,
-    labelsep=0.5em,
     labelwidth=0.5em,
+    labelsep=0.5em,
 }
 \setstretch{1.3}
 \mathchardef\plainmathcomma=\mathcode`\, 
@@ -139,6 +138,7 @@
 {
     \endtabularx
 }
+
 \newenvironment{tuacktable}[2][3]{%
     \par\begin{center}%
     \linespread{1.0}\selectfont
@@ -150,12 +150,6 @@
 }
 
 \newcommand{\textbolddot}[1]{\stackunder[0.4ex]{\textbf{#1}}{\textbullet}}
-
-% 表格上下的留白长度，直接改这里的数值即可：
-%   \statementtableskip           普通表格（如《数据范围》）
-%   \statementoverviewtableskip   导览区三张表（概览表 / 提交源程序文件名 / 编译选项）
-\providecommand{\statementtableskip}{\bigskipamount}
-\providecommand{\statementoverviewtableskip}{0.6em}
 \setcounter{tocdepth}{1}
 \setlength{\cftsecindent}{0pt}
 \setlength{\cftsecnumwidth}{0pt}
@@ -165,21 +159,55 @@
 \renewcommand{\cftsecfont}{\CJKfamily{hei}\selectfont}
 \renewcommand{\cftsecpagefont}{\CJKfamily{hei}\selectfont}
 \renewcommand{\headrulewidth}{0.2pt}
+\makeatletter
+\renewcommand{\headrule}{%
+  \vspace*{-1pt}%
+  \hrule\@height\headrulewidth\@width\headwidth
+  \vspace{\headrulewidth}%
+}
+\makeatother
 
 \newcommand{\myTitleSize}{\fontsize{22pt}{26.4pt}\selectfont}
 \newcommand{\myDateSize}{\fontsize{15pt}{0.6pt}\selectfont}
+
 \newcommand{\bigtitle}{CCPC}
 \newcommand{\shorttitle}{CCPC}
 \newcommand{\myday}{}
 \newcommand{\mydate}{}
+
+\let\origquote\quote
+\let\endorigquote\endquote
+\renewenvironment{quote}%
+  {\begin{origquote}\CJKfamily{kai}}%
+  {\end{origquote}}
 
 \renewcommand{\sectionmark}[1]{\markboth{#1}{#1}}
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead{}
 \fancyhead[L]{{\footnotesize \bigtitle  }}
-\fancyhead[R]{\footnotesize \myday\hspace{0.5em}\nouppercase{\leftmark}\unskip}
+\fancyhead[R]{\footnotesize \myday\hspace{0.4em}\nouppercase{\leftmark}\unskip}
 \fancyfoot[C]{{\footnotesize 第 \thepage 页\hspace{2em}共 \hyperref[LastPage]{\pageref{LastPage}} 页}}
+
+\newlength{\proinfolabelwidth}
+\newcommand{\proinfoitem}[2]{%
+  \settowidth{\proinfolabelwidth}{\textbf{#1}\ }%
+  \hangindent=\proinfolabelwidth
+  \hangafter=1\relax
+  \noindent\textbf{#1}\ #2\unskip
+}
+\newcommand{\proinfo}[4]{%
+  \par\noindent
+  \hspace*{2em}%
+  \begingroup
+  \begin{tabularx}{\dimexpr\textwidth-2em\relax}%
+      {@{}>{\raggedright\arraybackslash}X@{\hspace{2em}}>{\raggedright\arraybackslash}X@{}}
+    \proinfoitem{Input File:}{#1} & \proinfoitem{Output File:}{#2} \\[0.5ex]
+    \proinfoitem{Time Limit:}{#3} & \proinfoitem{Memory Limit:}{#4} \\
+  \end{tabularx}%
+  \endgroup
+  \par
+}
 
 \begin{document}
 \thispagestyle{empty}
@@ -212,6 +240,4 @@
 
 \newpage
 
-% Intentionally empty document body; content will be injected from markdown
-% and named sections. This template does not include example problems by default.
 \end{document}

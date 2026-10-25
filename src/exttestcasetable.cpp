@@ -6,14 +6,12 @@
  */
 
 #include "exttestcasetable.h"
-//
 #include "core/task.h"
 #include "core/testcase.h"
-//
 #include <QHeaderView>
 #include <limits>
 
-ExtTestCaseTable::ExtTestCaseTable(QWidget * /*parent*/) {
+ExtTestCaseTable::ExtTestCaseTable(QWidget *) {
 	clear();
 
 	horizontalHeader()->setMinimumHeight(25);

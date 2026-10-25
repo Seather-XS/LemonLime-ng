@@ -6,7 +6,6 @@
  */
 
 #pragma once
-//
 
 #include "base/LemonType.hpp"
 #include "core/contestant.h"
@@ -39,15 +38,12 @@ class StatisticsBrowser : public QWidget {
   private:
 	Ui::StatisticsBrowser *ui;
 	Contest *curContest;
-	/// 选项卡没显示时先不算：统计要遍历所有选手 × 所有测试点，大比赛很贵。
 	bool needsRefresh{false};
-	/// 切过来之后延迟一点再算，先把界面画出来。
 	QTimer *refreshTimer{nullptr};
 	static bool checkValid(QList<Task *>, const QList<Contestant *> &);
 	static QString getScoreNormalChart(const QMap<int, int> &, int, int);
 	static QString getTestcaseScoreChart(QList<TestCase *>, QList<QList<QList<int>>>,
 	                                     QList<QList<QList<ResultState>>>);
-	/// 生成统计页 HTML；contestantList 决定统计范围（全体 = 总统计，某个赛区 = 赛区统计）。
 	static QString buildStatisticsHtml(Contest *, const QList<Contestant *> &,
 	                                   const QString &regionName = QString());
 	static bool writeHtml(QWidget *, const QString &fileName, const QString &content);

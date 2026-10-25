@@ -7,7 +7,6 @@
  */
 
 #pragma once
-//
 #include <QString>
 #include <QTranslator>
 #include <memory>
@@ -19,15 +18,7 @@ namespace Lemon::common {
 		explicit LemonTranslator();
 
 	  public:
-		/**
-		 * @brief get the available languages.
-		 * @return (if available) languages (zh_CN, en_US, ...)
-		 */
 		const inline QStringList GetAvailableLanguages() const { return languages; }
-		/**
-		 * @brief reload the translation from file
-		 * @param code eg: zh_CN, ...
-		 */
 		bool InstallTranslation(const QString &);
 
 	  private:
@@ -37,6 +28,6 @@ namespace Lemon::common {
 		void refreshTranslations();
 	};
 	inline std::unique_ptr<common::LemonTranslator> LemonLimeTranslator;
-} // namespace Lemon::common
+} 
 
 using namespace Lemon::common;

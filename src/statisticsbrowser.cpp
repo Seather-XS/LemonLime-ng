@@ -7,14 +7,12 @@
 
 #include "statisticsbrowser.h"
 #include "ui_statisticsbrowser.h"
-//
 #include "base/LemonType.hpp"
 #include "base/LemonUtils.hpp"
 #include "base/settings.h"
 #include "core/contest.h"
 #include "core/contestant.h"
 #include "core/task.h"
-//
 #include <QApplication>
 #include <QCheckBox>
 #include <QFileDialog>
@@ -29,7 +27,6 @@ StatisticsBrowser::StatisticsBrowser(QWidget *parent) : QWidget(parent), ui(new 
 	ui->setupUi(this);
 	curContest = nullptr;
 
-	// 切到统计选项卡后延迟一点再算：统计要遍历所有选手 × 所有测试点，先把界面画出来。
 	refreshTimer = new QTimer(this);
 	refreshTimer->setSingleShot(true);
 	refreshTimer->setInterval(250);
@@ -247,8 +244,6 @@ auto StatisticsBrowser::checkValid(QList<Task *> taskList, const QList<Contestan
 	}
 
 	for (auto *i : contestantList) {
-		// 被判定取消测试的选手（违规 / 命名不合规）一题都没跑过，本来就没有成绩数据，
-		// 不参与「是否所有选手都已测试」的校验，否则统计页面会误报“有些奇怪的错误”。
 		if (i->isDisqualified())
 			continue;
 
@@ -282,8 +277,6 @@ auto StatisticsBrowser::checkValid(QList<Task *> taskList, const QList<Contestan
 
 				for (int k = 0; k < testCaseList.length(); k++) {
 
-					// 如果有子任务依赖，就会比一般的题目多一个 score 存依赖
-
 					if (scoreList[k].length() - (! testCaseList[k]->getDependenceSubtask().empty()) !=
 					    testCaseList[k]->getInputFiles().length())
 						return false;
@@ -299,8 +292,6 @@ auto StatisticsBrowser::checkValid(QList<Task *> taskList, const QList<Contestan
 }
 
 void StatisticsBrowser::refresh() {
-	// 没显示出来就先不算（比如刚打开比赛日时这个选项卡还在后台）：
-	// 统计要把所有选手 × 所有测试点都算一遍，大比赛很贵。等切过来再算。
 	if (! isVisible()) {
 		needsRefresh = true;
 		return;
@@ -344,7 +335,6 @@ void StatisticsBrowser::showEvent(QShowEvent *event) {
 		refreshTimer->start();
 }
 
-// 统计的 HTML 按「选手集合」生成：全体选手就是总统计，某个赛区就是一个赛区的统计。
 auto StatisticsBrowser::buildStatisticsHtml(Contest *curContest, const QList<Contestant *> &contestantList,
                                             const QString &regionName) -> QString {
 	QString buffer;
@@ -404,9 +394,6 @@ auto StatisticsBrowser::buildStatisticsHtml(Contest *curContest, const QList<Con
 		for (auto &j : contestantList) {
 			cnts[j->getTaskScore(i)]++;
 
-			// 被判定取消测试的选手（违规 / 命名不合规）实际上没有跑过这一题，
-			// 既不算「提交人数」也不算分母，也没有任何测试点数据，不能参与测试点统计，
-			// 否则会被当成“每个测试点都满分”混进正确率里。
 			if (j->isDisqualified())
 				continue;
 
@@ -488,7 +475,6 @@ void StatisticsBrowser::exportStatistics(QWidget *widget, Contest *curContest) {
 		return;
 	}
 
-	// 统计图固定导到当前比赛日的 dist/reports/ 目录（工作目录就是比赛日目录），不给改路径。
 	const QString reportsDir = QDir::current().absoluteFilePath(Settings::reportsPath());
 
 	if (! QDir().mkpath(reportsDir)) {
@@ -500,12 +486,10 @@ void StatisticsBrowser::exportStatistics(QWidget *widget, Contest *curContest) {
 		return;
 	}
 
-	// 总统计：全体选手。
 	if (! writeHtml(widget, reportsDir + QDir::separator() + QStringLiteral("statistics.html"),
 	                buildStatisticsHtml(curContest, contestantList)))
 		return;
 
-	// 启用赛区时，再为每个赛区单独导出一份：statistics-<赛区>.html
 	if (curContest->getRegionEnabled()) {
 		QMap<QString, QList<Contestant *>> byRegion;
 
@@ -524,7 +508,6 @@ void StatisticsBrowser::exportStatistics(QWidget *widget, Contest *curContest) {
 		}
 	}
 
-	// 全部写完后只提示这一次（命令行导出时 widget 为空，不弹窗）。
 	if (widget)
 		QMessageBox::information(widget, tr("LemonLime"), tr("Export is done"), QMessageBox::Ok);
 }

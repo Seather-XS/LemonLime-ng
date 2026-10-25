@@ -11,7 +11,6 @@ chcp 65001 >nul
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0package.ps1" %*
 set "code=%ERRORLEVEL%"
 
-rem Double-clicked from Explorer (no arguments): keep the window open.
 if "%~1"=="" pause
 
 exit /b %code%

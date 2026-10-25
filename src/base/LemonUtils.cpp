@@ -6,7 +6,6 @@
  */
 
 #include "LemonUtils.hpp"
-//
 
 namespace Lemon::common {
 
@@ -27,7 +26,6 @@ namespace Lemon::common {
 
 		result = result.trimmed();
 
-		// Windows 下文件名不能以点结尾
 		while (result.endsWith(QChar('.')))
 			result.chop(1);
 
@@ -42,8 +40,6 @@ namespace Lemon::common {
 		if (result.isEmpty())
 			return fallback;
 
-		// 先替最长的 `<title-day>`，再替 `<day>`，最后才是 `<title>`：
-		// 否则 `<title-day>` 会被 `<title>` 抢先吃掉一半。
 		const QString dayValue = dayName.trimmed().isEmpty() ? fallback : dayName.trimmed();
 		const QString titleDayValue = dayTitle.trimmed().isEmpty() ? dayValue : dayTitle.trimmed();
 		const QString titleValue = contestTitle.trimmed().isEmpty() ? titleDayValue : contestTitle.trimmed();
@@ -54,10 +50,9 @@ namespace Lemon::common {
 		result.replace(QStringLiteral("<day>"), dayValue, Qt::CaseInsensitive);
 		result.replace(QStringLiteral("<title>"), titleValue, Qt::CaseInsensitive);
 
-		// 名字里不能有路径分隔符，否则会把 PDF 写到 statement/ 外面去。
 		result.replace(QChar('/'), QChar('_'));
 		result.replace(QChar('\\'), QChar('_'));
 		return FileNameSafePart(result, fallback);
 	}
 
-} // namespace Lemon::common
+} 

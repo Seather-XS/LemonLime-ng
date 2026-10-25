@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 
 #include <QCompleter>
 #include <QDir>
@@ -21,7 +20,6 @@ class FileLineEdit : public QLineEdit {
 	explicit FileLineEdit(QWidget *parent = nullptr);
 	void setFilters(QDir::Filters);
 	void setFileExtensions(const QStringList &);
-	/// 把候选文件限制在 dataPath() 下的某个子目录里（传空表示不限制）。
 	void setRootDirectory(const QString &relativeDir);
 	void getFiles(const QString &, const QString &, QStringList &);
 
@@ -29,7 +27,7 @@ class FileLineEdit : public QLineEdit {
 	QCompleter *completer;
 	QStringList nameFilters;
 	QDir::Filters filters;
-	QString rootDirectory; ///< 相对 dataPath()，带结尾分隔符
+	QString rootDirectory; 
 
   public slots:
 	void refreshFileList();

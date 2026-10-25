@@ -6,15 +6,12 @@
  */
 
 #include "LemonBaseApplication.hpp"
-//
 #include "base/LemonLog.hpp"
 #include "base/LemonTranslator.hpp"
-#include "base/settings.h" // TODO: Config Refactor
-//
+#include "base/settings.h" 
 #include <QCommandLineParser>
 #include <QLocale>
 
-//
 #define LEMON_MODULE_NAME "LemonBaseApplication"
 
 using namespace Lemon;
@@ -33,14 +30,12 @@ auto LemonBaseApplication::Initialize() -> bool {
 		}
 	}
 
-	// Load Translations
 	Settings *settings = new Settings;
 	settings->loadSettings();
 	LemonLimeTranslator = std::make_unique<LemonTranslator>();
 	const auto allTranslations = LemonLimeTranslator->GetAvailableLanguages();
 	const auto osLanguage = QLocale::system().name();
 	if (! allTranslations.contains(settings->getUiLanguage())) {
-		// If we need to reset the language.
 		if (allTranslations.contains(osLanguage)) {
 			settings->setUiLanguage(osLanguage);
 		} else if (! allTranslations.isEmpty()) {
@@ -63,14 +58,10 @@ auto LemonBaseApplication::parseCommandLine(bool *canContinue, QString *errorMes
 		filteredArgs << arg;
 	}
 	QCommandLineParser parser;
-	//
 	QCommandLineOption debugLogOption("debug", QObject::tr("Enable debug output"));
-	//
 	parser.setApplicationDescription(QObject::tr("LemonLime - A tiny judging environment for OI contest."));
 	parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
-	//
 	parser.addOption(debugLogOption);
-	//
 	const auto helpOption = parser.addHelpOption();
 	const auto versionOption = parser.addVersionOption();
 

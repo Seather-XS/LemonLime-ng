@@ -5,7 +5,6 @@
  */
 
 #include "statementeditwidget.h"
-//
 #include "base/LemonUtils.hpp"
 #include "base/settings.h"
 #include "core/contest.h"
@@ -13,7 +12,6 @@
 #include "findreplacebar.h"
 #include "markdownhighlighter.h"
 #include "pdfpreview.h"
-//
 #include <QApplication>
 #include <QComboBox>
 #include <QDesktopServices>
@@ -22,6 +20,7 @@
 #include <QFileInfo>
 #include <QFontDatabase>
 #include <QFormLayout>
+#include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -44,7 +43,6 @@
 #define LEMON_MODULE_NAME "StatementEdit"
 
 namespace {
-	/// 与 statement-editor 相同的默认题面模板。
 	const char *defaultStatementMarkdown() {
 		return R"MD(---
 title: "题面标题"
@@ -67,6 +65,8 @@ date: ""
 
 # 题目（problem）
 
+<!-- PROINFO: Standard Input | Standard Output | 1000 ms | 512 MiB -->
+
 ## 题目描述
 
 ## 输入格式
@@ -87,7 +87,12 @@ date: ""
 )MD";
 	}
 
-	/// noi / noi new 模板下四个区段的默认内容（区段全空时自动填入）。
+	const QStringList &defaultProinfoValues() {
+		static const QStringList values = {QStringLiteral("Standard Input"), QStringLiteral("Standard Output"),
+		                                   QStringLiteral("1000 ms"), QStringLiteral("512 MiB")};
+		return values;
+	}
+
 	const QMap<QString, QString> &sectionDefaults() {
 		static const QMap<QString, QString> defaults = {
 		    {QStringLiteral("overview_table"),
@@ -142,7 +147,6 @@ date: ""
 		return name == QStringLiteral("noi") || name == QStringLiteral("noi new");
 	}
 
-	/// 试题标题输入框里的文本：`中文名（英文名）`
 	QString problemTitleText(const StatementProblem &problem) {
 		const QString title = problem.title.trimmed();
 		const QString english = problem.english.trimmed();
@@ -152,13 +156,12 @@ date: ""
 
 		return QStringLiteral("%1（%2）").arg(title, english);
 	}
-} // namespace
+} 
 
 QString StatementEditWidget::markdownPath() {
 	return Settings::statementPath() + QStringLiteral("statement.md");
 }
 
-// 当前要导出的 PDF 名字：模板存在比赛日里，占位符用比赛日上下文替换。
 QString StatementEditWidget::pdfFileName() const {
 	return Lemon::common::ResolveStatementPdfName(
 	           curContest ? curContest->getStatementPdfName() : QString(), dayFileName, dayTitle,
@@ -176,7 +179,6 @@ void StatementEditWidget::setDayContext(Contest *contest, const QString &dayFile
 	this->contestTitle = contestTitle;
 
 	if (pdfNameEdit) {
-		// 刷新时不要把输入的模板改成替换后的名字：模板才存在比赛日里。
 		QSignalBlocker blocker(pdfNameEdit);
 		pdfNameEdit->setText(curContest ? curContest->getStatementPdfName() : QString());
 		pdfNameEdit->setPlaceholderText(QStringLiteral("statement"));
@@ -190,23 +192,18 @@ StatementEditWidget::StatementEditWidget(QWidget *parent) : QWidget(parent) {
 	builder = new StatementBuilder();
 	buildUi();
 
-	// 打字/粘贴时不必每一下都重解析整份文档，攒一下再写回。
 	storeTimer = new QTimer(this);
 	storeTimer->setSingleShot(true);
 	storeTimer->setInterval(400);
 	connect(storeTimer, &QTimer::timeout, this, [this] {
 		storeEditor();
 
-		// 自动保存（statement-editor 的“自动保存”默认开启）
 		if (dirty && saveToDisk())
 			setStatus(tr("Saved %1").arg(markdownPath()));
 	});
 
-	// 这里不能调用 loadDocument()：此时还没打开任何比赛日，markdownPath() 是相对路径，
-	// 会在程序的工作目录下凭空建出 statement/statement.md。题面在 loadDay() 里用 reload() 载入。
 }
 
-// 改 PDF 文件名时预览换文件的去抖（见 refreshPdfNamePreview()）。
 void StatementEditWidget::setupPdfPreviewTimer() {
 	pdfPreviewTimer = new QTimer(this);
 	pdfPreviewTimer->setSingleShot(true);
@@ -215,7 +212,6 @@ void StatementEditWidget::setupPdfPreviewTimer() {
 }
 
 StatementEditWidget::~StatementEditWidget() {
-	// 后台还在编译就等它跑完：别让线程继续访问即将析构的 builder 与成员。
 	if (buildThread) {
 		buildThread->wait();
 		delete buildThread;
@@ -235,7 +231,6 @@ void StatementEditWidget::changeEvent(QEvent *event) {
 void StatementEditWidget::buildUi() {
 	auto *layout = new QVBoxLayout(this);
 
-	// ---- 顶部工具条 ----
 	auto *toolBar = new QHBoxLayout();
 	toolBar->addWidget(new QLabel(tr("Template:"), this));
 	templateBox = new QComboBox(this);
@@ -246,7 +241,6 @@ void StatementEditWidget::buildUi() {
 	importButton = new QPushButton(tr("Import"), this);
 	importButton->setToolTip(tr("Load statement/statement.md into the editor."));
 	saveButton = new QPushButton(tr("Save"), this);
-	// 编译与打开合并成一个按钮：编译成功后直接用系统默认程序打开。
 	exportButton = new QPushButton(tr("Export and Open PDF"), this);
 	exportButton->setToolTip(tr("Compile the statement PDF with pandoc + xelatex, then open it."));
 	toolBar->addWidget(importButton);
@@ -254,7 +248,6 @@ void StatementEditWidget::buildUi() {
 	toolBar->addWidget(exportButton);
 	layout->addLayout(toolBar);
 
-	// ---- PDF 文件名 ----
 	auto *nameBar = new QHBoxLayout();
 	nameBar->addWidget(new QLabel(tr("PDF file name:"), this));
 	pdfNameEdit = new QLineEdit(this);
@@ -268,7 +261,6 @@ void StatementEditWidget::buildUi() {
 	nameBar->addWidget(pdfNamePreview, 1);
 	layout->addLayout(nameBar);
 
-	// ---- 左树 + 编辑区 ----
 	auto *splitter = new QSplitter(Qt::Horizontal, this);
 	tree = new QTreeWidget(splitter);
 	tree->setHeaderHidden(true);
@@ -277,7 +269,6 @@ void StatementEditWidget::buildUi() {
 	auto *right = new QWidget(splitter);
 	auto *rightLayout = new QVBoxLayout(right);
 	rightLayout->setContentsMargins(0, 0, 0, 0);
-	// 查找 / 替换栏（Ctrl+F / Ctrl+H 时才显示）
 	findBar = new FindReplaceBar(right);
 	rightLayout->addWidget(findBar);
 	stack = new QStackedWidget(right);
@@ -285,7 +276,6 @@ void StatementEditWidget::buildUi() {
 	editor->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 	editor->setTabChangesFocus(false);
 	editor->setLineWrapMode(QPlainTextEdit::NoWrap);
-	// 简易 Markdown 高亮（与 statement-editor 相同的规则）
 	highlighter = new MarkdownHighlighter(editor->document());
 
 	auto *metaPage = new QWidget(stack);
@@ -305,14 +295,12 @@ void StatementEditWidget::buildUi() {
 	stack->addWidget(metaPage);
 	stack->addWidget(editor);
 
-	// 试题标题：单独一行输入（与 statement-editor 相同：正文里不用写 # 标题）
 	problemTitleRow = new QWidget(right);
 	auto *titleRowLayout = new QHBoxLayout(problemTitleRow);
 	titleRowLayout->setContentsMargins(0, 0, 0, 0);
 	titleRowLayout->addWidget(new QLabel(tr("Problem Title"), problemTitleRow));
 	problemTitleEdit = new QLineEdit(problemTitleRow);
 	problemTitleEdit->setPlaceholderText(tr("Title only, no leading #"));
-	// 标题是一行短文本；限长可以避免把整份题面粘进来后解析爆炸
 	problemTitleEdit->setMaxLength(200);
 	titleRowLayout->addWidget(problemTitleEdit, 1);
 	auto *titleHint = new QLabel(tr("No leading \"#\" needed: it is added automatically."), problemTitleRow);
@@ -320,13 +308,32 @@ void StatementEditWidget::buildUi() {
 	titleRowLayout->addWidget(titleHint);
 	problemTitleRow->hide();
 
+	proinfoRow = new QWidget(right);
+	auto *proinfoLayout = new QGridLayout(proinfoRow);
+	proinfoLayout->setContentsMargins(0, 0, 0, 0);
+	const QStringList proinfoLabels = {tr("Input File"), tr("Output File"), tr("Time Limit"),
+	                                   tr("Memory Limit")};
+	const QStringList &proinfoHints = defaultProinfoValues();
+
+	for (int i = 0; i < proinfoLabels.size(); i++) {
+		auto *edit = new QLineEdit(proinfoRow);
+		edit->setPlaceholderText(proinfoHints.at(i));
+		edit->setMaxLength(120);
+		edit->setToolTip(tr("Filled into \\proinfo of the ccpc template; leave it empty to omit an entry."));
+		proinfoEdits.append(edit);
+		proinfoLayout->addWidget(new QLabel(proinfoLabels.at(i), proinfoRow), i / 2, (i % 2) * 2);
+		proinfoLayout->addWidget(edit, i / 2, (i % 2) * 2 + 1);
+	}
+
+	proinfoRow->hide();
+
 	rightLayout->addWidget(problemTitleRow);
+	rightLayout->addWidget(proinfoRow);
 	rightLayout->addWidget(stack);
 
 	splitter->addWidget(tree);
 	splitter->addWidget(right);
 
-	// 右侧：statement.pdf 分页预览（等价于 statement-editor 的右栏预览）
 	preview = new PdfPreviewWidget(splitter);
 	splitter->addWidget(preview);
 	splitter->setStretchFactor(0, 0);
@@ -334,7 +341,6 @@ void StatementEditWidget::buildUi() {
 	splitter->setStretchFactor(2, 1);
 	layout->addWidget(splitter, 1);
 
-	// ---- 试题操作 ----
 	auto *problemBar = new QHBoxLayout();
 	auto *addButton = new QToolButton(this);
 	addButton->setText(QStringLiteral("＋"));
@@ -355,7 +361,6 @@ void StatementEditWidget::buildUi() {
 	problemBar->addWidget(statusLabel);
 	layout->addLayout(problemBar);
 
-	// ---- 日志 ----
 	auto *logBox = new QGroupBox(tr("Build log"), this);
 	auto *logLayout = new QVBoxLayout(logBox);
 	logView = new QPlainTextEdit(logBox);
@@ -365,7 +370,6 @@ void StatementEditWidget::buildUi() {
 	logLayout->addWidget(logView);
 	layout->addWidget(logBox);
 
-	// ---- 连接 ----
 	connect(tree, &QTreeWidget::currentItemChanged, this, [this] { treeSelectionChanged(); });
 	connect(editor, &QPlainTextEdit::textChanged, this, &StatementEditWidget::editorTextChanged);
 	connect(problemTitleEdit, &QLineEdit::textEdited, this, &StatementEditWidget::problemTitleEdited);
@@ -374,6 +378,9 @@ void StatementEditWidget::buildUi() {
 
 	for (auto *edit : metaEdits)
 		connect(edit, &QLineEdit::textChanged, this, &StatementEditWidget::metaChanged);
+
+	for (auto *edit : proinfoEdits)
+		connect(edit, &QLineEdit::textChanged, this, &StatementEditWidget::proinfoChanged);
 
 	connect(templateBox, &QComboBox::currentTextChanged, this, [this] { templateChanged(); });
 	connect(importButton, &QPushButton::clicked, this, &StatementEditWidget::importClicked);
@@ -386,7 +393,6 @@ void StatementEditWidget::buildUi() {
 	connect(downButton, &QToolButton::clicked, this, &StatementEditWidget::moveProblemDown);
 	connect(builder, &StatementBuilder::logMessage, this, &StatementEditWidget::appendLog);
 
-	// 编辑器里的查找 / 替换（两行常显，与 statement-editor 一致）
 	findBar->setEditor(editor);
 	const auto findShortcut = new QShortcut(QKeySequence::Find, this);
 	connect(findShortcut, &QShortcut::activated, this, [this] { findBar->activate(false); });
@@ -397,7 +403,6 @@ void StatementEditWidget::buildUi() {
 	retranslate();
 }
 
-// 可以随界面语言变化的文字集中在这里，切语言时重设一遍。
 void StatementEditWidget::retranslate() {
 	if (! pdfNameEdit)
 		return;
@@ -414,7 +419,6 @@ void StatementEditWidget::loadDocument() {
 	const QString path = markdownPath();
 
 	if (! QFileInfo::exists(path)) {
-		// 首次打开比赛日时，用与 statement-editor 相同的默认题面初始化。
 		QDir().mkpath(QFileInfo(path).absolutePath());
 		QFile file(path);
 
@@ -432,20 +436,16 @@ void StatementEditWidget::loadDocument() {
 
 	loading = true;
 	document = StatementDocument::parse(text);
-	// 文档整个换掉了，编辑框里原来的内容不属于新文档的任何一格，
-	// 先标记成「不一致」，避免 refreshTree() 重选旧槽位时把旧内容写进新文档。
 	editorSlot.clear();
 
 	if (isNoiTemplateName(templateBox->currentText()))
 		applyNoiSectionDefaults();
 
-	// refreshTree() 里会建好树并同步区段显隐，因而不在这里调用 applyTemplateVisibility()
 	refreshTree();
 	selectSlot(QStringLiteral("meta"));
 	setDirty(false);
 	loading = false;
 
-	// 已有编译结果时直接给出预览（名字对不上就写清楚在等哪个文件）。
 	applyPdfNameToPreview();
 }
 
@@ -520,8 +520,8 @@ void StatementEditWidget::refreshEditor() {
 	const bool isMeta = currentSlot == QStringLiteral("meta");
 	const bool isProblem = currentSlot.startsWith(QStringLiteral("problem:"));
 	problemTitleRow->setVisible(isProblem);
+	applyProinfoVisibility();
 	stack->setCurrentIndex(isMeta ? 0 : 1);
-	// 下面把内容装进编辑框，装完这两者才算一致；槽位无效时会重新清掉。
 	editorSlot = currentSlot;
 
 	if (isMeta) {
@@ -538,13 +538,17 @@ void StatementEditWidget::refreshEditor() {
 		if (index >= 0 && index < problems.size()) {
 			const StatementProblem &problem = problems.at(index);
 			problemTitleEdit->setText(problemTitleText(problem));
+
+			for (int i = 0; i < proinfoEdits.size(); i++)
+				proinfoEdits[i]->setText(problem.proinfo.value(i));
+
 			editor->setPlainText(problem.body.join(QChar('\n')).trimmed());
 		} else {
-			// 选中的题目在文档里已经不存在了（比如它被清空后退化成空块而被丢弃，
-			// 或者左树没跟上文档的变化）。此时编辑框里是空的，绝不能当成
-			// 「用户把这些内容删了」写回去；顺便退回「基础信息」，别让用户
-			// 对着一页空白以为题面整篇丢了。
 			problemTitleEdit->clear();
+
+			for (auto *edit : proinfoEdits)
+				edit->clear();
+
 			editor->clear();
 			editorSlot.clear();
 			QTimer::singleShot(0, this, [this] {
@@ -565,12 +569,9 @@ void StatementEditWidget::scheduleStoreEditor() {
 }
 
 void StatementEditWidget::storeEditor() {
-	// 有挂起的写回就一起做掉（后面会重新开始计时）
 	if (storeTimer)
 		storeTimer->stop();
 
-	// 编辑框里的内容不一定属于 currentSlot：切槽位、重新载入文档、删题 / 移题之后都可能对不上。
-	// 对不上就不写回，免得把别的内容写进这一题，甚至把题目标题与正文清空。
 	if (currentSlot != editorSlot)
 		return;
 
@@ -613,11 +614,12 @@ void StatementEditWidget::storeEditor() {
 		}
 
 		problem.body = editor->toPlainText().split(QChar('\n'));
+		problem.proinfo = currentProinfo();
 	}
 
 	const StatementProblem &old = problems.at(index);
 
-	if (old.heading() == problem.heading() &&
+	if (old.heading() == problem.heading() && old.proinfo == problem.proinfo &&
 	    old.body.join(QChar('\n')).trimmed() == problem.body.join(QChar('\n')).trimmed())
 		return;
 
@@ -626,7 +628,6 @@ void StatementEditWidget::storeEditor() {
 	setDirty(true);
 }
 
-/// 编辑试题时同步更新左树上的题目名。
 void StatementEditWidget::refreshProblemLabel() {
 	if (! currentSlot.startsWith(QStringLiteral("problem:")))
 		return;
@@ -644,11 +645,27 @@ QString StatementEditWidget::currentSectionName() const {
 	return currentSlot.mid(QStringLiteral("section:").length());
 }
 
+QStringList StatementEditWidget::currentProinfo() const {
+	QStringList values;
+
+	for (auto *edit : proinfoEdits)
+		values.append(edit->text());
+
+	return StatementProblem::normalizedProinfo(values);
+}
+
+void StatementEditWidget::applyProinfoVisibility() {
+	if (! proinfoRow)
+		return;
+
+	const bool ccpc = templateBox && templateBox->currentText() == QStringLiteral("ccpc");
+	proinfoRow->setVisible(ccpc && currentSlot.startsWith(QStringLiteral("problem:")));
+}
+
 void StatementEditWidget::editorTextChanged() {
 	if (loading)
 		return;
 
-	// 只更新左树标题（很便宜）；正文写回交给防抖计时器。
 	refreshProblemLabel();
 	scheduleStoreEditor();
 }
@@ -665,7 +682,6 @@ void StatementEditWidget::problemTitleEditFinished() {
 	if (loading)
 		return;
 
-	// 与 statement-editor 相同：标题框里不必写 #，写了也去掉
 	QString text = problemTitleEdit->text().trimmed();
 
 	while (text.startsWith(QChar('#')))
@@ -677,6 +693,13 @@ void StatementEditWidget::problemTitleEditFinished() {
 		problemTitleEdit->setText(text);
 
 	problemTitleEdited();
+}
+
+void StatementEditWidget::proinfoChanged() {
+	if (loading)
+		return;
+
+	storeEditor();
 }
 
 QString StatementEditWidget::problemLabel(int index, const QString &titleText) const {
@@ -701,7 +724,6 @@ void StatementEditWidget::metaChanged() {
 }
 
 void StatementEditWidget::applyTemplateVisibility() {
-	// setupUi 阶段（树还没建好）也会走到这里，必须判空。
 	if (! sectionGroup)
 		return;
 
@@ -709,6 +731,8 @@ void StatementEditWidget::applyTemplateVisibility() {
 
 	for (int i = 0; i < sectionGroup->childCount(); i++)
 		sectionGroup->child(i)->setHidden(ccpc);
+
+	applyProinfoVisibility();
 }
 
 void StatementEditWidget::applyNoiSectionDefaults() {
@@ -802,8 +826,6 @@ void StatementEditWidget::exportClicked() {
 	builder->setSourceFile(markdownPath());
 	builder->setOutputBase(QFileInfo(target).absolutePath() + QChar('/') + QFileInfo(target).completeBaseName());
 
-	// pandoc + 两遍 xelatex 要跑好几秒甚至更久。放在后台线程里跑，界面才不会在这期间卡死；
-	// builder 的 logMessage 是 AutoConnection，跨线程会自动排队回主线程，日志照样实时刷出来。
 	buildOk = false;
 	buildThread = QThread::create([this] { buildOk = builder->build(); });
 	connect(buildThread, &QThread::finished, this, &StatementEditWidget::statementBuildFinished);
@@ -834,7 +856,6 @@ void StatementEditWidget::statementBuildFinished() {
 	if (! logView->toPlainText().isEmpty())
 		appendLog(tr("Done."));
 
-	// 按钮只有这一个：编译完直接打开（系统默认的 PDF 阅读器）。
 	QDesktopServices::openUrl(QUrl::fromLocalFile(buildTarget));
 }
 
@@ -842,16 +863,11 @@ void StatementEditWidget::pdfNameChanged() {
 	if (loading || ! curContest)
 		return;
 
-	// 模板存在比赛日里，随自动保存（30s）与关闭比赛日一起落盘；
-	// 这里不算「题面被改过」，免得把没动过的 statement.md 重写一遍。
 	curContest->setStatementPdfName(pdfNameEdit->text());
 	refreshPdfNamePreview();
 	emit pdfFileNameChanged(pdfFileName());
 }
 
-// 输入框旁边显示「真正会写出的文件名」，省得用户对着占位符猜。
-// 预览换文件要读盘（甚至起 pdftocairo 渲染好几秒），敲字时每一下都换会卡，
-// 所以这里只立刻更新文字，预览本身攒 200ms 再换（结果还是「改完就能看到」）。
 void StatementEditWidget::refreshPdfNamePreview() {
 	if (! pdfNamePreview)
 		return;
@@ -873,8 +889,6 @@ void StatementEditWidget::applyPdfNameToPreview() {
 		return;
 	}
 
-	// 名字对应的 PDF 还没有：预览清空，但底下写清楚现在等的是哪个文件，
-	// 免得用户以为「改了名字预览没反应」。
 	preview->setMessage(tr("Compile the statement to see the preview here."));
 	preview->setInfoText(QDir::toNativeSeparators(path));
 }
@@ -885,12 +899,12 @@ void StatementEditWidget::addProblem() {
 	StatementProblem problem;
 	problem.title = tr("New Problem");
 	problem.english = QStringLiteral("problem");
+	problem.proinfo = defaultProinfoValues();
 	problem.body = problemSkeleton().split(QChar('\n')).mid(2);
 	problems.append(problem);
 	document.setProblems(problems);
 	setDirty(true);
 	const QString slot = QStringLiteral("problem:") + QString::number(problems.size() - 1);
-	// 文档变了，编辑框里的旧内容不再对应任何一格。
 	editorSlot.clear();
 	refreshTree();
 	selectSlot(slot);
@@ -929,7 +943,6 @@ void StatementEditWidget::moveProblemUp() {
 	problems.swapItemsAt(index, index - 1);
 	document.setProblems(problems);
 	setDirty(true);
-	// 换位后编辑框里的内容已经属于另一格了，先撇清关系再重建树。
 	editorSlot.clear();
 	refreshTree();
 	selectSlot(QStringLiteral("problem:") + QString::number(index - 1));

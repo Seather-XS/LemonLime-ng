@@ -179,7 +179,6 @@ auto Contestant::getTaskScore(int index) const -> int {
 	if (0 > index || index >= checkJudged.size())
 		return -1;
 
-	// 违规 / 命名不合规：整位选手每一道题都记 0 分（不编译不运行）。
 	if (isDisqualified())
 		return 0;
 
@@ -206,7 +205,6 @@ auto Contestant::getTaskScore(int index) const -> int {
 }
 
 auto Contestant::getTotalScore() const -> int {
-	// 违规 / 命名不合规都是全 0 分（依然参与排名），不按「没测过」处理。
 	if (isDisqualified())
 		return 0;
 
@@ -228,8 +226,6 @@ auto Contestant::getTotalScore() const -> int {
 }
 
 auto Contestant::getTotalUsedTime() const -> int {
-	// 被判定取消的选手一题都没编译运行过，用时算 0（依然参与排名），
-	// 不按「没测过」处理，否则表格里会显示成不可用。
 	if (isDisqualified())
 		return 0;
 
@@ -257,7 +253,6 @@ auto Contestant::getTotalUsedTime() const -> int {
 int Contestant::writeToJson(QJsonObject &out) {
 	WRITE_JSON(out, contestantName);
 	WRITE_JSON(out, region);
-	// 判定结果是上次测试的结论，必须存盘，否则重新打开会变回「未测试」。
 	int disqualifyStateValue = static_cast<int>(disqualifyState);
 	WRITE_JSON(out, disqualifyStateValue);
 	WRITE_JSON(out, disqualifyMessage);
@@ -284,8 +279,6 @@ int Contestant::writeToJson(QJsonObject &out) {
 int Contestant::readFromJson(const QJsonObject &in) {
 	READ_JSON(in, contestantName);
 	READ_JSON(in, region);
-	// 恢复上次测试给出的违规 / 命名判定；此处不重新扫描代码，所以未测试过的选手
-	// 仍然是 NotDisqualified（缺字段时默认为 0，兼容旧工程）。
 	int disqualifyStateValue = int(NotDisqualified);
 	READ_JSON(in, disqualifyStateValue);
 
@@ -331,7 +324,6 @@ void Contestant::readFromStream(QDataStream &in) {
 	in >> message;
 	in >> score;
 	in >> timeUsed;
-	// memoryUsed 之前存储为 int 三维数组，现在改为了 qint64，因此先读取旧结构，再逐层转换
 	QList<QList<QList<int>>> oldMemoryUsed;
 	in >> oldMemoryUsed;
 	for (const auto &l1 : oldMemoryUsed) {

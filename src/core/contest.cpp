@@ -55,12 +55,10 @@ namespace {
 		return Violation::normalizeRules(rules);
 	}
 
-	/// 这位选手在某一题下的源文件（口径与引擎会编译的尽量一致）。
 	QStringList sourceFilesOf(Contestant *contestant, Task *task,
 	                          QHash<QString, QFileInfoList> &directoryEntries) {
 		QStringList result;
 
-		// 提交答案题不编译选手源程序，不参与违规检测。
 		if (task->getTaskType() == Task::AnswersOnly)
 			return result;
 
@@ -87,15 +85,13 @@ namespace {
 		return result;
 	}
 
-	// 题目的磁盘目录名是否可以直接拼进 problem/ 下用：空、带分隔符、`.` 与 `..` 都得挡掉，
-	// 否则 removeRecursively() 会把整个 problem/ 甚至更上层的东西删掉。
 	bool isSafeTaskDirectoryName(const QString &name) {
 		if (name.isEmpty() || name == QStringLiteral(".") || name == QStringLiteral(".."))
 			return false;
 
 		return ! name.contains(QLatin1Char('/')) && ! name.contains(QLatin1Char('\\'));
 	}
-} // namespace
+} 
 
 Contest::Contest(QObject *parent) : QObject(parent) {
 	legacyViolationRules = Violation::defaultRules();
@@ -115,7 +111,6 @@ auto Contest::getRegionEnabled() const -> bool { return regionEnabled; }
 auto Contest::getViolationCheck() const -> bool { return violationCheck; }
 
 auto Contest::isViolationCompilerSelected(const QString &compilerName) const -> bool {
-	// 老比赛日没有「按语言勾选」这一项，等价于所有语言都勾上。
 	if (! violationCompilersConfigured)
 		return true;
 
@@ -141,7 +136,6 @@ void Contest::setViolationCompilers(const QStringList &compilerNames) {
 		if (! name.isEmpty() && ! violationCompilers.contains(name))
 			violationCompilers.append(name);
 
-	// 一旦保存过勾选，就按语言分开检查，不再使用旧版的全局规则。
 	violationCompilersConfigured = true;
 	legacyViolationRules.clear();
 }
@@ -157,7 +151,6 @@ void Contest::setStatementPdfName(const QString &name) { statementPdfName = name
 void Contest::evaluateContestantRules() {
 	const bool namingActive = namingCheck && ! namingPattern.isEmpty();
 
-	// 按语言检查时的候选：比赛日勾选了、而且这个语言确实配了规则。
 	QList<Compiler *> enabledCompilers;
 
 	if (violationCheck && violationCompilersConfigured && settings) {
@@ -167,20 +160,16 @@ void Contest::evaluateContestantRules() {
 				enabledCompilers.append(compiler);
 	}
 
-	// 旧版比赛日只有一份全局规则：没有按语言勾选过时继续按老办法统一检查。
 	const bool legacyMode = violationCheck && ! violationCompilersConfigured;
 	const QVector<ViolationRule> legacyRules =
 	    legacyMode ? Violation::normalizeRules(legacyViolationRules) : QVector<ViolationRule>();
 
 	for (auto *contestant : contestantList) {
-		// 「忽略限制重测」得到的成绩不被翻旧账（gengen-tuack 的语义）：这位选手一直算正常，
-		// 直到他被普通重测（那时标记会被清掉，重新扫描代码）。
 		if (contestant->isIgnoreRulesJudged()) {
 			contestant->setDisqualifyState(Contestant::NotDisqualified, QString());
 			continue;
 		}
 
-		// 命名限制比违规检测更靠前：文件夹名都不合规就不必再查代码内容。
 		if (namingActive &&
 		    ! Naming::matches(contestant->getContestantName(), contestant->getRegion(), namingPattern)) {
 			contestant->setDisqualifyState(
@@ -214,8 +203,6 @@ void Contest::evaluateContestantRules() {
 				if (sources.isEmpty())
 					continue;
 
-				// 这份提交属于哪个语言：按编译器列表的顺序，第一个能接住源文件后缀的说了算
-				// （与 TaskJudger 挑源文件的顺序一致）。头文件之类也跟着所属语言一起检查。
 				Compiler *owner = nullptr;
 
 				for (auto *compiler : enabledCompilers) {
@@ -329,16 +316,12 @@ void Contest::addTask(Task *task) {
 
 void Contest::deleteTask(int index) {
 	if (0 <= index && index < taskList.size()) {
-		// 题目在磁盘上的目录跟着一起删：problem/<题>/ 下的测试数据、校验器、交互库、
-		// 数据生成器都只属于这一道题，留着只会变成垃圾。
 		const QString taskName = taskList[index]->getDirectoryName();
 
 		if (isSafeTaskDirectoryName(taskName)) {
 			QDir taskDir(Settings::dataPath() + taskName);
 
 			if (taskDir.exists()) {
-				// 删不掉就是有句柄占着（QFileSystemWatcher、还开着的子进程、
-				// 资源管理器里的预览等），记一条日志方便排查，别默默地失败。
 				if (! taskDir.removeRecursively())
 					WARN("Failed to remove the data folder of task", taskName);
 				else
@@ -357,8 +340,7 @@ void Contest::deleteTask(int index) {
 }
 
 void Contest::refreshContestantList() {
-	// 选手目录：未启用赛区时是 source/<选手>/，启用赛区时是 source/<赛区>/<选手>/。
-	QMap<QString, QString> nameList; // 选手名 → 赛区名（空表示未启用赛区）
+	QMap<QString, QString> nameList; 
 	QDir sourceDir(Settings::sourcePath());
 
 	if (regionEnabled) {
@@ -435,7 +417,6 @@ void Contest::clearPath(const QString &curDir) {
 void Contest::judge(const QVector<std::pair<Contestant *, int>> &judgingTasks, bool ignoreRules) {
 	LOG("Start Judging");
 
-	// 本轮涉及哪些选手：由它决定这些人这轮之后的"身份"。
 	QSet<Contestant *> involved;
 
 	for (auto [contestant, i] : judgingTasks)
@@ -443,12 +424,9 @@ void Contest::judge(const QVector<std::pair<Contestant *, int>> &judgingTasks, b
 
 	for (auto *contestant : involved) {
 		if (ignoreRules) {
-			// 忽略限制重测（gengen-tuack 语义）：本轮不跳过任何人，把他们标记成
-			// 「成绩来自忽略限制重测」，之后重算判定时不再翻这段代码的旧账。
 			contestant->setIgnoreRulesJudged(true);
 			contestant->setDisqualifyState(Contestant::NotDisqualified, QString());
 		} else {
-			// 普通重测会重新检查代码，所以先撤掉之前的豁免。
 			contestant->setIgnoreRulesJudged(false);
 		}
 	}
@@ -457,17 +435,11 @@ void Contest::judge(const QVector<std::pair<Contestant *, int>> &judgingTasks, b
 		emit dialogAlert(tr("Ignore the restrictions and rejudge: the code content will NOT be checked "
 		                    "this time"));
 
-	// 两种重测都要重算一遍判定：被忽略限制重测的选手靠上面的标记豁免，
-	// 其余选手（包括以前被忽略限制重测过的）都会按当前代码与设置重新检查。
 	evaluateContestantRules();
 
 	stopJudging = false;
 	controller = new JudgingController(settings);
 
-	// 被判定为违规 / 命名不合规的选手可以直接跳过：这里的信号让测试界面（日志）
-	// 能写出「测试被取消 (...）」并提供详情入口。
-	// 进度条的最大值是「本轮所有（选手，试题）的时限之和」，跳过的那些也要把这份工时
-	// 补给测试界面，否则进度条永远走不满。
 	QSet<QString> skipped;
 	QHash<QString, int> skippedProgress;
 
@@ -476,7 +448,6 @@ void Contest::judge(const QVector<std::pair<Contestant *, int>> &judgingTasks, b
 			skippedProgress[contestant->getContestantName()] += taskList[i]->getTotalTimeLimit();
 	}
 
-	// connect(controller, &JudgingController::judgeFinished, this, &Contest::judgeFinished);
 	for (auto [contestant, i] : judgingTasks) {
 		const QString contestantName = contestant->getContestantName();
 
@@ -495,7 +466,6 @@ void Contest::judge(const QVector<std::pair<Contestant *, int>> &judgingTasks, b
 		TaskJudger *taskJudger = new TaskJudger();
 		connect(taskJudger, &TaskJudger::singleCaseFinished, this, &Contest::singleCaseFinished);
 		connect(taskJudger, &TaskJudger::compileError, this, &Contest::compileError);
-		// 每道题真正开跑时，先宣告选手（日志里「开始测试选手」必须在「开始测试试题」前面）。
 		connect(taskJudger, &TaskJudger::judgingStarted, this,
 		        [this, contestantName](const QString &problemTitle) {
 			        emit contestantJudgingStart(contestantName);
@@ -507,12 +477,6 @@ void Contest::judge(const QVector<std::pair<Contestant *, int>> &judgingTasks, b
 		taskJudger->setSettings(settings);
 		taskJudger->setContestant(contestant);
 		controller->addTask(taskJudger);
-		/*
-		connect(thread, &AssignmentThread::dialogAlert, this, &Contest::dialogAlert);
-		connect(thread, &AssignmentThread::singleSubtaskDependenceFinished, this,
-		        &Contest::singleSubtaskDependenceFinished);
-		connect(this, &Contest::stopJudgingSignal, thread, &AssignmentThread::stopJudgingSlot);
-		*/
 		contestant->setJudgingTime(QDateTime::currentDateTime());
 	}
 
@@ -569,7 +533,6 @@ void Contest::writeToJson(QJsonObject &out) {
 	if (violationCompilersConfigured) {
 		WRITE_JSON(out, violationCompilers);
 	} else {
-		// 还没按语言勾选过：继续写旧版的全局规则，读回去保持老行为。
 		QJsonArray violationRulesJson;
 
 		for (const auto &rule : legacyViolationRules)
@@ -605,8 +568,6 @@ void Contest::writeToJson(QJsonObject &out) {
 int Contest::readFromJson(const QJsonObject &in) {
 	QString version;
 
-	// If there's no version number, consider as version 1.0
-
 	if (READ_JSON(in, version) != -1) {
 		if (version != "1.0")
 			return -1;
@@ -617,7 +578,6 @@ int Contest::readFromJson(const QJsonObject &in) {
 	READ_JSON(in, regionEnabled);
 	READ_JSON(in, violationCheck);
 
-	// 新格式按语言勾选；旧格式只有一份全局规则，保留下来按老办法统一检查。
 	if (in.contains(QStringLiteral("violationCompilers"))) {
 		violationCompilersConfigured = true;
 		violationCompilers.clear();
@@ -634,16 +594,11 @@ int Contest::readFromJson(const QJsonObject &in) {
 
 	READ_JSON(in, namingCheck);
 	READ_JSON(in, namingPattern);
-	// 老比赛文件里没有这一项：读不到就保持空，用默认的 statement。
 	READ_JSON(in, statementPdfName);
 
 	QJsonArray tasks;
 	READ_JSON(in, tasks);
 
-	// NOTE: taskList and contestantList are empty here because readFromJson is
-	// only ever called once on a freshly constructed Contest (immediately after
-	// construction, before any tasks or contestants are added). If this invariant
-	// ever changes, qDeleteAll() must be called before clear() to avoid leaks.
 	taskList.clear();
 	for (const auto &task : tasks) {
 		Task *newTask = new Task();
@@ -655,7 +610,6 @@ int Contest::readFromJson(const QJsonObject &in) {
 	QJsonArray contestants;
 	READ_JSON(in, contestants);
 
-	// See note above: contestantList is also empty at this point.
 	contestantList.clear();
 	for (const auto &contestant : contestants) {
 		auto *newContestant = new Contestant();

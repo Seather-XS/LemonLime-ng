@@ -57,7 +57,7 @@ void DayDialog::setContext(const QString &contestDir, const QList<DayEntry> &day
 	}
 
 	if (days.isEmpty()) {
-		ui->tabWidget->setCurrentIndex(1); // 没有比赛日时直接到「新建」
+		ui->tabWidget->setCurrentIndex(1); 
 	} else if (currentIndex >= 0 && currentIndex < days.size()) {
 		ui->dayTable->selectRow(currentIndex);
 	}

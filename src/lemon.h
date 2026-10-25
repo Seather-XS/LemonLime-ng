@@ -8,7 +8,6 @@
  */
 
 #pragma once
-//
 
 #include <QMainWindow>
 #include <QtCore>
@@ -40,14 +39,10 @@ class LemonLime : public QMainWindow {
 	Contest *curContest;
 	Settings *settings;
 	QFileSystemWatcher *dataDirWatcher;
-	/// 数据目录一动就炸出一堆信号（判题时文件一直在写），攒一下再重建监听。
 	QTimer *dataWatcherTimer{nullptr};
 	QString curFile;
-	// 三层结构：比赛(Contest) → 比赛日(Day) → 试题(Task)。
-	// projectFile 为工程根目录下 contest.conf 的绝对路径；以单个 .cdf 打开时为空。
 	DayProject curProject;
 	QString projectFile;
-	/// 工程文件是本次新建的（不是从磁盘打开的）：保存时不必再留 .bak —— 它里面只有我们自己刚写的内容。
 	bool projectFileNewlyCreated{false};
 	int curDayIndex{0};
 	QList<QAction *> dayActions;
@@ -58,7 +53,6 @@ class LemonLime : public QMainWindow {
 	void judgeExtButtonFlip(bool);
 	void loadUiLanguage();
 	void insertWatchPath(const QString &, QFileSystemWatcher *);
-	/// 真正重建数据目录监听（由 dataWatcherTimer 去抖后调用）。
 	void rebuildDataWatcher();
 	void newContest(const QString &, const QString &, const QString &);
 	void saveContest(const QString &);
@@ -88,7 +82,6 @@ class LemonLime : public QMainWindow {
 	void summarySelectionChanged();
 	void refreshSummary();
 	void resetDataWatcher();
-	/// 释放数据目录监听：删试题 / 删比赛日前必须调，否则目录被句柄占着删不掉。
 	void releaseDataWatcher();
 	void showOptionsDialog();
 	void showContestSettingsDialog();
@@ -108,7 +101,6 @@ class LemonLime : public QMainWindow {
 	void closeAction();
 	void loadAction();
 	void addTasksAction();
-	/// 扫描 problem/<题>/data/，把还没加入的试题和测试点自动配置好（不读 data/ 的子目录）。
 	void addProblemTasksAction();
 	void exportResult();
 	void exportStatistics();

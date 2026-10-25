@@ -5,7 +5,6 @@
  */
 
 #include "csveditordialog.h"
-//
 #include "admissionassign.h"
 #include "admissioncolumns.h"
 #include "admissionnaming.h"
@@ -14,7 +13,6 @@
 #include "idruledialog.h"
 #include "seatdialog.h"
 #include "venuedialog.h"
-//
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QFileDialog>
@@ -43,7 +41,6 @@
 namespace {
 	enum FillMode { FillFixed = 0, FillSequence, FillRowNumber, FillClear };
 
-	/// 「序列」的起点：纯数字列就从 1 开始，否则给个 A1、A2 那样的。
 	QString sequenceValue(const QString &seed, int index) {
 		const QString base = seed.trimmed().isEmpty() ? QStringLiteral("1") : seed.trimmed();
 		bool numeric = false;
@@ -55,13 +52,11 @@ namespace {
 		return base + QString::number(index + 1);
 	}
 
-	/// 单元格文字（没有 item 就是空的）。
 	QString cellTextOf(const QTableWidget *grid, int row, int column) {
 		const QTableWidgetItem *item = grid->item(row, column);
 		return item ? item->text().trimmed() : QString();
 	}
 
-	/// 照片路径：绝对路径直接用，否则先按赛区目录找，再按比赛日目录找。
 	QString resolvePhoto(const QString &region, const QString &value) {
 		const QString trimmed = value.trimmed();
 
@@ -79,7 +74,6 @@ namespace {
 		return QFileInfo::exists(trimmed) ? trimmed : QString();
 	}
 
-	/// 撤销栈里的一步：两个快照之间的跳（整表一步）。
 	class FunctionCommand : public QUndoCommand {
 	  public:
 		FunctionCommand(QString text, std::function<void()> undoFunction, std::function<void()> redoFunction)
@@ -93,7 +87,7 @@ namespace {
 		std::function<void()> undoFunction;
 		std::function<void()> redoFunction;
 	};
-} // namespace
+} 
 
 FillTable::FillTable(QWidget *parent) : QTableWidget(parent) { setMouseTracking(true); }
 
@@ -169,7 +163,6 @@ void FillTable::mouseMoveEvent(QMouseEvent *event) {
 
 	const QModelIndex index = indexAt(event->pos());
 
-	// 只支持往下 / 往右拖
 	if (index.isValid()) {
 		QRect wanted = source;
 
@@ -230,7 +223,6 @@ void CsvEditorDialog::buildUi() {
 	splitter->addWidget(grid);
 
 	if (project) {
-		// 下半部分：本赛区的注意事项（纯文本，只认 [文字](链接) 这种超链接）
 		auto *bottom = new QWidget(splitter);
 		auto *bottomLayout = new QVBoxLayout(bottom);
 		bottomLayout->setContentsMargins(6, 6, 6, 0);
@@ -251,7 +243,6 @@ void CsvEditorDialog::buildUi() {
 
 	undoStack = new QUndoStack(this);
 	undoStack->setUndoLimit(100);
-	// 撤销 / 重做只留快捷键（右键菜单里的那些操作都自带一步撤销）。
 	auto *undoAction = undoStack->createUndoAction(this, tr("Undo"));
 	undoAction->setShortcut(QKeySequence::Undo);
 	auto *redoAction = undoStack->createRedoAction(this, tr("Redo"));
@@ -287,7 +278,6 @@ void CsvEditorDialog::buildUi() {
 	connect(buttons, &QDialogButtonBox::accepted, this, &CsvEditorDialog::saveClicked);
 	connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
-// 双击最后一行的空行 = 在末尾再添一行（名单长了不用来回滚）
 	connect(grid, &QTableWidget::cellDoubleClicked, this, [this](int row, int) {
 		if (row != grid->rowCount() - 1 || grid->rowCount() == 0)
 			return;
@@ -322,7 +312,6 @@ void CsvEditorDialog::load() {
 			grid->setItem(row, column, new QTableWidgetItem(table.cell(row, column)));
 	}
 
-	// 照片列：行高放大一点，顺便把缩略图画出来
 	const int photo = photoColumn();
 
 	if (photo >= 0) {
@@ -410,7 +399,6 @@ auto CsvEditorDialog::serialize() const -> QString {
 
 void CsvEditorDialog::applyState(const QString &state) {
 	const QStringList lines = state.split(QChar('\n'));
-	// 这一段会整表重填，itemChanged 会被触发；期间绝不能记撤销。
 	const bool previous = applyingState;
 	applyingState = true;
 	table.header = lines.value(0).split(QChar('\t'));
@@ -430,7 +418,6 @@ void CsvEditorDialog::applyState(const QString &state) {
 }
 
 void CsvEditorDialog::pushState(const QString &text) {
-	// 撤销 / 重做正在把快照写回界面时不能再 push（后面还有 command_list.at() 要用，会把栈搞乱）。
 	if (applyingState || ! undoStack)
 		return;
 
@@ -452,7 +439,6 @@ void CsvEditorDialog::pushState(const QString &text) {
 }
 
 void CsvEditorDialog::gridEdited() {
-	// 程序自己刷界面（load / 应用快照）时不要记撤销。
 	if (muted)
 		return;
 
@@ -476,7 +462,6 @@ void CsvEditorDialog::fillRequested(const QRect &source, const QRect &target) {
 		block << cells;
 	}
 
-	// 单列（往下拖）/ 单行（往右拖）且都是数字时递增，其余按块循环复制。
 	const bool singleColumn = width == 1 && target.right() <= source.right();
 	const bool singleRow = height == 1 && target.bottom() <= source.bottom();
 	bool increment = singleColumn || singleRow;
@@ -593,7 +578,6 @@ void CsvEditorDialog::fillColumn(int column, int mode) {
 			return;
 	}
 
-	// 只填到最后一个有内容的行（后面本来就没数据的行不用管）
 	int last = grid->rowCount() - 1;
 
 	while (last >= 0) {
@@ -729,7 +713,6 @@ void CsvEditorDialog::removeColumns(const QList<int> &columns) {
 		return;
 	}
 
-	// 直接删表格里的列：不动 table 再 load()，否则列号会因为 normalize() 重排而错位。
 	std::sort(targets.begin(), targets.end(), std::greater<int>());
 	QStringList removed;
 	muted = true;
@@ -767,7 +750,6 @@ void CsvEditorDialog::removeSelectedRows() {
 	if (rows.isEmpty())
 		return;
 
-	// 直接删表格里的行：table.rows 会跳过空行，按下标去删会删错行。
 	std::sort(rows.begin(), rows.end(), std::greater<int>());
 	muted = true;
 
@@ -848,7 +830,6 @@ void CsvEditorDialog::choosePhotos() {
 	if (path.isEmpty())
 		return;
 
-	// 能放进赛区目录就用相对路径（整个 admission 目录拷走也不会失效）
 	const QString relative = QDir(AdmissionProject::regionFolder(region)).relativeFilePath(path);
 	const QString value = QDir::fromNativeSeparators(relative.startsWith(QStringLiteral("..")) ? path : relative);
 
@@ -988,7 +969,6 @@ void CsvEditorDialog::configureColumn(int column) {
 		return;
 	}
 
-	// 配好就立刻按新规则算一遍，让用户马上看到效果。
 	if (! AdmissionColumns::evaluate(rules, table, region, true, &error))
 		QMessageBox::warning(this, tr("Admission tickets"), error);
 
@@ -1045,7 +1025,6 @@ auto CsvEditorDialog::sampleContext() const -> AdmissionNamingContext {
 	if (grid->rowCount() == 0)
 		return context;
 
-	// 用第一行的真实值做预览，占位符替换出来什么一看就知道。
 	for (int column = 0; column < grid->columnCount(); ++column) {
 		const QString label = grid->horizontalHeaderItem(column)->text().trimmed();
 		const QString value = grid->item(0, column) ? grid->item(0, column)->text().trimmed() : QString();
@@ -1103,7 +1082,6 @@ void CsvEditorDialog::seatsClicked() {
 
 	SeatDialog dialog(table, item ? item->venues : QList<AdmissionVenue>(), options, this);
 
-	// 「编辑考点 / 考场…」：就地改方案（唯一根据），改完刷新预览
 	connect(&dialog, &SeatDialog::editVenuesRequested, this, [this, &dialog] {
 		venuesClicked();
 
@@ -1146,13 +1124,11 @@ void CsvEditorDialog::seatsClicked() {
 void CsvEditorDialog::idsClicked() {
 	store();
 
-	// 策略由用户在这里决定（模板 / 各组的取值来源 / 已有号码怎么办），选完存进 config.json。
 	AdmissionAssign::IdOptions options;
 	options.templateText = project ? project->idTemplate
 	                              : QStringLiteral("<section>-S<number><number><number><number><number>");
 	options.charSources = project ? project->idCharSources : QStringList();
 
-	// 「全场序号」要把前面赛区的人数接上（模板里有 <char> 且选了它才用得到）
 	if (project)
 		for (const AdmissionRegion &item : project->regions) {
 			if (item.name == region)
