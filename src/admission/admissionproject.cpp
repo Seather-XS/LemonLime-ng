@@ -140,7 +140,7 @@ namespace {
 
 		return true;
 	}
-} 
+}
 
 auto AdmissionProject::root() -> QString {
 	return admissionRootOverride.isEmpty() ? QStringLiteral("admission") + sep() : admissionRootOverride;

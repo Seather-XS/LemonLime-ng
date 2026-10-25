@@ -18,7 +18,7 @@ namespace AdmissionAssign {
 			int capacity{1};
 			int count{0};
 		};
-	} 
+	}
 
 	bool planSeats(const AdmissionTable &table, const QList<AdmissionVenue> &venues, const SeatOptions &options,
 	               QStringList &venueValues, QStringList &roomValues, QStringList &seatValues, QString *error) {
@@ -155,7 +155,7 @@ namespace AdmissionAssign {
 			AdmissionNamingContext context;
 			context.section = section;
 			context.row = row + 1;
-			context.regionSeq = row + 1; 
+			context.regionSeq = row + 1;
 			context.globalSeq = options.globalOffset + row + 1;
 			context.name = table.cell(row, nameColumn);
 			context.id = table.cell(row, idColumn);
@@ -200,4 +200,4 @@ namespace AdmissionAssign {
 			table.rows[row][index] = values.at(row);
 		}
 	}
-} 
+}

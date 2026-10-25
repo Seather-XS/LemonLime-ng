@@ -55,4 +55,4 @@ namespace Lemon::common {
 		return FileNameSafePart(result, fallback);
 	}
 
-} 
+}

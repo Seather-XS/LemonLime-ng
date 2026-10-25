@@ -67,7 +67,7 @@ namespace {
 
 		return fallback;
 	}
-} 
+}
 
 DataWidget::DataWidget(QWidget *parent) : QWidget(parent) {
 	generator = new DataGenerator(this);

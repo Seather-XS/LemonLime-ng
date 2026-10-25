@@ -191,7 +191,7 @@ void Compiler::write(QJsonObject &json) const {
 	WRITE_JSON(json, timeLimitRatio);
 	WRITE_JSON(json, memoryLimitRatio);
 	WRITE_JSON(json, disableMemoryLimitCheck);
-	WRITE_JSON(json, interpreterAsWatcher);    
+	WRITE_JSON(json, interpreterAsWatcher);
 
 	QJsonArray rules;
 

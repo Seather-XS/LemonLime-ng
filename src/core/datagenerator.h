@@ -39,7 +39,7 @@ class DataGenerator : public QObject {
 	};
 
 	struct Group {
-		QStringList inputs;  
+		QStringList inputs;
 		QStringList outputs;
 	};
 
@@ -48,7 +48,7 @@ class DataGenerator : public QObject {
 		int testId{0};
 		int groupIndex{-1};
 		bool sample{false};
-		QString fileName;   
+		QString fileName;
 	};
 
 	struct Result {
@@ -63,7 +63,6 @@ class DataGenerator : public QObject {
 	bool run(const Options &options, Result *result);
 
 	static QString generatorDirectory(const QString &taskDirectory);
-	static QString sandboxDirectory(const QString &taskDirectory);
 
 	static QString generatorTemplate();
 	static QString solutionTemplate();

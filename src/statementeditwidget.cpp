@@ -156,7 +156,7 @@ date: ""
 
 		return QStringLiteral("%1（%2）").arg(title, english);
 	}
-} 
+}
 
 QString StatementEditWidget::markdownPath() {
 	return Settings::statementPath() + QStringLiteral("statement.md");

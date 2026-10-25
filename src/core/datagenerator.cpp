@@ -19,6 +19,7 @@
 #include <QRegularExpression>
 #include <QSet>
 #include <QStringList>
+#include <QTemporaryDir>
 
 #include <utility>
 
@@ -102,7 +103,7 @@ namespace {
 		bool finished{false};
 		int exitCode{-1};
 		QByteArray output;
-		QByteArray errorOutput;  
+		QByteArray errorOutput;
 	};
 
 	ProcessOutcome runProcess(const QString &program, const QStringList &arguments,
@@ -158,14 +159,10 @@ namespace {
 		const QString trimmed = QString::fromLocal8Bit(text).trimmed();
 		return trimmed.length() <= maxLength ? trimmed : trimmed.left(maxLength) + QStringLiteral(" …");
 	}
-} 
+}
 
 QString DataGenerator::generatorDirectory(const QString &taskDirectory) {
 	return QDir::fromNativeSeparators(taskDirectory) + QStringLiteral("/generator");
-}
-
-QString DataGenerator::sandboxDirectory(const QString &taskDirectory) {
-	return QDir::fromNativeSeparators(taskDirectory) + QStringLiteral("/sandbox");
 }
 
 QString DataGenerator::generatorTemplate() {
@@ -554,21 +551,26 @@ bool DataGenerator::run(const Options &options, Result *result) {
 		return false;
 	}
 
-	const QString sandboxDir = sandboxDirectory(taskDir);
-
-	if (! QDir().mkpath(sandboxDir)) {
-		result->error = tr("Cannot create %1.").arg(QDir::toNativeSeparators(sandboxDir));
-		return false;
-	}
-
-	clearFiles(sandboxDir);
-
 	for (const QString &name : {QStringLiteral("gen"), QStringLiteral("sol")}) {
 		const QString stale = generatorDir + QChar('/') + name + executableSuffix();
 
 		if (QFileInfo::exists(stale))
 			QFile::remove(stale);
 	}
+
+	const QString legacySandbox = taskDir + QStringLiteral("/sandbox");
+
+	if (QDir(legacySandbox).exists())
+		QDir(legacySandbox).removeRecursively();
+
+	QTemporaryDir sandbox(QDir::tempPath() + QStringLiteral("/lemon-data-XXXXXX"));
+
+	if (! sandbox.isValid()) {
+		result->error = tr("Cannot create %1.").arg(QDir::toNativeSeparators(QDir::tempPath()));
+		return false;
+	}
+
+	const QString sandboxDir = sandbox.path();
 
 	if (! compile(options, genSource, QStringLiteral("gen"), QStringLiteral("sol"), sandboxDir, &result->error) ||
 	    ! compile(options, solSource, QStringLiteral("sol"), QStringLiteral("gen"), sandboxDir, &result->error))

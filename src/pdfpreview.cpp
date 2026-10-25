@@ -39,7 +39,7 @@ namespace {
 		const int number = base.mid(dash + 1).toInt(&ok);
 		return ok ? number : 0;
 	}
-} 
+}
 
 PdfPreviewWidget::PdfPreviewWidget(QWidget *parent) : QWidget(parent) {
 	auto *layout = new QVBoxLayout(this);
@@ -263,7 +263,7 @@ void PdfPreviewWidget::finishRender() {
 	renderProcess = nullptr;
 
 	if (! process)
-		return; 
+		return;
 
 	const bool ok = process->exitStatus() == QProcess::NormalExit && process->exitCode() == 0;
 	process->deleteLater();

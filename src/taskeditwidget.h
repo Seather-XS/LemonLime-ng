@@ -32,7 +32,7 @@ class TaskEditWidget : public QWidget {
 	Ui::TaskEditWidget *ui;
 	Settings *settings{};
 	Task *editTask;
-	bool loadingTask{false}; 
+	bool loadingTask{false};
 	void refreshWidgetState();
 	void addSourceFiles(const QString &, const QString &);
 	void addGraderFiles(const QString &, const QString &);

@@ -59,7 +59,7 @@ namespace {
 		const QImage rightImage = right.pixmap(32).toImage();
 		return ! leftImage.isNull() && leftImage == rightImage;
 	}
-} 
+}
 
 ExportWidget::ExportWidget(QWidget *parent) : QWidget(parent) {
 	builder = new PackageBuilder(this);

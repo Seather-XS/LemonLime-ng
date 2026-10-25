@@ -24,4 +24,4 @@ namespace Lemon {
 	  private:
 		bool parseCommandLine(bool *canContinue, QString *errorMessage);
 	};
-} 
+}

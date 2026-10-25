@@ -18,4 +18,4 @@ namespace Lemon::common {
 		Q_UNUSED(process);
 #endif
 	}
-} 
+}

@@ -32,7 +32,7 @@ namespace {
 
 		return name;
 	}
-} 
+}
 
 NewTaskDialog::NewTaskDialog(QWidget *parent) : QDialog(parent) {
 	setWindowTitle(tr("New Task"));

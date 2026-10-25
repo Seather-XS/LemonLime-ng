@@ -63,7 +63,7 @@ namespace {
 
 		return count;
 	}
-} 
+}
 
 AdmissionWidget::AdmissionWidget(QWidget *parent) : QWidget(parent) {
 	project = new AdmissionProject();

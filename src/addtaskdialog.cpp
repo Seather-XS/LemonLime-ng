@@ -54,7 +54,7 @@ namespace {
 		combo->setCurrentIndex(target);
 		stored = combo->itemData(target).toString();
 	}
-} 
+}
 
 AddTaskDialog::AddTaskDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AddTaskDialog) {
 	ui->setupUi(this);

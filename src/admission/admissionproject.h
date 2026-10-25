@@ -23,7 +23,7 @@ struct AdmissionVenue {
 struct AdmissionRegion {
 	QString name;
 	QString notes;
-	AdmissionTable table; 
+	AdmissionTable table;
 	QList<AdmissionVenue> venues;
 
 	int totalCapacity() const;
@@ -46,7 +46,7 @@ class AdmissionProject {
 
 	QString title;
 	QString examTime;
-	QString contestNotes;          
+	QString contestNotes;
 	QString idTemplate{QStringLiteral("<section>-S<number><number><number><number><number>")};
 	QStringList idCharSources;
 	bool namingEnabled{false};
@@ -55,9 +55,9 @@ class AdmissionProject {
 	QStringList namingCharSources;
 	QString namingReplacement{QStringLiteral("_")};
 	int namingMaxLength{64};
-	QString dirLayout{"byRegion"}; 
+	QString dirLayout{"byRegion"};
 	int seatLayout{0};
-	QString seatOrder{"row"}; 
+	QString seatOrder{"row"};
 	bool packageByRegion{true};
 	QString packageName{"admission-{region}"};
 	bool overwrite{true};

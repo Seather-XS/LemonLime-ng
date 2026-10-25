@@ -18,4 +18,4 @@ namespace AdmissionTemplate {
 	QStringList lockedRowLabels();
 	bool validate(const QString &text, QString *error);
 	QString render(const QString &text, const QMap<QString, QString> &values, QStringList *unresolved);
-} 
+}

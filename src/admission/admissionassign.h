@@ -15,12 +15,12 @@
 namespace AdmissionAssign {
 	enum SeatLayout {
 		FillFirst = 0,
-		Balanced = 1,  
+		Balanced = 1,
 	};
 
 	struct SeatOptions {
 		QString order{QStringLiteral("row")};
-		int layout{FillFirst};                
+		int layout{FillFirst};
 	};
 
 	struct IdOptions {
@@ -34,4 +34,4 @@ namespace AdmissionAssign {
 	bool planIds(const AdmissionTable &table, const QString &section, const IdOptions &options,
 	             QStringList &ids, QString *error);
 	void applyColumn(AdmissionTable &table, const QString &column, const QStringList &values);
-} 
+}

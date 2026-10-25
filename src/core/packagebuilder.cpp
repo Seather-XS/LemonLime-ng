@@ -413,7 +413,7 @@ namespace {
 				        QByteArray(1, char(0x03)) + littleEndian16(method);
 				storedCrc = 0;
 				version = 51;
-				method = 99; 
+				method = 99;
 			} else {
 				QByteArray header(12, '\0');
 
@@ -459,7 +459,7 @@ namespace {
 			for (const Entry &entry : entries) {
 				writeU32(0x02014b50);
 				writeU16(entry.versionNeeded);
-				writeU16(entry.versionNeeded); 
+				writeU16(entry.versionNeeded);
 				writeU16(entry.flags);
 				writeU16(entry.method);
 				writeU16(dosTime);
@@ -471,7 +471,7 @@ namespace {
 				writeU16(quint16(entry.extra.size()));
 				writeU16(0);
 				writeU16(0);
-				writeU16(0); 
+				writeU16(0);
 				writeU32(entry.isDirectory ? 0x10u : 0x0u);
 				writeU32(entry.offset);
 				out->write(entry.name);
@@ -486,7 +486,7 @@ namespace {
 			writeU16(quint16(entries.size()));
 			writeU32(centralSize);
 			writeU32(centralStart);
-			writeU16(0); 
+			writeU16(0);
 
 			if (auto *file = qobject_cast<QFileDevice *>(out)) {
 				if (file->error() != QFileDevice::NoError) {
@@ -527,7 +527,7 @@ namespace {
 		                      quint16 flags, const QByteArray &extra, quint16 version) {
 			lastOffset = quint32(out->pos());
 			writeU32(0x04034b50);
-			writeU16(version); 
+			writeU16(version);
 			writeU16(flags);
 			writeU16(method);
 			writeU16(dosTime);
@@ -635,7 +635,7 @@ namespace {
 
 		return true;
 	}
-} 
+}
 
 PackageBuilder::PackageBuilder(QObject *parent) : QObject(parent) {}
 
@@ -982,7 +982,7 @@ namespace {
 		std::sort(result.begin(), result.end());
 		return result;
 	}
-} 
+}
 
 auto PackageBuilder::collectTestDataFiles(const Task *task, bool quiet) -> QList<QPair<QString, QString>> {
 	QList<QPair<QString, QString>> files;

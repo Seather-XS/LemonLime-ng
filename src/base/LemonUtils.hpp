@@ -138,7 +138,7 @@ namespace Lemon::detail {
 		jsonWriteHelper(val, jval);
 		json[name] = jval;
 	}
-} 
+}
 
 namespace Lemon {
 	template <typename T> int readJson(T &x, const QString &name, const QJsonObject &json) {
@@ -147,7 +147,7 @@ namespace Lemon {
 	template <typename T> void writeJson(const T &x, const QString &name, QJsonObject &json) {
 		detail::jsonWriteHelper(x, name, json);
 	}
-} 
+}
 #define READ_JSON(json, x) Lemon::readJson(x, #x, json)
 #define WRITE_JSON(json, x) Lemon::writeJson(x, #x, json)
 namespace Lemon::common {
@@ -162,4 +162,4 @@ namespace Lemon::common {
 	                                const QString &dayTitle, const QString &contestTitle,
 	                                const QString &fallback = QStringLiteral("statement"));
 
-} 
+}

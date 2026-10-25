@@ -59,4 +59,4 @@ namespace Lemon::base::config {
 		bool saveConfig(SaveFormat saveFormat) const;
 	};
 
-} 
+}

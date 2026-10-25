@@ -174,7 +174,7 @@ namespace {
 		    {KIND_STRING, QStringLiteral("cffi")},
 		};
 	}
-} 
+}
 
 auto Violation::defaultRules() -> QVector<ViolationRule> { return cppCommands(); }
 
@@ -276,7 +276,7 @@ auto Violation::maskCode(const QString &text) -> QString {
 		const QChar ch = text.at(index);
 		const QChar nxt = index + 1 < size ? text.at(index + 1) : QChar();
 
-		if (ch == QLatin1Char('/') && nxt == QLatin1Char('/')) { 
+		if (ch == QLatin1Char('/') && nxt == QLatin1Char('/')) {
 			while (index < size && text.at(index) != QLatin1Char('\n')) {
 				out.append(QLatin1Char(' '));
 				index += 1;
@@ -285,7 +285,7 @@ auto Violation::maskCode(const QString &text) -> QString {
 			continue;
 		}
 
-		if (ch == QLatin1Char('/') && nxt == QLatin1Char('*')) { 
+		if (ch == QLatin1Char('/') && nxt == QLatin1Char('*')) {
 			out.append(QStringLiteral("  "));
 			index += 2;
 
@@ -296,7 +296,7 @@ auto Violation::maskCode(const QString &text) -> QString {
 				index += 1;
 			}
 
-			if (index < size) { 
+			if (index < size) {
 				out.append(QStringLiteral("  "));
 				index += 2;
 			}
@@ -304,7 +304,7 @@ auto Violation::maskCode(const QString &text) -> QString {
 			continue;
 		}
 
-		if (ch == QLatin1Char('"') || ch == QLatin1Char('\'')) { 
+		if (ch == QLatin1Char('"') || ch == QLatin1Char('\'')) {
 			const QChar quote = ch;
 			out.append(QLatin1Char(' '));
 			index += 1;
@@ -312,7 +312,7 @@ auto Violation::maskCode(const QString &text) -> QString {
 			while (index < size) {
 				const QChar current = text.at(index);
 
-				if (current == QLatin1Char('\\') && index + 1 < size) { 
+				if (current == QLatin1Char('\\') && index + 1 < size) {
 					out.append(QStringLiteral("  "));
 					index += 2;
 					continue;

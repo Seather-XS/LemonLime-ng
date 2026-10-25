@@ -12,7 +12,7 @@
 #include <QVector>
 
 struct ViolationRule {
-	QString kind; 
+	QString kind;
 	QString text;
 
 	bool isCommand() const { return kind == QStringLiteral("command"); }
@@ -21,7 +21,7 @@ struct ViolationRule {
 struct ViolationLanguage {
 	QString name;
 	QStringList compilers;
-	QStringList extensions; 
+	QStringList extensions;
 	QVector<ViolationRule> rules;
 };
 

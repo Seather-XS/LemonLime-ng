@@ -54,4 +54,4 @@ namespace Lemon {
 #undef makeAbs
 	}
 
-} 
+}

@@ -23,18 +23,18 @@ class PackageBuilder : public QObject {
 
 	struct Item {
 		QString archivePath;
-		QString sourcePath;  
+		QString sourcePath;
 		bool isDirectory{false};
 	};
 
 	struct NestedArchive {
 		QString name;
-		QList<Item> items;  
+		QList<Item> items;
 	};
 
 	struct Plan {
 		QList<Item> items;
-		QList<NestedArchive> archives;  
+		QList<NestedArchive> archives;
 	};
 
 	explicit PackageBuilder(QObject *parent = nullptr);
@@ -65,7 +65,7 @@ class PackageBuilder : public QObject {
 
 	enum EncryptionMethod {
 		Aes256Encryption,
-		ZipCryptoEncryption, 
+		ZipCryptoEncryption,
 	};
 	void setEncryptionMethod(EncryptionMethod);
 	EncryptionMethod encryptionMethod() const { return encryption; }

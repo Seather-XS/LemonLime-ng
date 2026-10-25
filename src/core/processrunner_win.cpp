@@ -37,7 +37,7 @@ namespace {
 		    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
 		std::mt19937 gen(std::random_device{}());
 
-		std::uniform_int_distribution<int> rand(0, 
+		std::uniform_int_distribution<int> rand(0,
 		                                        possibleCharacters.length() - 1);
 		QString randomString;
 		for (int i = 0; i < length; ++i) {
@@ -86,7 +86,7 @@ namespace {
 		WaitForSingleObject(process, timeoutMs);
 	}
 
-} 
+}
 
 ProcessRunnerResult WinProcessRunner::run() {
 	ProcessRunnerResult res;
@@ -112,7 +112,7 @@ ProcessRunnerResult WinProcessRunner::run() {
 	auto hResult = CreateAppContainerProfile((const WCHAR *)(appContainerName.utf16()),
 	                                         (const WCHAR *)(appContainerName.utf16()),
 	                                         (const WCHAR *)(appContainerName.utf16()), nullptr, 0,
-	                                         &appContainerSID); 
+	                                         &appContainerSID);
 
 	if (hResult != S_OK) {
 		res.score = 0;

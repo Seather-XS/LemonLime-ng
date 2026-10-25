@@ -74,7 +74,7 @@ namespace AdmissionNotes {
 			out += escape(line.mid(last));
 			return out.trimmed();
 		}
-	} 
+	}
 
 	QString toLatex(const QString &text) {
 		QString normalized = text;
@@ -104,4 +104,4 @@ namespace AdmissionNotes {
 
 		return paragraphs.join(QStringLiteral("\\par\n"));
 	}
-} 
+}

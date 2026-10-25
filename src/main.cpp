@@ -100,7 +100,7 @@ namespace {
 		                                              contestTitle) +
 		       QStringLiteral(".pdf");
 	}
-} 
+}
 
 void initLogger() {
 	auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -1005,7 +1005,7 @@ int main(int argc, char *argv[]) {
 				if (px <= css || px < 640)
 					problems++;
 
-				QPixmap page(1500, 2121); 
+				QPixmap page(1500, 2121);
 				PdfPreviewWidget::fitPagePixmap(page, 600);
 				const double dpr = page.devicePixelRatio();
 				report << QStringLiteral("page pixmap: dpr=%1 css=%2")

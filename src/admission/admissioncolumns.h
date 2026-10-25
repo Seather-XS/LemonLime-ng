@@ -16,16 +16,16 @@ struct AdmissionColumnRule {
 	QString name;
 	QString type{QStringLiteral("template")};
 	QString templateText;
-	QStringList numberSources;                
+	QStringList numberSources;
 	QStringList charSources;
-	int length{8};                            
+	int length{8};
 	bool upper{true};
 	bool lower{true};
 	bool digit{true};
 	bool symbol{false};
 	bool excludeAmbiguous{true};
 	bool recalculable{false};
-	QString seedSource{QStringLiteral("row")}; 
+	QString seedSource{QStringLiteral("row")};
 };
 
 namespace AdmissionColumns {
@@ -36,4 +36,4 @@ namespace AdmissionColumns {
 	              bool onlyEmpty, QString *error);
 
 	QString preview(const AdmissionColumnRule &rule, const AdmissionNamingContext &context, QString *error);
-} 
+}

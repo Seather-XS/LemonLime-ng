@@ -31,7 +31,7 @@ namespace AdmissionTemplate {
 
 			return text;
 		}
-	} 
+	}
 
 	QString root() {
 		static const QString cached = [] {
@@ -180,4 +180,4 @@ namespace AdmissionTemplate {
 
 		return out;
 	}
-} 
+}

@@ -22,7 +22,7 @@ namespace {
 
 		return values;
 	}
-} 
+}
 
 IdRuleDialog::IdRuleDialog(const AdmissionTable &table, const QString &section,
                            const AdmissionAssign::IdOptions &current, QWidget *parent)

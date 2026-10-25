@@ -41,7 +41,7 @@ namespace {
 		return contestant->getDisqualifyState() == Contestant::ViolationDisqualified ? QStringLiteral("#c83c3c")
 		                                                                            : QStringLiteral("#a05ac8");
 	}
-} 
+}
 
 auto ExportUtil::getContestantHtmlCode(Contest *contest, Contestant *contestant, int num) -> QString {
 	QString htmlCode;

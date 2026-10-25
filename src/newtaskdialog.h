@@ -36,5 +36,5 @@ class NewTaskDialog : public QDialog {
 	QSpinBox *timeLimitEdit{};
 	QSpinBox *memoryLimitEdit{};
 	QPushButton *okButton{};
-	bool fileEdited{false}; 
+	bool fileEdited{false};
 };

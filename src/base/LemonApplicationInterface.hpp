@@ -15,7 +15,7 @@ namespace Lemon {
 		enum Argument {
 			NORMAL = 0,
 			EXIT = 1,
-			LEMON_LINK = 2 
+			LEMON_LINK = 2
 		};
 		QList<Argument> arguments;
 		QString version;
@@ -37,4 +37,4 @@ namespace Lemon {
 	};
 
 	inline LemonApplicationInterface *LemonCoreApplication = nullptr;
-} 
+}

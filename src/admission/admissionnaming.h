@@ -20,7 +20,7 @@ struct AdmissionNamingContext {
 	int col{0};
 	int regionSeq{0};
 	int globalSeq{0};
-	QMap<QString, QString> columns; 
+	QMap<QString, QString> columns;
 };
 
 namespace AdmissionNaming {
@@ -32,4 +32,4 @@ namespace AdmissionNaming {
 	QString describe(const QString &pattern);
 	QString sanitize(const QString &name, const QString &replacement, int maxLength);
 	QString excelLetters(int value);
-} 
+}

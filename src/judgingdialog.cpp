@@ -28,7 +28,7 @@ namespace {
 		format.setForeground(QBrush(viewer->palette().color(QPalette::Text)));
 		return format;
 	}
-} 
+}
 
 JudgingDialog::JudgingDialog(QWidget *parent) : QDialog(parent), ui(new Ui::JudgingDialog) {
 	ui->setupUi(this);

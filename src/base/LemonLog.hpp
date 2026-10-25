@@ -60,7 +60,7 @@ namespace Lemon::base {
 			logger->warn(logString);
 		}
 	}
-} 
+}
 
 template <typename TKey, typename TVal>
 QTextStream &operator<<(QTextStream &stream, const QPair<TKey, TVal> &pair) {

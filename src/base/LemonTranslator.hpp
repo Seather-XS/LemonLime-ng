@@ -28,6 +28,6 @@ namespace Lemon::common {
 		void refreshTranslations();
 	};
 	inline std::unique_ptr<common::LemonTranslator> LemonLimeTranslator;
-} 
+}
 
 using namespace Lemon::common;

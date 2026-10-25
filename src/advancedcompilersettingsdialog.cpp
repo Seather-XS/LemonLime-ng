@@ -51,7 +51,7 @@ namespace {
 
 		return Violation::normalizeRules(rules);
 	}
-} 
+}
 
 AdvancedCompilerSettingsDialog::AdvancedCompilerSettingsDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::AdvancedCompilerSettingsDialog) {

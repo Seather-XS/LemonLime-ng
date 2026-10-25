@@ -55,7 +55,7 @@ namespace {
 		return ! decoder.hasError();
 #endif
 	}
-} 
+}
 
 auto AdmissionTable::builtinColumns() -> QStringList {
 	return {QStringLiteral("姓名"),   QStringLiteral("准考证号"), QStringLiteral("考点"),
@@ -280,4 +280,4 @@ namespace AdmissionCsv {
 		table.header = header.isEmpty() ? AdmissionTable::builtinColumns() : header;
 		return writeFile(path, table, error);
 	}
-} 
+}

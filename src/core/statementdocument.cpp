@@ -217,7 +217,7 @@ namespace {
 
 		return kept.join(QChar('\n'));
 	}
-} 
+}
 
 const QStringList &StatementDocument::knownSections() { return knownSectionsList(); }
 

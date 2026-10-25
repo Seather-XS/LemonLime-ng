@@ -392,7 +392,7 @@ void Settings::copyFrom(Settings *other) {
 	setInputFileExtensions(other->getInputFileExtensions().join(";"));
 	setOutputFileExtensions(other->getOutputFileExtensions().join(";"));
 	setSplashTime(other->getSplashTime());
-	setUiLanguage(other->getUiLanguage()); 
+	setUiLanguage(other->getUiLanguage());
 
 	for (auto &i : compilerList) {
 		delete i;
@@ -779,7 +779,7 @@ void Settings::ensureDayFolderOrdering(const QString &dayRoot) {
 	}
 
 	if (QFile file(iniPath); file.open(QIODevice::ReadOnly) && file.readAll() == data)
-		return; 
+		return;
 
 	{
 		QFile file(iniPath);

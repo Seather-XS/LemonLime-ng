@@ -33,7 +33,7 @@ namespace {
 		static const QRegularExpression re(QStringLiteral(R"(^\s{0,3}#{1,6}\s)"));
 		return re;
 	}
-} 
+}
 
 MarkdownHighlighter::MarkdownHighlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
 	headingFormat.setFontWeight(QFont::Bold);

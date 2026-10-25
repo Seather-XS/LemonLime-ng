@@ -20,7 +20,7 @@ class Contestant : public QObject {
 	enum DisqualifyState {
 		NotDisqualified,
 		ViolationDisqualified,
-		NamingDisqualified     
+		NamingDisqualified
 	};
 
 	explicit Contestant(QObject *parent = nullptr);

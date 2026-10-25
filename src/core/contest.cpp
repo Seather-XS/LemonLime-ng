@@ -91,7 +91,7 @@ namespace {
 
 		return ! name.contains(QLatin1Char('/')) && ! name.contains(QLatin1Char('\\'));
 	}
-} 
+}
 
 Contest::Contest(QObject *parent) : QObject(parent) {
 	legacyViolationRules = Violation::defaultRules();
@@ -340,7 +340,7 @@ void Contest::deleteTask(int index) {
 }
 
 void Contest::refreshContestantList() {
-	QMap<QString, QString> nameList; 
+	QMap<QString, QString> nameList;
 	QDir sourceDir(Settings::sourcePath());
 
 	if (regionEnabled) {

@@ -87,7 +87,7 @@ namespace {
 		std::function<void()> undoFunction;
 		std::function<void()> redoFunction;
 	};
-} 
+}
 
 FillTable::FillTable(QWidget *parent) : QTableWidget(parent) { setMouseTracking(true); }
 

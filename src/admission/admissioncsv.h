@@ -31,4 +31,4 @@ namespace AdmissionCsv {
 	bool writeTemplate(const QString &path, const QStringList &header, QString *error);
 	QString escape(const QString &value);
 	bool looksLikeGbk(const QByteArray &raw);
-} 
+}

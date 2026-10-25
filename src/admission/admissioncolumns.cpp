@@ -94,7 +94,7 @@ namespace AdmissionColumns {
 
 			return out;
 		}
-	} 
+	}
 
 	bool load(const QString &region, QList<AdmissionColumnRule> &rules, QString *error) {
 		rules.clear();
@@ -288,4 +288,4 @@ namespace AdmissionColumns {
 
 		return true;
 	}
-} 
+}

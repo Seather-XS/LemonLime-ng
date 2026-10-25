@@ -1543,7 +1543,7 @@ namespace {
 
 		return true;
 	}
-} 
+}
 
 QStringList StatementBuilder::templateNames() {
 	return {QStringLiteral("ccpc"), QStringLiteral("noi"), QStringLiteral("noi new")};

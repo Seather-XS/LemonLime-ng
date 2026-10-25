@@ -17,7 +17,7 @@ class StatementProblem {
 
 	QString title;
 	QString english;
-	QStringList body;  
+	QStringList body;
 	QStringList proinfo;
 
 	QString heading() const;
@@ -58,7 +58,7 @@ class StatementDocument {
 		bool isSection{false};
 		QString text;
 		QString name;
-		QString body;  
+		QString body;
 	};
 
 	static QStringList splitLines(const QString &text);
@@ -74,6 +74,6 @@ class StatementDocument {
 
 	bool hasFront{false};
 	QList<QPair<QString, QString>> metaEntries;
-	QMap<QString, QString> metaValues;           
+	QMap<QString, QString> metaValues;
 	QList<Item> items;
 };

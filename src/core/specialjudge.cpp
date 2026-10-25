@@ -172,7 +172,7 @@ void addPostRoutine() {
 	qAddPostRoutine(SpecialJudge::cleanup);
 }
 
-} 
+}
 
 auto SpecialJudge::resolve(const QString &checkerPath, const QString &compilerLocation,
                            const QString &compileTemplate, int timeLimitMs, QString &error) -> QString {

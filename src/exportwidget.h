@@ -57,7 +57,7 @@ class ExportWidget : public QWidget {
 	struct PendingNode {
 		QTreeWidgetItem *root{nullptr};
 		QString path;
-		QString source;                 
+		QString source;
 		bool folder{false};
 	};
 

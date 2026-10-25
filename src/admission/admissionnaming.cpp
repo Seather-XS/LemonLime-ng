@@ -89,7 +89,7 @@ namespace AdmissionNaming {
 			*ok = false;
 			return context.regionSeq;
 		}
-	} 
+	}
 
 	QStringList reservedKeywords() {
 		return {QStringLiteral("section"), QStringLiteral("number"), QStringLiteral("char"),
@@ -310,4 +310,4 @@ namespace AdmissionNaming {
 
 		return out.right(2);
 	}
-} 
+}

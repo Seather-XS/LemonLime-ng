@@ -8,7 +8,7 @@
 #include "LemonBaseApplication.hpp"
 #include "base/LemonLog.hpp"
 #include "base/LemonTranslator.hpp"
-#include "base/settings.h" 
+#include "base/settings.h"
 #include <QCommandLineParser>
 #include <QLocale>
 

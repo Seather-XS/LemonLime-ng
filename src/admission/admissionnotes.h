@@ -11,4 +11,4 @@
 namespace AdmissionNotes {
 	QString escape(const QString &text);
 	QString toLatex(const QString &text);
-} 
+}

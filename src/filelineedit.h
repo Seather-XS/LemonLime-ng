@@ -27,7 +27,7 @@ class FileLineEdit : public QLineEdit {
 	QCompleter *completer;
 	QStringList nameFilters;
 	QDir::Filters filters;
-	QString rootDirectory; 
+	QString rootDirectory;
 
   public slots:
 	void refreshFileList();

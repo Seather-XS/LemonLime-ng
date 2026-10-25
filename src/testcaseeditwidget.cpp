@@ -33,7 +33,7 @@ TestCaseEditWidget::TestCaseEditWidget(QWidget *parent) : QWidget(parent), ui(ne
 	connect(this, &TestCaseEditWidget::dataPathChanged, ui->inputFileEdit, &FileLineEdit::refreshFileList);
 	connect(this, &TestCaseEditWidget::dataPathChanged, ui->outputFileEdit, &FileLineEdit::refreshFileList);
 	connect(ui->subtaskDependecne, &QLineEdit::editingFinished, this,
-	        &TestCaseEditWidget::subtaskDependenceChanged); 
+	        &TestCaseEditWidget::subtaskDependenceChanged);
 	connect(ui->addButton, &QPushButton::clicked, this, &TestCaseEditWidget::addSingleCase);
 	connect(deleteAction, &QAction::triggered, this, &TestCaseEditWidget::deleteSingleCase);
 	connect(ui->fullScore, &QLineEdit::textChanged, this, &TestCaseEditWidget::fullScoreChanged);

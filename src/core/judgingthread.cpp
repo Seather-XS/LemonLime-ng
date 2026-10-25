@@ -100,7 +100,7 @@ void JudgingThread::stopJudgingSlot() { stopJudging = true; }
 class BufferedStreamReader {
 
   public:
-	static const int BUFFER_SIZE = 1 << 18; 
+	static const int BUFFER_SIZE = 1 << 18;
 	explicit BufferedStreamReader(const char *filename) : file(fopen(filename, "r")) {
 		result.reserve(32);
 		bufPos = buffer + BUFFER_SIZE;
@@ -122,7 +122,7 @@ class BufferedStreamReader {
 	char buffer[BUFFER_SIZE], *bufEnd, *bufPos;
 	bool isEof;
 	int lineNumber;
-	std::string result; 
+	std::string result;
 	auto peekChar() -> char;
 	void tryNextLine();
 
@@ -739,7 +739,7 @@ namespace {
 		WARN("Failed to remove", path);
 		return ! QFile::exists(path);
 	}
-} 
+}
 
 void JudgingThread::judgeTraditionalTask() {
 	if (! QFileInfo::exists(inputFile)) {
@@ -853,7 +853,7 @@ void JudgingThread::run() {
 	needRejudge = false;
 
 	switch (task->getTaskType()) {
-		case Task::Interaction: 
+		case Task::Interaction:
 			[[fallthrough]];
 		case Task::Traditional:
 			[[fallthrough]];

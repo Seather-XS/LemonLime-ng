@@ -217,7 +217,7 @@ void FindReplaceBar::replaceAll() {
 		count++;
 
 		if (count > 100000)
-			break;  
+			break;
 	}
 
 	cursor.endEditBlock();

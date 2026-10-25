@@ -9,7 +9,7 @@
 #include "base/LemonBase.hpp"
 #include "base/LemonLog.hpp"
 #include "base/LemonTranslator.hpp"
-#include "base/settings.h" 
+#include "base/settings.h"
 #include <QCoreApplication>
 #include <QTime>
 #define LEMON_MODULE_NAME "LemonApplicationInterface"

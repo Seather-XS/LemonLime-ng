@@ -165,7 +165,7 @@ namespace {
 
 		return blocks.join(QStringLiteral("\n\n")).trimmed();
 	}
-} 
+}
 
 AdmissionGenerator::AdmissionGenerator(QObject *parent) : QObject(parent) {}
 
