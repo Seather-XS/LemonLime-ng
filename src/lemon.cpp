@@ -39,6 +39,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QSaveFile>
 #include <QStatusBar>
 #include <QTextBrowser>
 #include <QUrl>
@@ -730,7 +731,6 @@ void LemonLime::loadContest(const QString &filePath) {
 
 	curProject = DayProject();
 	projectFile.clear();
-	projectFileNewlyCreated = false;
 	curDayIndex = 0;
 	loadDay(QFileInfo(filePath).absoluteFilePath());
 }
@@ -755,7 +755,6 @@ void LemonLime::loadProject(const QString &path) {
 
 	curProject = DayProject::fromJson(obj);
 	projectFile = QFileInfo(path).absoluteFilePath();
-	projectFileNewlyCreated = false;
 	curDayIndex = -1;
 
 	chooseDay();
@@ -1013,7 +1012,6 @@ void LemonLime::newContest(const QString &title, const QString &savingName, cons
 	curProject = DayProject();
 	curProject.title = title;
 	projectFile = QDir(path).absoluteFilePath(QStringLiteral("contest.conf"));
-	projectFileNewlyCreated = true;
 	curDayIndex = -1;
 	saveProjectFile();
 
@@ -1542,13 +1540,7 @@ void LemonLime::saveProjectFile() {
 	if (projectFile.isEmpty())
 		return;
 
-	if (! projectFileNewlyCreated && QFile::exists(projectFile)) {
-		const QString backup = projectFile + QStringLiteral(".bak");
-		QFile::remove(backup);
-		QFile::copy(projectFile, backup);
-	}
-
-	QFile file(projectFile);
+	QSaveFile file(projectFile);
 
 	if (! file.open(QFile::WriteOnly)) {
 		QMessageBox::warning(this, tr("Error"), tr("Cannot open file %1").arg(projectFile), QMessageBox::Close);
@@ -1556,6 +1548,10 @@ void LemonLime::saveProjectFile() {
 	}
 
 	file.write(QJsonDocument(curProject.toJson()).toJson(QJsonDocument::Compact));
+
+	if (! file.commit())
+		QMessageBox::warning(this, tr("Error"), tr("Cannot write file %1").arg(projectFile),
+		                     QMessageBox::Close);
 }
 
 void LemonLime::refreshDayMenu() {

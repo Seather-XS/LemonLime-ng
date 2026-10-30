@@ -457,6 +457,15 @@ QList<DataGenerator::PlannedTest> DataGenerator::planTests(const Options &option
 
 DataGenerator::DataGenerator(QObject *parent) : QObject(parent) {}
 
+int DataGenerator::Result::testCount() const {
+	int total = 0;
+
+	for (const Group &group : groups)
+		total += group.inputs.size();
+
+	return total;
+}
+
 void DataGenerator::log(const QString &message) { emit logMessage(message); }
 
 void DataGenerator::setStatus(const QString &message) { emit statusMessage(message); }
@@ -697,10 +706,10 @@ bool DataGenerator::run(const Options &options, Result *result) {
 	}
 
 	log(tr("Generated %1 test case(s) and %2 sample(s).")
-	        .arg(result->groups.size())
+	        .arg(result->testCount())
 	        .arg(result->sampleAnswers.size()));
 	setStatus(tr("Generated %1 test case(s) and %2 sample(s).")
-	              .arg(result->groups.size())
+	              .arg(result->testCount())
 	              .arg(result->sampleAnswers.size()));
 	result->ok = true;
 	return true;

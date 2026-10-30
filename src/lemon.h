@@ -43,7 +43,6 @@ class LemonLime : public QMainWindow {
 	QString curFile;
 	DayProject curProject;
 	QString projectFile;
-	bool projectFileNewlyCreated{false};
 	int curDayIndex{0};
 	QList<QAction *> dayActions;
 	QSignalMapper *signalMapper;

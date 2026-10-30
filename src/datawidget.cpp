@@ -26,7 +26,6 @@
 #include <QRegularExpression>
 #include <QSignalBlocker>
 #include <QSpinBox>
-#include <QSplitter>
 #include <QThread>
 #include <QTimer>
 #include <QUrl>
@@ -105,14 +104,15 @@ void DataWidget::showEvent(QShowEvent *event) {
 
 void DataWidget::buildUi() {
 	auto *layout = new QHBoxLayout(this);
-	auto *splitter = new QSplitter(Qt::Horizontal, this);
+	layout->setContentsMargins(0, 0, 0, 0);
 
-	auto *listBox = new QGroupBox(tr("Tasks"), splitter);
+	auto *listBox = new QGroupBox(tr("Tasks"), this);
+	listBox->setMinimumWidth(176);
 	auto *listLayout = new QVBoxLayout(listBox);
 	taskList = new QListWidget(listBox);
 	listLayout->addWidget(taskList);
 
-	auto *right = new QWidget(splitter);
+	auto *right = new QWidget(this);
 	auto *rightLayout = new QVBoxLayout(right);
 	rightLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -203,12 +203,8 @@ void DataWidget::buildUi() {
 	logLayout->addWidget(logView);
 	rightLayout->addWidget(logBox, 1);
 
-	splitter->addWidget(listBox);
-	splitter->addWidget(right);
-	splitter->setStretchFactor(0, 0);
-	splitter->setStretchFactor(1, 1);
-	splitter->setSizes({220, 780});
-	layout->addWidget(splitter);
+	layout->addWidget(listBox, 1);
+	layout->addWidget(right, 3);
 
 	connect(taskList, &QListWidget::currentRowChanged, this, &DataWidget::taskSelectionChanged);
 	connect(subtaskBox, &QCheckBox::toggled, this, &DataWidget::updateParameterState);
@@ -596,10 +592,10 @@ void DataWidget::generateFinished() {
 
 	setStatus(tr("Done."));
 	appendLog(tr("Done: %1 test case(s) and %2 sample(s).")
-	              .arg(pendingResult.groups.size())
+	              .arg(pendingResult.testCount())
 	              .arg(pendingResult.sampleAnswers.size()));
 	emit statusChanged(tr("Generated %1 test case(s) and %2 sample(s).")
-	                       .arg(pendingResult.groups.size())
+	                       .arg(pendingResult.testCount())
 	                       .arg(pendingResult.sampleAnswers.size()));
 
 	if (! pendingOptions.configureTestCases) {
@@ -622,8 +618,17 @@ void DataWidget::generateFinished() {
 		memoryLimit = settings ? settings->getDefaultMemoryLimit() : 128;
 
 	DataGenerator::applyToTask(task, pendingResult, pendingOptions.subtaskMode, timeLimit, memoryLimit);
-	setStatus(tr("Configured %1 test case(s).").arg(task->getTestCaseList().size()));
-	emit statusChanged(tr("Data generated; %1 test case(s) configured.").arg(task->getTestCaseList().size()));
+
+	const int configured = task->getTestCaseList().size();
+
+	if (pendingOptions.subtaskMode) {
+		setStatus(tr("Configured %1 subtask(s).").arg(configured));
+		emit statusChanged(tr("Data generated; %1 subtask(s) configured.").arg(configured));
+	} else {
+		setStatus(tr("Configured %1 test case(s).").arg(configured));
+		emit statusChanged(tr("Data generated; %1 test case(s) configured.").arg(configured));
+	}
+
 	emit contestModified();
 }
 

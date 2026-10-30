@@ -2506,6 +2506,11 @@ Depends: </source>
         <translation></translation>
     </message>
     <message>
+        <location filename="../src/lemon.cpp" line="1543"/>
+        <source>Cannot write file %1</source>
+        <translation>Cannot write file %1</translation>
+    </message>
+    <message>
         <location filename="../src/forms/lemon.ui" line="68"/>
         <source>Tasks</source>
         <translation></translation>
@@ -5269,6 +5274,16 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/datawidget.cpp"/>
         <source>Data generated; %1 test case(s) configured.</source>
         <translation>Data generated; %1 test case(s) configured.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Configured %1 subtask(s).</source>
+        <translation>Configured %1 subtask(s).</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Data generated; %1 subtask(s) configured.</source>
+        <translation>Data generated; %1 subtask(s) configured.</translation>
     </message>
 </context>
 </TS>

@@ -2533,6 +2533,11 @@ Depends: </source>
         <translation>LemonLime-ng</translation>
     </message>
     <message>
+        <location filename="../src/lemon.cpp" line="1543"/>
+        <source>Cannot write file %1</source>
+        <translation>無法寫入檔案 %1</translation>
+    </message>
+    <message>
         <location filename="../src/forms/lemon.ui" line="68"/>
         <source>Tasks</source>
         <translation>試題</translation>
@@ -5305,6 +5310,16 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/datawidget.cpp"/>
         <source>Data generated; %1 test case(s) configured.</source>
         <translation>資料已產生，已設定 %1 個測試點。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Configured %1 subtask(s).</source>
+        <translation>已設定 %1 個子任務。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Data generated; %1 subtask(s) configured.</source>
+        <translation>資料已產生，已設定 %1 個子任務。</translation>
     </message>
 </context>
 </TS>

@@ -56,6 +56,8 @@ class DataGenerator : public QObject {
 		QString error;
 		QList<Group> groups;
 		QStringList sampleAnswers;
+
+		int testCount() const;
 	};
 
 	explicit DataGenerator(QObject *parent = nullptr);
