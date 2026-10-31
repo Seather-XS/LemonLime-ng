@@ -5017,6 +5017,31 @@ p, li { white-space: pre-wrap; }
         <source>Cannot move %1 into %2.</source>
         <translation>Cannot move %1 into %2.</translation>
     </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>%1 / %2</source>
+        <translation>%1 / %2</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Wrote %1 (%2 bytes).</source>
+        <translation>Wrote %1 (%2 bytes).</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Wrote %1 (%2 ms).</source>
+        <translation>Wrote %1 (%2 ms).</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Unknown placeholder in the sample file name prefix: %1</source>
+        <translation>Unknown placeholder in the sample file name prefix: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>%1 file(s) already exist in data/ or down/ (%2). Turn on "Overwrite the existing test cases" to remove them, or change the file name prefix.</source>
+        <translation>%1 file(s) already exist in data/ or down/ (%2). Turn on "Overwrite the existing test cases" to remove them, or change the file name prefix.</translation>
+    </message>
 </context>
 <context>
     <name>DataWidget</name>
@@ -5062,11 +5087,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/datawidget.cpp"/>
-        <source>Number of test points in each subtask, separated by spaces.</source>
-        <translation>Number of test points in each subtask, separated by spaces.</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
         <source>Name Files by Subtask</source>
         <translation>Name Files by Subtask</translation>
     </message>
@@ -5102,16 +5122,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/datawidget.cpp"/>
-        <source>Remove the old files in data/ and down/ first</source>
-        <translation>Remove the old files in data/ and down/ first</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Write the result into the test cases of this task</source>
-        <translation>Write the result into the test cases of this task</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
         <source>Generate Data</source>
         <translation>Generate Data</translation>
     </message>
@@ -5134,31 +5144,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/datawidget.cpp"/>
         <source>There is no task in this contest day yet.</source>
         <translation>There is no task in this contest day yet.</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Will generate %1 in data/.</source>
-        <translation>Will generate %1 in data/.</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Will generate %1 … %2 in data/ (%3 files).</source>
-        <translation>Will generate %1 … %2 in data/ (%3 files).</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Samples: %1 in down/.</source>
-        <translation>Samples: %1 in down/.</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Samples: %1 … %2 in down/ (%3 files).</source>
-        <translation>Samples: %1 … %2 in down/ (%3 files).</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Subtasks: %1.</source>
-        <translation>Subtasks: %1.</translation>
     </message>
     <message>
         <location filename="../src/datawidget.cpp"/>
@@ -5284,6 +5269,141 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/datawidget.cpp"/>
         <source>Data generated; %1 subtask(s) configured.</source>
         <translation>Data generated; %1 subtask(s) configured.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generating</source>
+        <translation>Generating</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Finished</source>
+        <translation>Finished</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Failed</source>
+        <translation>Failed</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Not started</source>
+        <translation>Not started</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Number of test points in each subtask, separated by commas.</source>
+        <translation>Number of test points in each subtask, separated by commas.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Overwrite the existing test cases</source>
+        <translation>Overwrite the existing test cases</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Append the test cases</source>
+        <translation>Append the test cases</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Test Point</source>
+        <translation>Test Point</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>File</source>
+        <translation>File</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Sample %1</source>
+        <translation>Sample %1</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>No details were recorded.</source>
+        <translation>No details were recorded.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generation Details</source>
+        <translation>Generation Details</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>The test points per subtask must be positive integers, e.g. "5,5,4,6".</source>
+        <translation>The test points per subtask must be positive integers, e.g. "5,5,4,6".</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Fill in the test points per subtask, e.g. "5,5,4,6".</source>
+        <translation>Fill in the test points per subtask, e.g. "5,5,4,6".</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generated %1 test case(s) and %2 sample(s).</source>
+        <translation>Generated %1 test case(s) and %2 sample(s).</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Data generated; %1 subtask(s) appended (%2 in total).</source>
+        <translation>Data generated; %1 subtask(s) appended (%2 in total).</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Data generated; %1 test case(s) appended (%2 in total).</source>
+        <translation>Data generated; %1 test case(s) appended (%2 in total).</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Action</source>
+        <translation>Action</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerate the data of this test point</source>
+        <translation>Regenerate the data of this test point</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerating %1 ...</source>
+        <translation>Regenerating %1 ...</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerated %1.</source>
+        <translation>Regenerated %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>the test point</source>
+        <translation>the test point</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Sample File Name Prefix</source>
+        <translation>Sample File Name Prefix</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Leave empty to use the file name prefix. "&lt;subid&gt;" is dropped for samples, and "&lt;testid&gt;" is the sample index.</source>
+        <translation>Leave empty to use the file name prefix. "&lt;subid&gt;" is dropped for samples, and "&lt;testid&gt;" is the sample index.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Replace the test cases of this task with the generated ones, and clear the old files in data/ and down/ first.</source>
+        <translation>Replace the test cases of this task with the generated ones, and clear the old files in data/ and down/ first.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Keep the existing test cases and the old files; the generation stops when a file name is already taken. Leave both unchecked to keep the test cases untouched.</source>
+        <translation>Keep the existing test cases and the old files; the generation stops when a file name is already taken. Leave both unchecked to keep the test cases untouched.</translation>
     </message>
 </context>
 </TS>

@@ -17,11 +17,12 @@ class QCheckBox;
 class QLabel;
 class QLineEdit;
 class QListWidget;
-class QPlainTextEdit;
 class QPushButton;
 class QSpinBox;
+class QTableWidget;
 class QThread;
 class QTimer;
+class QToolButton;
 
 class DataWidget : public QWidget {
 	Q_OBJECT
@@ -48,6 +49,9 @@ class DataWidget : public QWidget {
 	void openSolutionFile();
 	void generateFinished();
 	void saveConfig();
+	void fileStarted(int testIndex, int stage);
+	void fileFinished(int testIndex, int stage, bool ok, const QString &detail);
+	void regenerateTest(int index);
 
   private:
 	void buildUi();
@@ -55,12 +59,20 @@ class DataWidget : public QWidget {
 	void appendLog(const QString &line);
 	void setStatus(const QString &text);
 	void updateParameterState();
+	void rebuildResultTable(bool force = false);
+	void setRowStatus(int row, int status);
+	void showRowDetail(int row);
+	void applyStoredStatuses();
+	void saveResultStatuses();
+	void resetRowStates();
+	void setRowButtonsEnabled(bool enabled);
 	void openSourceFile(const QString &baseName);
 	DataGenerator::Options uiOptions() const;
 	void loadConfigFor(Task *task);
 	void flushConfig();
 	void scheduleSaveConfig();
 	Task *currentTask() const;
+	Task *taskForDirectory(const QString &directory) const;
 	bool collectOptions(Task *task, DataGenerator::Options *options, QString *error);
 
 	Contest *curContest{};
@@ -69,6 +81,7 @@ class DataWidget : public QWidget {
 
 	QListWidget *taskList{};
 	QLineEdit *patternEdit{};
+	QLineEdit *samplePatternEdit{};
 	QCheckBox *subtaskBox{};
 	QSpinBox *caseSpin{};
 	QLabel *subtaskLabel{};
@@ -78,18 +91,29 @@ class DataWidget : public QWidget {
 	QLineEdit *inputSuffixEdit{};
 	QLineEdit *outputSuffixEdit{};
 	QLineEdit *sampleSuffixEdit{};
-	QCheckBox *cleanBox{};
-	QCheckBox *configureBox{};
+	QCheckBox *overwriteBox{};
+	QCheckBox *appendBox{};
 	QPushButton *generateButton{};
 	QPushButton *openFolderButton{};
 	QPushButton *editGeneratorButton{};
 	QPushButton *editSolutionButton{};
-	QLabel *previewLabel{};
 	QLabel *statusLabel{};
-	QPlainTextEdit *logView{};
+	QTableWidget *resultTable{};
+
+	QList<int> rowStates;
+	QList<QStringList> rowDetails;
+	QList<QString> rowPaths;
+	QList<QLabel *> rowStatusLabels;
+	QList<QToolButton *> rowButtons;
+	QList<DataGenerator::PlannedTest> plan;
+	int currentDetailRow{-1};
+	QString planSignature;
 
 	QThread *generateThread{};
 	bool generateOk{false};
+	bool pendingPartial{false};
+	int pendingTestIndex{-1};
+	QString pendingTaskDirectory;
 	QString configTask;
 	QTimer *configTimer{};
 	bool loadingConfig{false};

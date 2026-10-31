@@ -5053,6 +5053,31 @@ p, li { white-space: pre-wrap; }
         <source>Cannot move %1 into %2.</source>
         <translation>無法把 %1 移動到 %2。</translation>
     </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>%1 / %2</source>
+        <translation>%1 / %2</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Wrote %1 (%2 bytes).</source>
+        <translation>已寫入 %1（%2 位元組）。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Wrote %1 (%2 ms).</source>
+        <translation>已寫入 %1（耗時 %2 ms）。</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>Unknown placeholder in the sample file name prefix: %1</source>
+        <translation>樣例檔名前綴裡有未知佔位符：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/datagenerator.cpp"/>
+        <source>%1 file(s) already exist in data/ or down/ (%2). Turn on "Overwrite the existing test cases" to remove them, or change the file name prefix.</source>
+        <translation>data/ 或 down/ 裡已有 %1 個同名檔案（%2）。勾選「覆蓋原有測試點設定」可以清掉它們，或者修改檔名前綴。</translation>
+    </message>
 </context>
 <context>
     <name>DataWidget</name>
@@ -5098,11 +5123,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/datawidget.cpp"/>
-        <source>Number of test points in each subtask, separated by spaces.</source>
-        <translation>各子任務的測試點數目，用空格分隔。</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
         <source>Name Files by Subtask</source>
         <translation>依子任務命名</translation>
     </message>
@@ -5138,16 +5158,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/datawidget.cpp"/>
-        <source>Remove the old files in data/ and down/ first</source>
-        <translation>先清掉 data/ 與 down/ 裡的舊檔案</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Write the result into the test cases of this task</source>
-        <translation>把產生結果寫進這道題的測試點</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
         <source>Generate Data</source>
         <translation>產生資料</translation>
     </message>
@@ -5170,31 +5180,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/datawidget.cpp"/>
         <source>There is no task in this contest day yet.</source>
         <translation>這個比賽日還沒有試題。</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Will generate %1 in data/.</source>
-        <translation>將在 data/ 下產生：%1。</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Will generate %1 … %2 in data/ (%3 files).</source>
-        <translation>將在 data/ 下產生 %1 … %2（共 %3 個檔案）。</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Samples: %1 in down/.</source>
-        <translation>範例：down/ 下的 %1。</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Samples: %1 … %2 in down/ (%3 files).</source>
-        <translation>範例：down/ 下的 %1 … %2（共 %3 個檔案）。</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Subtasks: %1.</source>
-        <translation>子任務：%1。</translation>
     </message>
     <message>
         <location filename="../src/datawidget.cpp"/>
@@ -5320,6 +5305,141 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/datawidget.cpp"/>
         <source>Data generated; %1 subtask(s) configured.</source>
         <translation>資料已產生，已設定 %1 個子任務。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generating</source>
+        <translation>生成中</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Finished</source>
+        <translation>正常完成</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Failed</source>
+        <translation>狀態異常</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Not started</source>
+        <translation>未開始</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Number of test points in each subtask, separated by commas.</source>
+        <translation>各子任務的測試點數量，以英文逗號分隔。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Overwrite the existing test cases</source>
+        <translation>覆蓋原有測試點設定</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Append the test cases</source>
+        <translation>追加測試點</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Test Point</source>
+        <translation>測試點編號</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>File</source>
+        <translation>檔名</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Status</source>
+        <translation>生成狀態</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Sample %1</source>
+        <translation>樣例 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>No details were recorded.</source>
+        <translation>沒有記錄詳情。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generation Details</source>
+        <translation>生成詳情</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>The test points per subtask must be positive integers, e.g. "5,5,4,6".</source>
+        <translation>各子任務測試點數量必須是正整數，例如 "5,5,4,6"。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Fill in the test points per subtask, e.g. "5,5,4,6".</source>
+        <translation>請填寫各子任務測試點數量，例如 "5,5,4,6"。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Generated %1 test case(s) and %2 sample(s).</source>
+        <translation>已生成 %1 個測試點、%2 個樣例。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Data generated; %1 subtask(s) appended (%2 in total).</source>
+        <translation>資料已生成；追加了 %1 個子任務（共 %2 個）。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Data generated; %1 test case(s) appended (%2 in total).</source>
+        <translation>資料已生成；追加了 %1 個測試點（共 %2 個）。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Action</source>
+        <translation>操作</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerate the data of this test point</source>
+        <translation>重新產生這個測試點的資料</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerating %1 ...</source>
+        <translation>正在重新產生 %1 ...</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerated %1.</source>
+        <translation>已重新產生 %1。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>the test point</source>
+        <translation>該測試點</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Sample File Name Prefix</source>
+        <translation>樣例檔名前綴</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Leave empty to use the file name prefix. "&lt;subid&gt;" is dropped for samples, and "&lt;testid&gt;" is the sample index.</source>
+        <translation>留空則與檔名前綴相同；樣例會去掉 &lt;subid&gt;，&lt;testid&gt; 就是樣例序號。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Replace the test cases of this task with the generated ones, and clear the old files in data/ and down/ first.</source>
+        <translation>以生成結果取代這道題原有的測試點，並先清掉 data/ 與 down/ 裡的舊檔案。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Keep the existing test cases and the old files; the generation stops when a file name is already taken. Leave both unchecked to keep the test cases untouched.</source>
+        <translation>保留原有測試點與舊檔案；遇到重名檔案會停止生成。兩項都不勾選則不修改測試點。</translation>
     </message>
 </context>
 </TS>

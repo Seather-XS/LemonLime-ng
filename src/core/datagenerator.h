@@ -18,9 +18,14 @@ class DataGenerator : public QObject {
 	Q_OBJECT
 
   public:
+	enum Stage { InputStage = 0, OutputStage = 1 };
+
 	struct Options {
+		enum class WriteMode { None, Overwrite, Append };
+
 		QString taskDirectory;
 		QString namePattern;
+		QString sampleNamePattern;
 		QString inputSuffix{QStringLiteral(".in")};
 		QString outputSuffix{QStringLiteral(".ans")};
 		QString sampleSuffix{QStringLiteral(".ans")};
@@ -29,8 +34,8 @@ class DataGenerator : public QObject {
 		QList<int> subtaskCases;
 		bool subtaskNaming{false};
 		int sampleCount{0};
-		bool cleanData{true};
-		bool configureTestCases{true};
+		WriteMode writeMode{WriteMode::Overwrite};
+		QList<int> onlyTests; // planned test indices to (re)generate; empty means all
 		QString compilerLocation;
 		QString compilerArguments;
 		QProcessEnvironment environment;
@@ -60,6 +65,12 @@ class DataGenerator : public QObject {
 		int testCount() const;
 	};
 
+	struct FileStatus {
+		QString path;
+		int state{0};
+		QStringList details;
+	};
+
 	explicit DataGenerator(QObject *parent = nullptr);
 
 	bool run(const Options &options, Result *result);
@@ -76,13 +87,19 @@ class DataGenerator : public QObject {
 	static bool loadConfig(const QString &taskDirectory, Options *options);
 	static bool saveConfig(const QString &taskDirectory, const Options &options);
 
+	static QList<FileStatus> loadStatuses(const QString &taskDirectory);
+	static bool saveStatuses(const QString &taskDirectory, const QList<FileStatus> &statuses);
+
 	static QList<PlannedTest> planTests(const Options &options, const QString &taskName, QString *error);
 
-	static void applyToTask(Task *task, const Result &result, bool subtaskMode, int timeLimit, int memoryLimit);
+	static void applyToTask(Task *task, const Result &result, bool subtaskMode, int timeLimit, int memoryLimit,
+	                        bool append);
 
   signals:
 	void logMessage(const QString &message);
 	void statusMessage(const QString &message);
+	void fileStarted(int testIndex, int stage);
+	void fileFinished(int testIndex, int stage, bool ok, const QString &detail);
 
   private:
 	void log(const QString &message);

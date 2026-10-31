@@ -229,6 +229,9 @@ bool DataGenerator::loadConfig(const QString &taskDirectory, Options *options) {
 	if (object.contains(QStringLiteral("namePattern")))
 		options->namePattern = object.value(QStringLiteral("namePattern")).toString();
 
+	if (object.contains(QStringLiteral("sampleNamePattern")))
+		options->sampleNamePattern = object.value(QStringLiteral("sampleNamePattern")).toString();
+
 	if (object.contains(QStringLiteral("inputSuffix")))
 		options->inputSuffix = object.value(QStringLiteral("inputSuffix")).toString();
 
@@ -250,11 +253,20 @@ bool DataGenerator::loadConfig(const QString &taskDirectory, Options *options) {
 	if (object.contains(QStringLiteral("sampleCount")))
 		options->sampleCount = object.value(QStringLiteral("sampleCount")).toInt(options->sampleCount);
 
-	if (object.contains(QStringLiteral("cleanData")))
-		options->cleanData = object.value(QStringLiteral("cleanData")).toBool();
+	if (object.contains(QStringLiteral("writeMode"))) {
+		const QString mode = object.value(QStringLiteral("writeMode")).toString();
 
-	if (object.contains(QStringLiteral("configureTestCases")))
-		options->configureTestCases = object.value(QStringLiteral("configureTestCases")).toBool();
+		if (mode == QStringLiteral("append"))
+			options->writeMode = Options::WriteMode::Append;
+		else if (mode == QStringLiteral("none"))
+			options->writeMode = Options::WriteMode::None;
+		else
+			options->writeMode = Options::WriteMode::Overwrite;
+	} else if (object.contains(QStringLiteral("configureTestCases"))) {
+		options->writeMode = object.value(QStringLiteral("configureTestCases")).toBool()
+		                         ? Options::WriteMode::Overwrite
+		                         : Options::WriteMode::None;
+	}
 
 	if (object.contains(QStringLiteral("subtaskCases"))) {
 		options->subtaskCases.clear();
@@ -275,6 +287,7 @@ bool DataGenerator::saveConfig(const QString &taskDirectory, const Options &opti
 
 	QJsonObject object;
 	object.insert(QStringLiteral("namePattern"), options.namePattern);
+	object.insert(QStringLiteral("sampleNamePattern"), options.sampleNamePattern);
 	object.insert(QStringLiteral("inputSuffix"), options.inputSuffix);
 	object.insert(QStringLiteral("outputSuffix"), options.outputSuffix);
 	object.insert(QStringLiteral("sampleSuffix"), options.sampleSuffix);
@@ -282,8 +295,12 @@ bool DataGenerator::saveConfig(const QString &taskDirectory, const Options &opti
 	object.insert(QStringLiteral("subtaskNaming"), options.subtaskNaming);
 	object.insert(QStringLiteral("caseCount"), options.caseCount);
 	object.insert(QStringLiteral("sampleCount"), options.sampleCount);
-	object.insert(QStringLiteral("cleanData"), options.cleanData);
-	object.insert(QStringLiteral("configureTestCases"), options.configureTestCases);
+	object.insert(QStringLiteral("configureTestCases"), options.writeMode != Options::WriteMode::None);
+	object.insert(QStringLiteral("writeMode"),
+	              options.writeMode == Options::WriteMode::Append
+	                  ? QStringLiteral("append")
+	                  : options.writeMode == Options::WriteMode::None ? QStringLiteral("none")
+	                                                                  : QStringLiteral("overwrite"));
 
 	QJsonArray counts;
 
@@ -293,6 +310,65 @@ bool DataGenerator::saveConfig(const QString &taskDirectory, const Options &opti
 	object.insert(QStringLiteral("subtaskCases"), counts);
 
 	QFile file(configPath(taskDirectory));
+
+	if (! file.open(QIODevice::WriteOnly | QIODevice::Text))
+		return false;
+
+	file.write(QJsonDocument(object).toJson(QJsonDocument::Indented));
+	return true;
+}
+
+QList<DataGenerator::FileStatus> DataGenerator::loadStatuses(const QString &taskDirectory) {
+	QList<FileStatus> statuses;
+	QFile file(generatorDirectory(taskDirectory) + QStringLiteral("/status.json"));
+
+	if (! file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return statuses;
+
+	const QJsonObject object = QJsonDocument::fromJson(file.readAll()).object();
+
+	for (const QJsonValue &value : object.value(QStringLiteral("rows")).toArray()) {
+		const QJsonObject row = value.toObject();
+		FileStatus status;
+		status.path = row.value(QStringLiteral("path")).toString();
+		status.state = row.value(QStringLiteral("state")).toInt();
+
+		for (const QJsonValue &detail : row.value(QStringLiteral("details")).toArray())
+			status.details.append(detail.toString());
+
+		if (! status.path.isEmpty())
+			statuses.append(status);
+	}
+
+	return statuses;
+}
+
+bool DataGenerator::saveStatuses(const QString &taskDirectory, const QList<FileStatus> &statuses) {
+	const QString directory = generatorDirectory(taskDirectory);
+
+	if (directory.isEmpty() || ! QDir().mkpath(directory))
+		return false;
+
+	QJsonArray rows;
+
+	for (const FileStatus &status : statuses) {
+		QJsonObject row;
+		row.insert(QStringLiteral("path"), status.path);
+		row.insert(QStringLiteral("state"), status.state);
+
+		QJsonArray details;
+
+		for (const QString &detail : status.details)
+			details.append(detail);
+
+		row.insert(QStringLiteral("details"), details);
+		rows.append(row);
+	}
+
+	QJsonObject object;
+	object.insert(QStringLiteral("rows"), rows);
+
+	QFile file(directory + QStringLiteral("/status.json"));
 
 	if (! file.open(QIODevice::WriteOnly | QIODevice::Text))
 		return false;
@@ -393,8 +469,11 @@ QList<DataGenerator::PlannedTest> DataGenerator::planTests(const Options &option
 	QSet<QString> usedSamples;
 	int globalId = 0;
 
-	auto buildName = [&](int subtask, const QString &testId, bool useSubId) {
-		QString name = options.namePattern;
+	const QString samplePattern = options.sampleNamePattern.trimmed().isEmpty() ? options.namePattern
+	                                                                           : options.sampleNamePattern;
+
+	auto buildName = [&](const QString &pattern, int subtask, const QString &testId, bool useSubId) {
+		QString name = pattern;
 		name.replace(QStringLiteral("<name>"), taskName);
 		name.replace(QStringLiteral("<subid>"), useSubId ? QString::number(subtask) : QString());
 		name.replace(QStringLiteral("<testid>"), testId);
@@ -408,8 +487,9 @@ QList<DataGenerator::PlannedTest> DataGenerator::planTests(const Options &option
 			test.subtask = options.subtaskMode ? group + 1 : 0;
 			test.testId = options.subtaskNaming ? index : globalId;
 			test.groupIndex = options.subtaskMode ? group : globalId - 1;
-			test.fileName = buildName(
-			    test.subtask, options.subtaskNaming ? twoDigits(index) : QString::number(globalId), true);
+			test.fileName = buildName(options.namePattern, test.subtask,
+			                          options.subtaskNaming ? twoDigits(index) : QString::number(globalId),
+			                          true);
 
 			if (test.fileName.isEmpty() || test.fileName.contains(QChar('<')) ||
 			    test.fileName.contains(QChar('>'))) {
@@ -434,11 +514,11 @@ QList<DataGenerator::PlannedTest> DataGenerator::planTests(const Options &option
 		sample.testId = index;
 		sample.groupIndex = -1;
 		sample.sample = true;
-		sample.fileName = buildName(-1, QString::number(index), false);
+		sample.fileName = buildName(samplePattern, -1, QString::number(index), false);
 
 		if (sample.fileName.isEmpty() || sample.fileName.contains(QChar('<')) ||
 		    sample.fileName.contains(QChar('>'))) {
-			*error = tr("Unknown placeholder in the file name prefix: %1").arg(options.namePattern);
+			*error = tr("Unknown placeholder in the sample file name prefix: %1").arg(samplePattern);
 			return {};
 		}
 
@@ -470,13 +550,14 @@ void DataGenerator::log(const QString &message) { emit logMessage(message); }
 
 void DataGenerator::setStatus(const QString &message) { emit statusMessage(message); }
 
-void DataGenerator::applyToTask(Task *task, const Result &result, bool subtaskMode, int timeLimit,
-                                int memoryLimit) {
+void DataGenerator::applyToTask(Task *task, const Result &result, bool subtaskMode, int timeLimit, int memoryLimit,
+                                bool append) {
 	if (! task || result.groups.isEmpty())
 		return;
 
-	while (! task->getTestCaseList().isEmpty())
-		task->deleteTestCase(task->getTestCaseList().size() - 1);
+	if (! append)
+		while (! task->getTestCaseList().isEmpty())
+			task->deleteTestCase(task->getTestCaseList().size() - 1);
 
 	const int count = result.groups.size();
 	const int totalScore = qMax(100, count);
@@ -501,7 +582,7 @@ void DataGenerator::applyToTask(Task *task, const Result &result, bool subtaskMo
 
 		if (subtaskMode && index > 0) {
 			QList<int> depends;
-			depends.append(index);
+			depends.append(task->getTestCaseList().size());
 			testCase->setDependenceSubtask(depends);
 		}
 
@@ -560,6 +641,35 @@ bool DataGenerator::run(const Options &options, Result *result) {
 		return false;
 	}
 
+	const QString dataDir = taskDir + QStringLiteral("/data");
+	const QString downDir = taskDir + QStringLiteral("/down");
+	const bool fullRun = options.onlyTests.isEmpty();
+
+	if (fullRun && options.writeMode != Options::WriteMode::Overwrite) {
+		QSet<QString> clashes;
+
+		for (const PlannedTest &test : tests) {
+			const QString directory = test.sample ? downDir : dataDir;
+			const QString outputSuffix = test.sample ? options.sampleSuffix : options.outputSuffix;
+
+			for (const QString &suffix : {options.inputSuffix, outputSuffix})
+				if (QFileInfo::exists(directory + QChar('/') + test.fileName + suffix))
+					clashes.insert(test.fileName + suffix);
+		}
+
+		if (! clashes.isEmpty()) {
+			QStringList names = clashes.values();
+			names.sort();
+
+			result->error = tr("%1 file(s) already exist in data/ or down/ (%2). Turn on \"Overwrite the "
+			                   "existing test cases\" to remove them, or change the file name prefix.")
+			                    .arg(names.size())
+			                    .arg(names.mid(0, 5).join(QStringLiteral(", ")) +
+			                         (names.size() > 5 ? QStringLiteral(" …") : QString()));
+			return false;
+		}
+	}
+
 	for (const QString &name : {QStringLiteral("gen"), QStringLiteral("sol")}) {
 		const QString stale = generatorDir + QChar('/') + name + executableSuffix();
 
@@ -585,12 +695,10 @@ bool DataGenerator::run(const Options &options, Result *result) {
 	    ! compile(options, solSource, QStringLiteral("sol"), QStringLiteral("gen"), sandboxDir, &result->error))
 		return false;
 
-	const QString dataDir = taskDir + QStringLiteral("/data");
-	const QString downDir = taskDir + QStringLiteral("/down");
 	QDir().mkpath(dataDir);
 	QDir().mkpath(downDir);
 
-	if (options.cleanData) {
+	if (fullRun && options.writeMode == Options::WriteMode::Overwrite) {
 		const int removed = clearFiles(dataDir) + clearFiles(downDir);
 
 		if (removed > 0)
@@ -608,12 +716,22 @@ bool DataGenerator::run(const Options &options, Result *result) {
 		groups.append(Group());
 
 	for (int index = 0; index < tests.size(); index++) {
+		if (! options.onlyTests.isEmpty() && ! options.onlyTests.contains(index))
+			continue;
+
 		const PlannedTest &test = tests.at(index);
 		const QString directory = test.sample ? downDir : dataDir;
 		const QString inputName = test.fileName + options.inputSuffix;
 		const QString outputName =
 		    test.fileName + (test.sample ? options.sampleSuffix : options.outputSuffix);
 		const QString progress = tr("%1 / %2").arg(index + 1).arg(tests.size());
+		int stage = InputStage;
+
+		auto fail = [&](const QString &message) {
+			result->error = message;
+			emit fileFinished(index, stage, false, message);
+			return false;
+		};
 
 		if (test.sample) {
 			log(tr("Generating sample %1 (test %2) ...").arg(inputName).arg(test.testId));
@@ -626,47 +744,44 @@ bool DataGenerator::run(const Options &options, Result *result) {
 			setStatus(tr("Generating %1 (%2) ...").arg(inputName, progress));
 		}
 
+		emit fileStarted(index, InputStage);
+
 		const ProcessOutcome generator = runProcess(
 		    genExecutable, {QString::number(test.subtask), QString::number(test.testId)}, sandboxDir,
 		    environment, options.runTimeLimit, {}, {});
 
-		if (! generator.started) {
-			result->error = tr("Cannot start the generator: %1").arg(firstLines(generator.errorOutput));
-			return false;
-		}
+		if (! generator.started)
+			return fail(tr("Cannot start the generator: %1").arg(firstLines(generator.errorOutput)));
 
 		if (! firstLines(generator.errorOutput).isEmpty())
 			log(firstLines(generator.errorOutput));
 
-		if (! generator.finished) {
-			result->error = tr("The generator did not finish in %1 s on %2.")
-			                    .arg(options.runTimeLimit / 1000)
-			                    .arg(inputName);
-			return false;
-		}
+		if (! generator.finished)
+			return fail(tr("The generator did not finish in %1 s on %2.")
+			                .arg(options.runTimeLimit / 1000)
+			                .arg(inputName));
 
-		if (generator.exitCode != 0) {
-			result->error =
-			    tr("The generator exited with code %1 on %2.").arg(generator.exitCode).arg(inputName);
-			return false;
-		}
+		if (generator.exitCode != 0)
+			return fail(tr("The generator exited with code %1 on %2.")
+			                .arg(generator.exitCode)
+			                .arg(inputName));
 
-		if (generator.output.isEmpty()) {
-			result->error = tr("The generator wrote nothing to stdout on %1.").arg(inputName);
-			return false;
-		}
+		if (generator.output.isEmpty())
+			return fail(tr("The generator wrote nothing to stdout on %1.").arg(inputName));
 
 		const QString inputPath = directory + QChar('/') + inputName;
 		QFile inputFile(inputPath);
 
 		if (! inputFile.open(QIODevice::WriteOnly) ||
-		    inputFile.write(generator.output) != static_cast<qint64>(generator.output.size())) {
-			result->error = tr("Cannot write %1.").arg(QDir::toNativeSeparators(inputPath));
-			return false;
-		}
+		    inputFile.write(generator.output) != static_cast<qint64>(generator.output.size()))
+			return fail(tr("Cannot write %1.").arg(QDir::toNativeSeparators(inputPath)));
 
 		inputFile.close();
+		emit fileFinished(index, InputStage, true,
+		                  tr("Wrote %1 (%2 bytes).").arg(inputName).arg(generator.output.size()));
 
+		stage = OutputStage;
+		emit fileStarted(index, OutputStage);
 		setStatus(tr("Running the model solution on %1 (%2) ...").arg(inputName, progress));
 
 		QElapsedTimer timer;
@@ -676,16 +791,16 @@ bool DataGenerator::run(const Options &options, Result *result) {
 		    runProcess(solExecutable, {}, sandboxDir, environment, options.runTimeLimit, inputPath,
 		               directory + QChar('/') + outputName);
 
-		if (! solution.started || ! solution.finished || solution.exitCode != 0) {
-			result->error = tr("The model solution failed on %1: %2")
-			                    .arg(inputName, ! firstLines(solution.errorOutput).isEmpty()
-			                                        ? firstLines(solution.errorOutput)
-			                                        : tr("exit code %1").arg(solution.exitCode));
-			return false;
-		}
+		if (! solution.started || ! solution.finished || solution.exitCode != 0)
+			return fail(tr("The model solution failed on %1: %2")
+			                .arg(inputName, ! firstLines(solution.errorOutput).isEmpty()
+			                                    ? firstLines(solution.errorOutput)
+			                                    : tr("exit code %1").arg(solution.exitCode)));
 
 		log(tr("Answer written: %1 (%2 ms)").arg(outputName).arg(timer.elapsed()));
 		setStatus(tr("Answer written: %1 (%2)").arg(outputName, progress));
+		emit fileFinished(index, OutputStage, true,
+		                  tr("Wrote %1 (%2 ms).").arg(outputName).arg(timer.elapsed()));
 
 		if (test.sample) {
 			result->sampleAnswers.append(outputName);
@@ -700,17 +815,19 @@ bool DataGenerator::run(const Options &options, Result *result) {
 		if (! group.inputs.isEmpty())
 			result->groups.append(group);
 
-	if (result->groups.isEmpty()) {
+	if (result->groups.isEmpty() && options.onlyTests.isEmpty()) {
 		result->error = tr("No test case was generated.");
 		return false;
 	}
 
-	log(tr("Generated %1 test case(s) and %2 sample(s).")
-	        .arg(result->testCount())
-	        .arg(result->sampleAnswers.size()));
-	setStatus(tr("Generated %1 test case(s) and %2 sample(s).")
-	              .arg(result->testCount())
-	              .arg(result->sampleAnswers.size()));
+	if (options.onlyTests.isEmpty()) {
+		log(tr("Generated %1 test case(s) and %2 sample(s).")
+		        .arg(result->testCount())
+		        .arg(result->sampleAnswers.size()));
+		setStatus(tr("Generated %1 test case(s) and %2 sample(s).")
+		              .arg(result->testCount())
+		              .arg(result->sampleAnswers.size()));
+	}
 	result->ok = true;
 	return true;
 }
