@@ -5322,21 +5322,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/datawidget.cpp"/>
-        <source>Sample %1</source>
-        <translation>Sample %1</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>No details were recorded.</source>
-        <translation>No details were recorded.</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Generation Details</source>
-        <translation>Generation Details</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
         <source>The test points per subtask must be positive integers, e.g. "5,5,4,6".</source>
         <translation>The test points per subtask must be positive integers, e.g. "5,5,4,6".</translation>
     </message>
@@ -5362,16 +5347,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/datawidget.cpp"/>
-        <source>Action</source>
-        <translation>Action</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Regenerate the data of this test point</source>
-        <translation>Regenerate the data of this test point</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
         <source>Regenerating %1 ...</source>
         <translation>Regenerating %1 ...</translation>
     </message>
@@ -5379,11 +5354,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/datawidget.cpp"/>
         <source>Regenerated %1.</source>
         <translation>Regenerated %1.</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>the test point</source>
-        <translation>the test point</translation>
     </message>
     <message>
         <location filename="../src/datawidget.cpp"/>
@@ -5404,6 +5374,36 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/datawidget.cpp"/>
         <source>Keep the existing test cases and the old files; the generation stops when a file name is already taken. Leave both unchecked to keep the test cases untouched.</source>
         <translation>Keep the existing test cases and the old files; the generation stops when a file name is already taken. Leave both unchecked to keep the test cases untouched.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerate Selected</source>
+        <translation>Regenerate Selected</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Drag over the rows below to select test points, then regenerate them.</source>
+        <translation>Drag over the rows below to select test points, then regenerate them.</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Sample Data</source>
+        <translation>Sample Data</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerating %1 test point(s) ...</source>
+        <translation>Regenerating %1 test point(s) ...</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerated %1 test point(s).</source>
+        <translation>Regenerated %1 test point(s).</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerate the selected data</source>
+        <translation>Regenerate the selected data</translation>
     </message>
 </context>
 </TS>

@@ -22,7 +22,6 @@ class QSpinBox;
 class QTableWidget;
 class QThread;
 class QTimer;
-class QToolButton;
 
 class DataWidget : public QWidget {
 	Q_OBJECT
@@ -51,7 +50,9 @@ class DataWidget : public QWidget {
 	void saveConfig();
 	void fileStarted(int testIndex, int stage);
 	void fileFinished(int testIndex, int stage, bool ok, const QString &detail);
-	void regenerateTest(int index);
+	void regenerateSelected();
+	void updateRegenerateState();
+	void showResultMenu(const QPoint &pos);
 
   private:
 	void buildUi();
@@ -60,12 +61,16 @@ class DataWidget : public QWidget {
 	void setStatus(const QString &text);
 	void updateParameterState();
 	void rebuildResultTable(bool force = false);
-	void setRowStatus(int row, int status);
-	void showRowDetail(int row);
+	void refreshRowLabel(int planIndex);
+	void setRowStatus(int fileRow, int status);
+	int planIndexAt(const QModelIndex &index) const;
 	void applyStoredStatuses();
 	void saveResultStatuses();
 	void resetRowStates();
-	void setRowButtonsEnabled(bool enabled);
+	void resetPlanStates(const QList<int> &indices);
+	void regenerateTests(const QList<int> &indices);
+	QList<int> selectedPlanIndices() const;
+	QStringList columnLabels() const;
 	void openSourceFile(const QString &baseName);
 	DataGenerator::Options uiOptions() const;
 	void loadConfigFor(Task *task);
@@ -97,22 +102,24 @@ class DataWidget : public QWidget {
 	QPushButton *openFolderButton{};
 	QPushButton *editGeneratorButton{};
 	QPushButton *editSolutionButton{};
+	QPushButton *regenerateButton{};
 	QLabel *statusLabel{};
 	QTableWidget *resultTable{};
 
+	QList<DataGenerator::PlannedTest> plan;
 	QList<int> rowStates;
 	QList<QStringList> rowDetails;
 	QList<QString> rowPaths;
-	QList<QLabel *> rowStatusLabels;
-	QList<QToolButton *> rowButtons;
-	QList<DataGenerator::PlannedTest> plan;
+	QList<QLabel *> planStatusLabels;
+	QList<QList<int>> rowPlans;
+	QList<int> planToRow;
 	int currentDetailRow{-1};
 	QString planSignature;
 
 	QThread *generateThread{};
 	bool generateOk{false};
 	bool pendingPartial{false};
-	int pendingTestIndex{-1};
+	QList<int> pendingIndices;
 	QString pendingTaskDirectory;
 	QString configTask;
 	QTimer *configTimer{};

@@ -18,11 +18,12 @@
 #include <QHBoxLayout>
 #include <QHash>
 #include <QHeaderView>
-#include <QIcon>
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
+#include <QMenu>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QSignalBlocker>
@@ -30,7 +31,6 @@
 #include <QTableWidget>
 #include <QThread>
 #include <QTimer>
-#include <QToolButton>
 #include <QUrl>
 #include <QVBoxLayout>
 
@@ -89,6 +89,157 @@ namespace {
 
 		return fallback;
 	}
+
+	// Selects whole 3-column test point groups instead of single cells or whole rows.
+	class GroupTable : public QTableWidget {
+	  public:
+		explicit GroupTable(QWidget *parent = nullptr) : QTableWidget(parent) {
+			setSelectionBehavior(QAbstractItemView::SelectItems);
+			setSelectionMode(QAbstractItemView::ExtendedSelection);
+		}
+
+		void selectOnlyGroup(int row, int half) { applyGroups({row * 2 + half}); }
+
+		bool isGroupSelected(int row, int half) const {
+			const int group = groupAt(row, half);
+
+			if (group < 0)
+				return false;
+
+			const QModelIndex index = model()->index(row, half * 3);
+			return selectionModel()->isSelected(index);
+		}
+
+	  protected:
+		void mousePressEvent(QMouseEvent *event) override {
+			if (event->button() != Qt::LeftButton) {
+				QTableWidget::mousePressEvent(event);
+				return;
+			}
+
+			const QModelIndex index = indexAt(event->pos());
+			const int group = index.isValid() ? groupAt(index.row(), index.column() >= 3 ? 1 : 0) : -1;
+
+			if (group < 0) {
+				clearSelection();
+				anchor = -1;
+				event->accept();
+				return;
+			}
+
+			if (event->modifiers() & Qt::ControlModifier) {
+				QList<int> groups = selectedGroups();
+
+				if (groups.contains(group))
+					groups.removeAll(group);
+				else
+					groups.append(group);
+
+				applyGroups(groups);
+				anchor = group;
+			} else if (event->modifiers() & Qt::ShiftModifier && anchor >= 0) {
+				applyRange(anchor, group);
+			} else {
+				anchor = group;
+				applyGroups({group});
+			}
+
+			pressPos = event->pos();
+			dragging = true;
+			event->accept();
+		}
+
+		void mouseMoveEvent(QMouseEvent *event) override {
+			if (! dragging || ! (event->buttons() & Qt::LeftButton)) {
+				QTableWidget::mouseMoveEvent(event);
+				return;
+			}
+
+			if (pressPos.x() >= 0)
+				applyRubberBand(QRect(pressPos, event->pos()).normalized());
+
+			event->accept();
+		}
+
+		void mouseReleaseEvent(QMouseEvent *event) override {
+			dragging = false;
+			pressPos = QPoint(-1, -1);
+			QTableWidget::mouseReleaseEvent(event);
+		}
+
+	  private:
+		int groupAt(int row, int half) const {
+			if (row < 0 || row >= rowCount())
+				return -1;
+
+			const QTableWidgetItem *item = this->item(row, half * 3);
+
+			if (! item || ! (item->flags() & Qt::ItemIsSelectable))
+				return -1;
+
+			return row * 2 + half;
+		}
+
+		QList<int> selectedGroups() const {
+			QList<int> groups;
+
+			for (int row = 0; row < rowCount(); row++)
+				for (int half = 0; half < 2; half++)
+					if (isGroupSelected(row, half))
+						groups.append(row * 2 + half);
+
+			return groups;
+		}
+
+		void applyRange(int anchorGroup, int targetGroup) {
+			const int from = qMin(anchorGroup / 2, targetGroup / 2);
+			const int to = qMax(anchorGroup / 2, targetGroup / 2);
+			QList<int> groups;
+
+			for (int row = from; row <= to; row++)
+				for (int half = 0; half < 2; half++)
+					if (groupAt(row, half) >= 0)
+						groups.append(row * 2 + half);
+
+			applyGroups(groups);
+		}
+
+		QRect groupRect(int row, int half) const {
+			return visualRect(model()->index(row, half * 3))
+			    .united(visualRect(model()->index(row, half * 3 + 2)));
+		}
+
+		void applyRubberBand(const QRect &band) {
+			QList<int> groups;
+
+			for (int row = 0; row < rowCount(); row++)
+				for (int half = 0; half < 2; half++)
+					if (groupAt(row, half) >= 0 && band.intersects(groupRect(row, half)))
+						groups.append(row * 2 + half);
+
+			applyGroups(groups);
+		}
+
+		void applyGroups(const QList<int> &groups) {
+			QItemSelection selection;
+
+			for (int group : groups) {
+				const int row = group / 2;
+				const int half = group % 2;
+
+				if (groupAt(row, half) < 0)
+					continue;
+
+				selection.select(model()->index(row, half * 3), model()->index(row, half * 3 + 2));
+			}
+
+			selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
+		}
+
+		int anchor{-1};
+		bool dragging{false};
+		QPoint pressPos{-1, -1};
+	};
 }
 
 DataWidget::DataWidget(QWidget *parent) : QWidget(parent) {
@@ -247,32 +398,38 @@ void DataWidget::buildUi() {
 	                                   "when missing)."));
 	editSolutionButton = new QPushButton(tr("Edit sol.cpp"), right);
 	editSolutionButton->setToolTip(tr("Open sol.cpp with the default editor (a skeleton is created when missing)."));
+	regenerateButton = new QPushButton(tr("Regenerate Selected"), right);
+	regenerateButton->setToolTip(tr("Drag over the rows below to select test points, then regenerate them."));
 	buttonBar->addWidget(generateButton);
 	buttonBar->addWidget(openFolderButton);
 	buttonBar->addWidget(editGeneratorButton);
 	buttonBar->addWidget(editSolutionButton);
-	buttonBar->addStretch();
+	buttonBar->addWidget(regenerateButton);
 	statusLabel = new QLabel(right);
-	buttonBar->addWidget(statusLabel);
+	statusLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	buttonBar->addWidget(statusLabel, 1);
 	rightLayout->addLayout(buttonBar);
 
 	auto *resultBox = new QGroupBox(tr("Log"), right);
 	auto *resultLayout = new QVBoxLayout(resultBox);
-	resultTable = new QTableWidget(resultBox);
-	resultTable->setColumnCount(4);
-	resultTable->setHorizontalHeaderLabels({tr("Test Point"), tr("File"), tr("Status"), tr("Action")});
+	resultTable = new GroupTable(resultBox);
+	resultTable->setColumnCount(6);
+	resultTable->setHorizontalHeaderLabels(columnLabels());
 	resultTable->verticalHeader()->setVisible(false);
 	resultTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	resultTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-	resultTable->setSelectionMode(QAbstractItemView::SingleSelection);
+	resultTable->setTabKeyNavigation(false);
 	resultTable->setAlternatingRowColors(true);
+	resultTable->setShowGrid(false);
 	resultTable->setWordWrap(false);
-	resultTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-	resultTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-	resultTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Fixed);
-	resultTable->setColumnWidth(2, 170);
-	resultTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Fixed);
-	resultTable->setColumnWidth(3, 44);
+	resultTable->setContextMenuPolicy(Qt::CustomContextMenu);
+
+	for (int base : {0, 3}) {
+		resultTable->horizontalHeader()->setSectionResizeMode(base, QHeaderView::ResizeToContents);
+		resultTable->horizontalHeader()->setSectionResizeMode(base + 1, QHeaderView::Stretch);
+		resultTable->horizontalHeader()->setSectionResizeMode(base + 2, QHeaderView::Fixed);
+		resultTable->setColumnWidth(base + 2, 130);
+	}
+
 	resultTable->horizontalHeader()->setHighlightSections(false);
 	resultLayout->addWidget(resultTable);
 	rightLayout->addWidget(resultBox, 1);
@@ -309,6 +466,9 @@ void DataWidget::buildUi() {
 	connect(openFolderButton, &QPushButton::clicked, this, &DataWidget::openGeneratorFolder);
 	connect(editGeneratorButton, &QPushButton::clicked, this, &DataWidget::openGeneratorFile);
 	connect(editSolutionButton, &QPushButton::clicked, this, &DataWidget::openSolutionFile);
+	connect(regenerateButton, &QPushButton::clicked, this, &DataWidget::regenerateSelected);
+	connect(resultTable, &QTableWidget::itemSelectionChanged, this, &DataWidget::updateRegenerateState);
+	connect(resultTable, &QTableWidget::customContextMenuRequested, this, &DataWidget::showResultMenu);
 	connect(generator, &DataGenerator::fileStarted, this, &DataWidget::fileStarted);
 	connect(generator, &DataGenerator::fileFinished, this, &DataWidget::fileFinished);
 
@@ -324,10 +484,10 @@ void DataWidget::retranslate() {
 	openFolderButton->setText(tr("Open generator Folder"));
 	editGeneratorButton->setText(tr("Edit gen.cpp"));
 	editSolutionButton->setText(tr("Edit sol.cpp"));
+	regenerateButton->setText(tr("Regenerate Selected"));
 
 	if (resultTable)
-		resultTable->setHorizontalHeaderLabels(
-		    {tr("Test Point"), tr("File"), tr("Status"), tr("Action")});
+		resultTable->setHorizontalHeaderLabels(columnLabels());
 
 	updateParameterState();
 	rebuildResultTable(true);
@@ -464,40 +624,87 @@ void DataWidget::rebuildResultTable(bool force) {
 	planSignature = signature;
 	plan = tests;
 
-	for (QLabel *label : std::as_const(rowStatusLabels)) {
+	for (QLabel *label : std::as_const(planStatusLabels)) {
+		if (! label)
+			continue;
+
 		label->hide();
 		label->deleteLater();
 	}
 
-	for (QToolButton *button : std::as_const(rowButtons)) {
-		button->hide();
-		button->deleteLater();
-	}
-
 	resultTable->clearContents();
 	resultTable->setRowCount(0);
+	resultTable->clearSpans();
 	rowStates.clear();
 	rowDetails.clear();
 	rowPaths.clear();
-	rowStatusLabels.clear();
-	rowButtons.clear();
+	planStatusLabels.clear();
+	rowPlans.clear();
+	planToRow.clear();
 	currentDetailRow = -1;
 
-	if (tests.isEmpty())
+	if (tests.isEmpty()) {
+		updateRegenerateState();
 		return;
+	}
 
-	resultTable->setRowCount(tests.size() * 2);
+	int testCount = 0;
+	int sampleCount = 0;
+
+	for (const DataGenerator::PlannedTest &test : std::as_const(tests))
+		(test.sample ? sampleCount : testCount)++;
+
+	const int testRows = (testCount + 1) / 2;
+	const bool divider = testCount > 0 && sampleCount > 0;
+	const int sampleRowStart = testRows + (divider ? 1 : 0);
+	const int sampleRows = (sampleCount + 1) / 2;
+	const int rowCount = sampleRowStart + sampleRows;
+
+	// Test points fill the left half top-to-bottom first, then the right half.
+	const int testLeftCount = (testCount + 1) / 2;
+	const int sampleLeftCount = (sampleCount + 1) / 2;
+
+	resultTable->setRowCount(rowCount);
+	planToRow.fill(-1, tests.size());
+	rowPlans.clear();
+
+	for (int row = 0; row < rowCount; row++)
+		rowPlans.append(QList<int>());
+
+	planStatusLabels.fill(nullptr, tests.size());
+
+	const int lineHeight = resultTable->fontMetrics().height();
+
+	if (divider) {
+		auto *dividerItem = new QTableWidgetItem(tr("Sample Data"));
+		dividerItem->setFlags(Qt::ItemIsEnabled);
+		dividerItem->setTextAlignment(Qt::AlignCenter);
+		QFont font = dividerItem->font();
+		font.setBold(true);
+		dividerItem->setFont(font);
+		dividerItem->setForeground(palette().color(QPalette::Disabled, QPalette::Text));
+		resultTable->setItem(testRows, 0, dividerItem);
+		resultTable->setSpan(testRows, 0, 1, 6);
+		resultTable->setRowHeight(testRows, lineHeight + 10);
+	}
 
 	QHash<int, int> subtaskCounters;
+	int testPosition = 0;
+	int samplePosition = 0;
 
 	for (int index = 0; index < tests.size(); index++) {
 		const DataGenerator::PlannedTest &test = tests.at(index);
-		const int row = index * 2;
+		const int position = test.sample ? samplePosition++ : testPosition++;
+		const int leftCount = test.sample ? sampleLeftCount : testLeftCount;
+		const bool rightHalf = position >= leftCount;
+		const int row = (test.sample ? sampleRowStart : 0) +
+		                (rightHalf ? position - leftCount : position);
+		const int column = rightHalf ? 3 : 0;
 
 		QString idText;
 
 		if (test.sample) {
-			idText = tr("Sample %1").arg(test.testId);
+			idText = QString::number(test.testId);
 		} else if (options.subtaskMode) {
 			idText = QStringLiteral("%1-%2").arg(test.subtask).arg(++subtaskCounters[test.subtask]);
 		} else {
@@ -506,92 +713,138 @@ void DataWidget::rebuildResultTable(bool force) {
 
 		auto *idItem = new QTableWidgetItem(idText);
 		idItem->setTextAlignment(Qt::AlignCenter);
-		resultTable->setItem(row, 0, idItem);
-		resultTable->setSpan(row, 0, 2, 1);
-
-		auto *regenerateButton = new QToolButton(resultTable);
-		regenerateButton->setIcon(QIcon(QStringLiteral(":/icon/view-refresh.svg")));
-		regenerateButton->setAutoRaise(true);
-		regenerateButton->setToolTip(tr("Regenerate the data of this test point"));
-		connect(regenerateButton, &QToolButton::clicked, this, [this, index] { regenerateTest(index); });
-		resultTable->setCellWidget(row, 3, regenerateButton);
-		resultTable->setSpan(row, 3, 2, 1);
-		rowButtons.append(regenerateButton);
+		resultTable->setItem(row, column, idItem);
 
 		const QString inputName = test.fileName + options.inputSuffix;
 		const QString outputName =
 		    test.fileName + (test.sample ? options.sampleSuffix : options.outputSuffix);
 		const QString folder = test.sample ? QStringLiteral("down") : QStringLiteral("data");
+		const QString directory = Settings::dataPath() + task->getDirectoryName() + QChar('/');
 
-		for (int stage = 0; stage < 2; stage++) {
-			const int target = row + stage;
-			const QString name = stage == 0 ? inputName : outputName;
-			const QString path = QStringLiteral("%1/%2").arg(folder, name);
-			const QString fullPath = Settings::dataPath() + task->getDirectoryName() + QChar('/') + path;
+		auto *fileLabel = new QLabel(resultTable);
+		fileLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+		fileLabel->setContentsMargins(4, 0, 4, 0);
+		fileLabel->setText(inputName + QChar('\n') + outputName);
+		fileLabel->setToolTip(QDir::toNativeSeparators(directory + folder + QChar('/') + inputName) +
+		                      QChar('\n') + QDir::toNativeSeparators(directory + folder + QChar('/') +
+		                                                             outputName));
+		resultTable->setCellWidget(row, column + 1, fileLabel);
 
-			auto *nameItem = new QTableWidgetItem(name);
-			nameItem->setToolTip(QDir::toNativeSeparators(fullPath));
-			resultTable->setItem(target, 1, nameItem);
+		auto *statusLabel = new QLabel(resultTable);
+		statusLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+		statusLabel->setContentsMargins(4, 0, 4, 0);
+		statusLabel->setTextFormat(Qt::RichText);
+		resultTable->setCellWidget(row, column + 2, statusLabel);
 
-			auto *label = new QLabel(resultTable);
-			label->setContentsMargins(4, 0, 4, 0);
-			label->setTextFormat(Qt::RichText);
-			label->setTextInteractionFlags(Qt::TextBrowserInteraction);
-			connect(label, &QLabel::linkActivated, this, [this, target] { showRowDetail(target); });
-			resultTable->setCellWidget(target, 2, label);
-
-			rowStates.append(RowPending);
-			rowDetails.append(QStringList());
-			rowPaths.append(path);
-			rowStatusLabels.append(label);
-			label->setText(QStringLiteral("<span style=\"color:%1\">%2</span>")
-			                   .arg(stateColor(RowPending), stateText(RowPending)));
-		}
+		rowStates.append(RowPending);
+		rowStates.append(RowPending);
+		rowDetails.append(QStringList());
+		rowDetails.append(QStringList());
+		rowPaths.append(QStringLiteral("%1/%2").arg(folder, inputName));
+		rowPaths.append(QStringLiteral("%1/%2").arg(folder, outputName));
+		planStatusLabels[index] = statusLabel;
+		rowPlans[row].append(index);
+		planToRow[index] = row;
+		resultTable->setRowHeight(row, lineHeight * 2 + 12);
+		refreshRowLabel(index);
 	}
 
 	applyStoredStatuses();
+	updateRegenerateState();
 }
 
-void DataWidget::setRowStatus(int row, int status) {
-	if (row < 0 || row >= rowStates.size())
+void DataWidget::refreshRowLabel(int planIndex) {
+	QLabel *label = planStatusLabels.value(planIndex);
+
+	if (! label)
 		return;
 
-	rowStates[row] = status;
+	QStringList lines;
+	QStringList tips;
 
-	QString text = QStringLiteral("<span style=\"color:%1\">%2</span>")
-	                   .arg(stateColor(status), stateText(status));
+	for (int stage = 0; stage < 2; stage++) {
+		const int file = planIndex * 2 + stage;
+		const int state = rowStates.value(file);
 
-	if (status == RowFailed)
-		text += QStringLiteral(" <a href=\"detail\" style=\"color:%1; text-decoration:none\">…</a>")
-		            .arg(stateColor(status));
+		QString text = QStringLiteral("<span style=\"color:%1\">%2</span>")
+		                   .arg(stateColor(state), stateText(state));
 
-	if (QLabel *label = rowStatusLabels.value(row)) {
-		label->setText(text);
-		label->setToolTip(rowDetails.value(row).join(QChar('\n')));
+		lines.append(text);
+
+		QString tip = stateText(state);
+
+		for (const QString &detail : rowDetails.value(file))
+			tip += QChar('\n') + detail;
+
+		tips.append(tip);
 	}
+
+	label->setText(lines.join(QStringLiteral("<br/>")));
+	label->setToolTip(tips.join(QChar('\n')));
 }
 
-void DataWidget::showRowDetail(int row) {
-	if (row < 0 || row >= rowPaths.size())
+void DataWidget::setRowStatus(int fileRow, int status) {
+	if (fileRow < 0 || fileRow >= rowStates.size())
 		return;
 
-	QStringList lines = rowDetails.value(row);
+	rowStates[fileRow] = status;
+	refreshRowLabel(fileRow / 2);
+}
 
-	if (lines.isEmpty())
-		lines.append(tr("No details were recorded."));
+QStringList DataWidget::columnLabels() const {
+	const QStringList labels{tr("Test Point"), tr("File"), tr("Status")};
 
-	QString path = rowPaths.value(row);
+	return labels + labels;
+}
 
-	if (Task *task = currentTask())
-		path = Settings::dataPath() + task->getDirectoryName() + QChar('/') + path;
+void DataWidget::showResultMenu(const QPoint &pos) {
+	auto *table = static_cast<GroupTable *>(resultTable);
+	const QModelIndex index = table->indexAt(pos);
+	const int planIndex = planIndexAt(index);
 
-	QMessageBox box(this);
-	box.setIcon(rowStates.value(row) == RowFailed ? QMessageBox::Warning : QMessageBox::Information);
-	box.setWindowTitle(tr("Generation Details"));
-	box.setText(QDir::toNativeSeparators(path));
-	box.setInformativeText(stateText(rowStates.value(row)));
-	box.setDetailedText(lines.join(QChar('\n')));
-	box.exec();
+	if (planIndex >= 0 && ! table->isGroupSelected(index.row(), index.column() >= 3 ? 1 : 0))
+		table->selectOnlyGroup(index.row(), index.column() >= 3 ? 1 : 0);
+
+	QMenu menu(this);
+	QAction *regenerate = menu.addAction(tr("Regenerate the selected data"));
+	regenerate->setEnabled(generateThread == nullptr && ! selectedPlanIndices().isEmpty());
+	connect(regenerate, &QAction::triggered, this, &DataWidget::regenerateSelected);
+	menu.exec(table->viewport()->mapToGlobal(pos));
+}
+
+int DataWidget::planIndexAt(const QModelIndex &index) const {
+	if (! index.isValid())
+		return -1;
+
+	const int half = index.column() >= 3 ? 1 : 0;
+	const QList<int> indices = rowPlans.value(index.row());
+
+	return indices.value(half, -1);
+}
+
+QList<int> DataWidget::selectedPlanIndices() const {
+	QList<int> indices;
+
+	if (! resultTable || ! resultTable->selectionModel())
+		return indices;
+
+	for (const QModelIndex &index : resultTable->selectionModel()->selectedIndexes()) {
+		const int half = index.column() >= 3 ? 1 : 0;
+		const int planIndex = rowPlans.value(index.row()).value(half, -1);
+
+		if (planIndex >= 0 && ! indices.contains(planIndex))
+			indices.append(planIndex);
+	}
+
+	std::sort(indices.begin(), indices.end());
+	return indices;
+}
+
+void DataWidget::updateRegenerateState() {
+	if (! regenerateButton)
+		return;
+
+	regenerateButton->setEnabled(generateThread == nullptr && ! selectedPlanIndices().isEmpty());
 }
 
 void DataWidget::applyStoredStatuses() {
@@ -617,10 +870,12 @@ void DataWidget::applyStoredStatuses() {
 		if (it == byPath.constEnd())
 			continue;
 
-		const int state = it->state == RowRunning ? RowPending : it->state;
+		rowStates[row] = it->state == RowRunning ? RowPending : it->state;
 		rowDetails[row] = it->details;
-		setRowStatus(row, state);
 	}
+
+	for (int planIndex = 0; planIndex < plan.size(); planIndex++)
+		refreshRowLabel(planIndex);
 }
 
 void DataWidget::saveResultStatuses() {
@@ -643,20 +898,40 @@ void DataWidget::saveResultStatuses() {
 void DataWidget::resetRowStates() {
 	for (int row = 0; row < rowStates.size(); row++) {
 		rowDetails[row].clear();
-		setRowStatus(row, RowPending);
+		rowStates[row] = RowPending;
+	}
+
+	for (int planIndex = 0; planIndex < plan.size(); planIndex++)
+		refreshRowLabel(planIndex);
+}
+
+void DataWidget::resetPlanStates(const QList<int> &indices) {
+	for (int planIndex : indices) {
+		for (int stage = 0; stage < 2; stage++) {
+			const int file = planIndex * 2 + stage;
+
+			if (file < 0 || file >= rowStates.size())
+				continue;
+
+			rowStates[file] = RowPending;
+			rowDetails[file].clear();
+		}
+
+		refreshRowLabel(planIndex);
 	}
 }
 
-void DataWidget::setRowButtonsEnabled(bool enabled) {
-	for (QToolButton *button : std::as_const(rowButtons))
-		button->setEnabled(enabled);
-}
+void DataWidget::regenerateSelected() { regenerateTests(selectedPlanIndices()); }
 
-void DataWidget::regenerateTest(int index) {
-	if (generateThread || ! currentTask() || index < 0 || index >= plan.size())
+void DataWidget::regenerateTests(const QList<int> &indices) {
+	if (generateThread || indices.isEmpty())
 		return;
 
 	Task *task = currentTask();
+
+	if (! task)
+		return;
+
 	DataGenerator::Options options;
 	QString error;
 
@@ -665,13 +940,21 @@ void DataWidget::regenerateTest(int index) {
 		return;
 	}
 
-	const DataGenerator::PlannedTest &test = plan.at(index);
-	const QString name = test.fileName + options.inputSuffix;
+	QList<int> chosen;
 
-	options.onlyTests.append(index);
+	for (int index : indices)
+		if (index >= 0 && index < plan.size() && ! chosen.contains(index))
+			chosen.append(index);
+
+	if (chosen.isEmpty())
+		return;
+
+	std::sort(chosen.begin(), chosen.end());
+	resetPlanStates(chosen);
+	options.onlyTests = chosen;
 	pendingOptions = options;
 	pendingPartial = true;
-	pendingTestIndex = index;
+	pendingIndices = chosen;
 	pendingTaskDirectory = task->getDirectoryName();
 	pendingResult = DataGenerator::Result();
 	generateOk = false;
@@ -680,9 +963,17 @@ void DataWidget::regenerateTest(int index) {
 	openFolderButton->setEnabled(false);
 	editGeneratorButton->setEnabled(false);
 	editSolutionButton->setEnabled(false);
-	setRowButtonsEnabled(false);
-	setStatus(tr("Regenerating %1 ...").arg(name));
-	emit statusChanged(tr("Regenerating %1 ...").arg(name));
+	regenerateButton->setEnabled(false);
+
+	QString message;
+
+	if (chosen.size() == 1)
+		message = tr("Regenerating %1 ...").arg(plan.at(chosen.first()).fileName);
+	else
+		message = tr("Regenerating %1 test point(s) ...").arg(chosen.size());
+
+	setStatus(message);
+	emit statusChanged(message);
 
 	generateThread = QThread::create([this] { generateOk = generator->run(pendingOptions, &pendingResult); });
 	connect(generateThread, &QThread::finished, this, &DataWidget::generateFinished);
@@ -906,14 +1197,14 @@ void DataWidget::generateClicked() {
 	rebuildResultTable(true);
 	resetRowStates();
 	pendingPartial = false;
-	pendingTestIndex = -1;
+	pendingIndices.clear();
 	pendingTaskDirectory = task->getDirectoryName();
 	currentDetailRow = -1;
 	generateButton->setEnabled(false);
 	openFolderButton->setEnabled(false);
 	editGeneratorButton->setEnabled(false);
 	editSolutionButton->setEnabled(false);
-	setRowButtonsEnabled(false);
+	regenerateButton->setEnabled(false);
 	setStatus(tr("Generating ..."));
 	emit statusChanged(tr("Generating ..."));
 
@@ -933,7 +1224,7 @@ void DataWidget::generateFinished() {
 	openFolderButton->setEnabled(currentTask() != nullptr);
 	editGeneratorButton->setEnabled(currentTask() != nullptr);
 	editSolutionButton->setEnabled(currentTask() != nullptr);
-	setRowButtonsEnabled(true);
+	updateRegenerateState();
 	currentDetailRow = -1;
 
 	if (! generateOk) {
@@ -945,17 +1236,16 @@ void DataWidget::generateFinished() {
 	}
 
 	if (pendingPartial) {
-		QString name = tr("the test point");
+		QString message;
 
-		if (pendingTestIndex >= 0 && pendingTestIndex < plan.size()) {
-			const DataGenerator::PlannedTest &test = plan.at(pendingTestIndex);
-			name = test.fileName +
-			       (test.sample ? pendingOptions.sampleSuffix : pendingOptions.inputSuffix);
-		}
+		if (pendingIndices.size() == 1 && pendingIndices.first() < plan.size())
+			message = tr("Regenerated %1.").arg(plan.at(pendingIndices.first()).fileName);
+		else
+			message = tr("Regenerated %1 test point(s).").arg(pendingIndices.size());
 
 		saveResultStatuses();
-		setStatus(tr("Regenerated %1.").arg(name));
-		emit statusChanged(tr("Regenerated %1.").arg(name));
+		setStatus(message);
+		emit statusChanged(message);
 		return;
 	}
 
@@ -1078,9 +1368,7 @@ void DataWidget::appendLog(const QString &line) {
 		return;
 
 	rowDetails[currentDetailRow].append(line);
-
-	if (QLabel *label = rowStatusLabels.value(currentDetailRow))
-		label->setToolTip(rowDetails.value(currentDetailRow).join(QChar('\n')));
+	refreshRowLabel(currentDetailRow / 2);
 }
 
 void DataWidget::setStatus(const QString &text) {

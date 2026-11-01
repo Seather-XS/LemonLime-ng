@@ -5358,21 +5358,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/datawidget.cpp"/>
-        <source>Sample %1</source>
-        <translation>样例 %1</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>No details were recorded.</source>
-        <translation>没有记录详情。</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Generation Details</source>
-        <translation>生成详情</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
         <source>The test points per subtask must be positive integers, e.g. "5,5,4,6".</source>
         <translation>各子任务测试点数量必须是正整数，例如 "5,5,4,6"。</translation>
     </message>
@@ -5398,16 +5383,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/datawidget.cpp"/>
-        <source>Action</source>
-        <translation>操作</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>Regenerate the data of this test point</source>
-        <translation>重新生成这个测试点的数据</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
         <source>Regenerating %1 ...</source>
         <translation>正在重新生成 %1 ...</translation>
     </message>
@@ -5415,11 +5390,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/datawidget.cpp"/>
         <source>Regenerated %1.</source>
         <translation>已重新生成 %1。</translation>
-    </message>
-    <message>
-        <location filename="../src/datawidget.cpp"/>
-        <source>the test point</source>
-        <translation>该测试点</translation>
     </message>
     <message>
         <location filename="../src/datawidget.cpp"/>
@@ -5440,6 +5410,36 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/datawidget.cpp"/>
         <source>Keep the existing test cases and the old files; the generation stops when a file name is already taken. Leave both unchecked to keep the test cases untouched.</source>
         <translation>保留原有测试点和旧文件；遇到重名文件会停止生成。两项都不勾选则不修改测试点。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerate Selected</source>
+        <translation>重新生成选中项</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Drag over the rows below to select test points, then regenerate them.</source>
+        <translation>在下方表格中拖动选中若干测试点，再点这里重新生成它们。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Sample Data</source>
+        <translation>样例数据</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerating %1 test point(s) ...</source>
+        <translation>正在重新生成 %1 个测试点 ...</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerated %1 test point(s).</source>
+        <translation>已重新生成 %1 个测试点。</translation>
+    </message>
+    <message>
+        <location filename="../src/datawidget.cpp"/>
+        <source>Regenerate the selected data</source>
+        <translation>重新生成选中的数据</translation>
     </message>
 </context>
 </TS>

@@ -620,16 +620,17 @@ namespace {
 	}
 
 	QString stripMinipage(const QString &text) {
-		if (! text.contains(QStringLiteral("minipage")))
-			return text;
-
-		static const QRegularExpression minipageBegin(
-		    QStringLiteral(R"(\\begin\{minipage\}(?:\[[^\]]*\])?\{[^{}]*\})"));
-		static const QRegularExpression centeringLine(QStringLiteral(R"((?m)^[ \t]*\\centering[ \t]*\n?)"));
+		// pandoc writes the cell alignment inside the minipage: \begin{minipage}[b]{\linewidth}\centering
+		// Dropping the minipage but keeping \centering redefines \\ to \@centercr, whose \addvspace
+		// is illegal inside the \sbox used by the one-page table branch (LaTeX error: Not allowed in LR mode).
+		static const QRegularExpression minipageBegin(QStringLiteral(
+		    R"(\\begin\{minipage\}(?:\[[^\]]*\])?\{[^{}]*\}(?:\\(?:centering|raggedright|raggedleft|arraybackslash))*)"));
+		static const QRegularExpression alignmentLine(QStringLiteral(
+		    R"((?m)^[ \t]*(?:\\(?:centering|raggedright|raggedleft|arraybackslash)[ \t]*\n?)+)"));
 		QString result = text;
 		result.remove(minipageBegin);
 		result.remove(QStringLiteral("\\end{minipage}"));
-		result.remove(centeringLine);
+		result.remove(alignmentLine);
 		return result;
 	}
 
