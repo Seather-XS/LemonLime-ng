@@ -317,6 +317,55 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
+	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--repair-day")) {
+		QCoreApplication app(argc, argv);
+		const QString dayFile = QFileInfo(QString::fromLocal8Bit(argv[2])).absoluteFilePath();
+		QFile day(dayFile);
+
+		if (! day.open(QIODevice::ReadOnly)) {
+			LOG("repair-day: cannot open", dayFile);
+			return 2;
+		}
+
+		Settings settings;
+		settings.loadSettings();
+		Contest contest(nullptr);
+		contest.setSettings(&settings);
+
+		if (contest.readFromJson(QJsonDocument::fromJson(day.readAll()).object()) == -1) {
+			LOG("repair-day: broken contest file", dayFile);
+			return 3;
+		}
+
+		day.close();
+		QDir::setCurrent(QFileInfo(dayFile).absolutePath());
+		const ContestRepairReport report = contest.repairBrokenConfiguration();
+
+		for (const QString &change : report.changes)
+			LOG("repair-day: repaired", change);
+
+		for (const QString &item : report.unresolved)
+			LOG("repair-day: unresolved", item);
+
+		if (report.changes.isEmpty()) {
+			LOG("repair-day: nothing to repair");
+			return 0;
+		}
+
+		QJsonObject out;
+		contest.writeToJson(out);
+		QFile target(dayFile);
+
+		if (! target.open(QIODevice::WriteOnly)) {
+			LOG("repair-day: cannot write", dayFile);
+			return 4;
+		}
+
+		target.write(QJsonDocument(out).toJson(QJsonDocument::Compact));
+		LOG("repair-day: repaired", report.changes.size(), "item(s)");
+		return 0;
+	}
+
 	if (argc >= 3 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--check-live-skip")) {
 		QApplication app(argc, argv);
 		const QString dayFile = QString::fromLocal8Bit(argv[2]);

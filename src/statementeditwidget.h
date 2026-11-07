@@ -74,6 +74,8 @@ class StatementEditWidget : public QWidget {
 	void selectSlot(const QString &slot);
 	void applyTemplateVisibility();
 	void applyNoiSectionDefaults();
+	void applyProblemHeadingStyle();
+	StatementProblem::HeadingStyle currentProblemHeadingStyle() const;
 	QString currentSectionName() const;
 	void refreshProblemLabel();
 	QStringList currentProinfo() const;
@@ -97,6 +99,7 @@ class StatementEditWidget : public QWidget {
 	QPlainTextEdit *editor{};
 	QWidget *problemTitleRow{};
 	QLineEdit *problemTitleEdit{};
+	QLineEdit *problemEnglishEdit{};
 	QWidget *proinfoRow{};
 	QList<QLineEdit *> proinfoEdits;
 	QLineEdit *pdfNameEdit{};

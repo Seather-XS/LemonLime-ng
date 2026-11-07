@@ -31,6 +31,7 @@
 #include <QShortcut>
 #include <QSplitter>
 #include <QStackedWidget>
+#include <QTextOption>
 #include <QTextStream>
 #include <QThread>
 #include <QTimer>
@@ -147,14 +148,21 @@ date: ""
 		return name == QStringLiteral("noi") || name == QStringLiteral("noi new");
 	}
 
+	QString problemTitleText(const QString &title, const QString &english) {
+		const QString name = title.trimmed();
+		const QString eng = english.trimmed();
+
+		if (eng.isEmpty())
+			return name;
+
+		if (name.isEmpty())
+			return eng;
+
+		return QStringLiteral("%1（%2）").arg(name, eng);
+	}
+
 	QString problemTitleText(const StatementProblem &problem) {
-		const QString title = problem.title.trimmed();
-		const QString english = problem.english.trimmed();
-
-		if (english.isEmpty())
-			return title;
-
-		return QStringLiteral("%1（%2）").arg(title, english);
+		return problemTitleText(problem.title, problem.english);
 	}
 }
 
@@ -275,7 +283,8 @@ void StatementEditWidget::buildUi() {
 	editor = new QPlainTextEdit(stack);
 	editor->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 	editor->setTabChangesFocus(false);
-	editor->setLineWrapMode(QPlainTextEdit::NoWrap);
+	editor->setLineWrapMode(QPlainTextEdit::WidgetWidth);
+	editor->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 	highlighter = new MarkdownHighlighter(editor->document());
 
 	auto *metaPage = new QWidget(stack);
@@ -296,16 +305,19 @@ void StatementEditWidget::buildUi() {
 	stack->addWidget(editor);
 
 	problemTitleRow = new QWidget(right);
-	auto *titleRowLayout = new QHBoxLayout(problemTitleRow);
+	auto *titleRowLayout = new QGridLayout(problemTitleRow);
 	titleRowLayout->setContentsMargins(0, 0, 0, 0);
-	titleRowLayout->addWidget(new QLabel(tr("Problem Title"), problemTitleRow));
+	titleRowLayout->addWidget(new QLabel(tr("Problem Title"), problemTitleRow), 0, 0);
 	problemTitleEdit = new QLineEdit(problemTitleRow);
 	problemTitleEdit->setPlaceholderText(tr("Title only, no leading #"));
 	problemTitleEdit->setMaxLength(200);
-	titleRowLayout->addWidget(problemTitleEdit, 1);
-	auto *titleHint = new QLabel(tr("No leading \"#\" needed: it is added automatically."), problemTitleRow);
-	titleHint->setStyleSheet(QStringLiteral("color: gray;"));
-	titleRowLayout->addWidget(titleHint);
+	titleRowLayout->addWidget(problemTitleEdit, 0, 1);
+	titleRowLayout->addWidget(new QLabel(tr("English Name"), problemTitleRow), 0, 2);
+	problemEnglishEdit = new QLineEdit(problemTitleRow);
+	problemEnglishEdit->setMaxLength(200);
+	titleRowLayout->addWidget(problemEnglishEdit, 0, 3);
+	titleRowLayout->setColumnStretch(1, 1);
+	titleRowLayout->setColumnStretch(3, 1);
 	problemTitleRow->hide();
 
 	proinfoRow = new QWidget(right);
@@ -373,7 +385,10 @@ void StatementEditWidget::buildUi() {
 	connect(tree, &QTreeWidget::currentItemChanged, this, [this] { treeSelectionChanged(); });
 	connect(editor, &QPlainTextEdit::textChanged, this, &StatementEditWidget::editorTextChanged);
 	connect(problemTitleEdit, &QLineEdit::textEdited, this, &StatementEditWidget::problemTitleEdited);
+	connect(problemEnglishEdit, &QLineEdit::textEdited, this, &StatementEditWidget::problemTitleEdited);
 	connect(problemTitleEdit, &QLineEdit::editingFinished, this,
+	        &StatementEditWidget::problemTitleEditFinished);
+	connect(problemEnglishEdit, &QLineEdit::editingFinished, this,
 	        &StatementEditWidget::problemTitleEditFinished);
 
 	for (auto *edit : metaEdits)
@@ -394,6 +409,10 @@ void StatementEditWidget::buildUi() {
 	connect(builder, &StatementBuilder::logMessage, this, &StatementEditWidget::appendLog);
 
 	findBar->setEditor(editor);
+	// Bulk replacements run inside an edit block, which QSyntaxHighlighter does not
+	// track, so re-run the whole markdown highlighting afterwards.
+	connect(findBar, &FindReplaceBar::contentReplaced, this,
+	        [this] { highlighter->rehighlight(); });
 	const auto findShortcut = new QShortcut(QKeySequence::Find, this);
 	connect(findShortcut, &QShortcut::activated, this, [this] { findBar->activate(false); });
 	const auto replaceShortcut = new QShortcut(QKeySequence::Replace, this);
@@ -435,7 +454,13 @@ void StatementEditWidget::loadDocument() {
 		text = QString::fromUtf8(file.readAll());
 
 	loading = true;
-	document = StatementDocument::parse(text);
+	document = StatementDocument::parse(text, currentProblemHeadingStyle());
+
+	const QList<StatementProblem> problems = document.problems();
+
+	if (! problems.isEmpty())
+		document.setProblems(problems);
+
 	editorSlot.clear();
 
 	if (isNoiTemplateName(templateBox->currentText()))
@@ -537,7 +562,8 @@ void StatementEditWidget::refreshEditor() {
 
 		if (index >= 0 && index < problems.size()) {
 			const StatementProblem &problem = problems.at(index);
-			problemTitleEdit->setText(problemTitleText(problem));
+			problemTitleEdit->setText(problem.title);
+			problemEnglishEdit->setText(problem.english);
 
 			for (int i = 0; i < proinfoEdits.size(); i++)
 				proinfoEdits[i]->setText(problem.proinfo.value(i));
@@ -545,6 +571,7 @@ void StatementEditWidget::refreshEditor() {
 			editor->setPlainText(problem.body.join(QChar('\n')).trimmed());
 		} else {
 			problemTitleEdit->clear();
+			problemEnglishEdit->clear();
 
 			for (auto *edit : proinfoEdits)
 				edit->clear();
@@ -600,26 +627,14 @@ void StatementEditWidget::storeEditor() {
 		return;
 
 	StatementProblem problem;
-
-	{
-		QString title;
-		QString english;
-		const QString fieldText = problemTitleEdit->text().trimmed();
-
-		if (StatementDocument::headingOf(QStringLiteral("# ") + fieldText, title, english)) {
-			problem.title = title;
-			problem.english = english;
-		} else {
-			problem.title = fieldText;
-		}
-
-		problem.body = editor->toPlainText().split(QChar('\n'));
-		problem.proinfo = currentProinfo();
-	}
+	problem.title = problemTitleEdit->text().trimmed();
+	problem.english = problemEnglishEdit->text().trimmed();
+	problem.body = editor->toPlainText().split(QChar('\n'));
+	problem.proinfo = currentProinfo();
 
 	const StatementProblem &old = problems.at(index);
 
-	if (old.heading() == problem.heading() && old.proinfo == problem.proinfo &&
+	if (old.title == problem.title && old.english == problem.english && old.proinfo == problem.proinfo &&
 	    old.body.join(QChar('\n')).trimmed() == problem.body.join(QChar('\n')).trimmed())
 		return;
 
@@ -638,7 +653,7 @@ void StatementEditWidget::refreshProblemLabel() {
 	if (! item || index < 0)
 		return;
 
-	item->setText(0, problemLabel(index, problemTitleEdit->text()));
+	item->setText(0, problemLabel(index, problemTitleText(problemTitleEdit->text(), problemEnglishEdit->text())));
 }
 
 QString StatementEditWidget::currentSectionName() const {
@@ -652,6 +667,33 @@ QStringList StatementEditWidget::currentProinfo() const {
 		values.append(edit->text());
 
 	return StatementProblem::normalizedProinfo(values);
+}
+
+StatementProblem::HeadingStyle StatementEditWidget::currentProblemHeadingStyle() const {
+	if (templateBox && templateBox->currentText() == QStringLiteral("ccpc"))
+		return StatementProblem::HeadingStyle::Ccpc;
+
+	return StatementProblem::HeadingStyle::Parenthesized;
+}
+
+void StatementEditWidget::applyProblemHeadingStyle() {
+	const StatementProblem::HeadingStyle style = currentProblemHeadingStyle();
+
+	if (document.problemHeadingStyle() == style)
+		return;
+
+	// Read the problems with the previous style, then rewrite their headings with the new one.
+	const QList<StatementProblem> problems = document.problems();
+	document.setProblemHeadingStyle(style);
+
+	if (problems.isEmpty())
+		return;
+
+	const QString before = document.toMarkdown();
+	document.setProblems(problems);
+
+	if (document.toMarkdown() != before)
+		setDirty(true);
 }
 
 void StatementEditWidget::applyProinfoVisibility() {
@@ -682,15 +724,19 @@ void StatementEditWidget::problemTitleEditFinished() {
 	if (loading)
 		return;
 
-	QString text = problemTitleEdit->text().trimmed();
+	const QList<QLineEdit *> fields = {problemTitleEdit, problemEnglishEdit};
 
-	while (text.startsWith(QChar('#')))
-		text.remove(0, 1);
+	for (QLineEdit *edit : fields) {
+		QString text = edit->text().trimmed();
 
-	text = text.trimmed();
+		while (text.startsWith(QChar('#')))
+			text.remove(0, 1);
 
-	if (text != problemTitleEdit->text())
-		problemTitleEdit->setText(text);
+		text = text.trimmed();
+
+		if (text != edit->text())
+			edit->setText(text);
+	}
 
 	problemTitleEdited();
 }
@@ -756,6 +802,8 @@ void StatementEditWidget::templateChanged() {
 	if (! sectionGroup)
 		return;
 
+	storeEditor();
+	applyProblemHeadingStyle();
 	applyTemplateVisibility();
 
 	if (isNoiTemplateName(templateBox->currentText()))

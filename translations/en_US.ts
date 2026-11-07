@@ -3108,6 +3108,11 @@ Depends: </source>
         <translation></translation>
     </message>
     <message>
+        <location filename="../src/lemon.cpp" line="796"/>
+        <source>Repaired %1 broken configuration item(s)</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../src/lemon.cpp" line="751"/>
         <location filename="../src/lemon.cpp" line="776"/>
         <location filename="../src/lemon.cpp" line="923"/>
@@ -3988,7 +3993,7 @@ No: remove it from the contest only.</translation>
     </message>
     <message>
         <location filename="../src/statementeditwidget.cpp" line="318"/>
-        <source>No leading &quot;#&quot; needed: it is added automatically.</source>
+        <source>English Name</source>
         <translation></translation>
     </message>
     <message>

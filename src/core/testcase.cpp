@@ -148,6 +148,10 @@ int TestCase::readFromJson(const QJsonObject &in) {
 	}
 
 	READ_JSON(in, outputFiles);
+
+	for (auto &fileName : this->outputFiles)
+		fileName.replace('/', QDir::separator());
+
 	return 0;
 }
 void TestCase::readFromStream(QDataStream &in) {

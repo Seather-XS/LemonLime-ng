@@ -43,6 +43,70 @@ namespace {
 		return re;
 	}
 
+	const QRegularExpression &headingLetterPattern() {
+		static const QRegularExpression re(QStringLiteral(R"(^([A-Z]{1,3})\.\s+)"));
+		return re;
+	}
+
+	// A = 0, B = 1, ..., Z = 25, AA = 26, ...
+	QString problemLetter(int index) {
+		if (index < 0)
+			return {};
+
+		QString letters;
+		int value = index;
+
+		do {
+			letters.prepend(QChar('A' + value % 26));
+			value = value / 26 - 1;
+		} while (value >= 0);
+
+		return letters;
+	}
+
+	bool splitHeadingAtSlash(const QString &text, QString &title, QString &english) {
+		const int position = text.lastIndexOf(QStringLiteral(" / "));
+
+		if (position <= 0)
+			return false;
+
+		const QString left = text.left(position).trimmed();
+		const QString right = text.mid(position + 3).trimmed();
+
+		if (left.isEmpty() || right.isEmpty())
+			return false;
+
+		title = left;
+		english = right;
+		return true;
+	}
+
+	bool splitHeadingAtParens(const QString &text, QString &title, QString &english) {
+		if (text.isEmpty())
+			return false;
+
+		const QChar last = text.at(text.length() - 1);
+
+		if (last != QChar(0xff09) && last != QChar(')'))
+			return false;
+
+		const QChar open = last == QChar(0xff09) ? QChar(0xff08) : QChar('(');
+		const int position = text.lastIndexOf(open);
+
+		if (position <= 0)
+			return false;
+
+		const QString candidate = text.mid(position + 1, text.length() - position - 2);
+
+		if (candidate.contains(QChar(0xff08)) || candidate.contains(QChar(0xff09)) ||
+		    candidate.contains(QChar('(')) || candidate.contains(QChar(')')) || candidate.length() > 100)
+			return false;
+
+		title = text.left(position).trimmed();
+		english = candidate.trimmed();
+		return true;
+	}
+
 	const QRegularExpression &emptyHeadingPattern() {
 		static const QRegularExpression re(QStringLiteral(R"(^#\s*$)"));
 		return re;
@@ -225,10 +289,6 @@ const QStringList &StatementDocument::editableMetaKeys() { return editableMetaKe
 
 QString StatementDocument::problemMarker() { return problemMarkerText(); }
 
-bool StatementDocument::headingOf(const QString &line, QString &title, QString &english) {
-	return matchProblemHeading(line, title, english);
-}
-
 QStringList StatementDocument::splitLines(const QString &text) { return text.split(QChar('\n')); }
 
 bool StatementDocument::isProblemMarker(const QString &line) {
@@ -247,7 +307,8 @@ QString StatementDocument::problemTitleText(const QString &line) {
 	return text.trimmed();
 }
 
-bool StatementDocument::matchProblemHeading(const QString &line, QString &title, QString &english) {
+bool StatementDocument::matchProblemHeading(const QString &line, QString &title, QString &english, int index,
+                                            StatementProblem::HeadingStyle style) {
 	title.clear();
 	english.clear();
 
@@ -262,30 +323,33 @@ bool StatementDocument::matchProblemHeading(const QString &line, QString &title,
 	if (text.isEmpty())
 		return true;
 
-	const QChar last = text.at(text.length() - 1);
+	// The ccpc template prefixes every heading with "A.", "B.", ...; drop it so the
+	// user only sees the title and the English name in the editor.
+	const QRegularExpressionMatch letter = headingLetterPattern().match(text);
 
-	if (last == QChar(0xff09) || last == QChar(')')) {
-		const QChar open = last == QChar(0xff09) ? QChar(0xff08) : QChar('(');
-		const int position = text.lastIndexOf(open);
+	if (letter.hasMatch()) {
+		const QString rest = text.mid(letter.capturedLength()).trimmed();
+		const bool expected = index >= 0 && letter.captured(1) == problemLetter(index);
 
-		if (position > 0) {
-			const QString candidate = text.mid(position + 1, text.length() - position - 2);
-
-			if (! candidate.contains(QChar(0xff08)) && ! candidate.contains(QChar(0xff09)) &&
-			    ! candidate.contains(QChar('(')) && ! candidate.contains(QChar(')')) &&
-			    candidate.length() <= 100) {
-				title = text.left(position).trimmed();
-				english = candidate.trimmed();
-				return true;
-			}
-		}
+		if (expected || rest.contains(QStringLiteral(" / ")))
+			text = rest;
 	}
+
+	if (style == StatementProblem::HeadingStyle::Ccpc && splitHeadingAtSlash(text, title, english))
+		return true;
+
+	if (splitHeadingAtParens(text, title, english))
+		return true;
+
+	if (splitHeadingAtSlash(text, title, english))
+		return true;
 
 	title = text;
 	return true;
 }
 
-void StatementDocument::splitProblemArea(const QString &text, QStringList &head, QList<StatementProblem> &problems) {
+void StatementDocument::splitProblemArea(const QString &text, QStringList &head, QList<StatementProblem> &problems,
+                                         StatementProblem::HeadingStyle style) {
 	const QStringList lines = splitLines(text);
 	head.clear();
 	problems.clear();
@@ -318,12 +382,14 @@ void StatementDocument::splitProblemArea(const QString &text, QStringList &head,
 		QString title;
 		QString english;
 
-		if (matchProblemHeading(line, title, english)) {
+		if (matchProblemHeading(line, title, english, -1, style)) {
 			const bool empty = current.title.isEmpty() && current.english.isEmpty() && current.body.isEmpty();
 
 			if (! inProblem || ! empty)
 				flush();
 
+			// Re-parse once the problem index is known so a leading "A." marker is dropped.
+			matchProblemHeading(line, title, english, problems.size(), style);
 			inProblem = true;
 			sawHeading = true;
 			current.title = title;
@@ -348,15 +414,17 @@ void StatementDocument::splitProblemArea(const QString &text, QStringList &head,
 	flush();
 }
 
-QString StatementDocument::serializeProblemArea(const QStringList &head, const QList<StatementProblem> &problems) {
+QString StatementDocument::serializeProblemArea(const QStringList &head, const QList<StatementProblem> &problems,
+                                                StatementProblem::HeadingStyle style) {
 	QStringList chunks;
 	const QString headText = normalizeBlock(head.join(QChar('\n')));
 
 	if (! headText.isEmpty())
 		chunks.append(headText);
 
-	for (const StatementProblem &problem : problems) {
-		QString block = problem.heading();
+	for (int i = 0; i < problems.size(); i++) {
+		const StatementProblem &problem = problems.at(i);
+		QString block = problem.heading(style, i);
 		const QString proinfo = StatementProblem::proinfoComment(problem.proinfo);
 		const QString body = normalizeBlock(problem.body.join(QChar('\n')));
 
@@ -385,17 +453,31 @@ QString StatementDocument::serializeProblemArea(const QStringList &head, const Q
 	return text;
 }
 
-QString StatementProblem::heading() const {
+QString StatementProblem::heading(HeadingStyle style, int index) const {
 	const QString name = title.trimmed();
 	const QString eng = english.trimmed();
+	QString text;
 
-	if (name.isEmpty() && eng.isEmpty())
+	if (name.isEmpty())
+		text = eng;
+	else if (eng.isEmpty())
+		text = name;
+	else if (style == HeadingStyle::Ccpc)
+		text = QStringLiteral("%1 / %2").arg(name, eng);
+	else
+		text = QStringLiteral("%1（%2）").arg(name, eng);
+
+	if (text.isEmpty())
 		return QStringLiteral("#");
 
-	if (eng.isEmpty())
-		return QStringLiteral("# %1").arg(name);
+	if (style == HeadingStyle::Ccpc) {
+		const QString letter = problemLetter(index);
 
-	return QStringLiteral("# %1（%2）").arg(name, eng);
+		if (! letter.isEmpty())
+			return QStringLiteral("# %1. %2").arg(letter, text);
+	}
+
+	return QStringLiteral("# ") + text;
 }
 
 bool StatementProblem::parseProinfoLine(const QString &line, QStringList &values) {
@@ -432,8 +514,9 @@ QStringList StatementProblem::normalizedProinfo(QStringList values) {
 	return values;
 }
 
-StatementDocument StatementDocument::parse(const QString &text) {
+StatementDocument StatementDocument::parse(const QString &text, StatementProblem::HeadingStyle headingStyle) {
 	StatementDocument doc;
+	doc.headingStyle = headingStyle;
 	const QString normalized = normalizeNewlines(text);
 
 	QList<MetaEntry> entries;
@@ -553,7 +636,8 @@ int StatementDocument::problemsItem() const {
 			QString title;
 			QString english;
 
-			if (isProblemMarker(line) || matchProblemHeading(line, title, english)) {
+			if (isProblemMarker(line) ||
+			    matchProblemHeading(line, title, english, -1, problemHeadingStyle())) {
 				hit = true;
 				break;
 			}
@@ -574,22 +658,22 @@ QString StatementDocument::problemsText() const {
 QString StatementDocument::headText() const {
 	QStringList head;
 	QList<StatementProblem> problems;
-	splitProblemArea(problemsText(), head, problems);
+	splitProblemArea(problemsText(), head, problems, headingStyle);
 	return head.join(QChar('\n')).trimmed();
 }
 
 QList<StatementProblem> StatementDocument::problems() const {
 	QStringList head;
 	QList<StatementProblem> problems;
-	splitProblemArea(problemsText(), head, problems);
+	splitProblemArea(problemsText(), head, problems, headingStyle);
 	return problems;
 }
 
 void StatementDocument::setProblems(const QList<StatementProblem> &problems) {
 	QStringList head;
 	QList<StatementProblem> existing;
-	splitProblemArea(problemsText(), head, existing);
-	const QString text = serializeProblemArea(head, problems);
+	splitProblemArea(problemsText(), head, existing, headingStyle);
+	const QString text = serializeProblemArea(head, problems, headingStyle);
 
 	const int index = problemsItem();
 

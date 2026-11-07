@@ -14,6 +14,7 @@ class QLabel;
 class QLineEdit;
 class QPlainTextEdit;
 class QPushButton;
+class QTextCursor;
 
 class FindReplaceBar : public QWidget {
 	Q_OBJECT
@@ -25,6 +26,9 @@ class FindReplaceBar : public QWidget {
 	void activate(bool focusReplace = false);
 	void deactivate();
 
+  signals:
+	void contentReplaced();
+
   protected:
 	bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -34,6 +38,7 @@ class FindReplaceBar : public QWidget {
 	void replaceAll();
 	void setStatus(const QString &text);
 	QTextDocument::FindFlags findFlags() const;
+	bool selectionMatches(const QTextCursor &cursor, const QString &text) const;
 
 	QPlainTextEdit *editor{};
 	QLineEdit *findEdit{};

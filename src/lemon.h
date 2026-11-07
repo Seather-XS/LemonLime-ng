@@ -59,7 +59,7 @@ class LemonLime : public QMainWindow {
 	void loadDay(const QString &);
 	void loadProject(const QString &);
 	void migrateLayout();
-	bool normalizeTestCasePaths();
+	int repairBrokenConfiguration();
 	void refreshDayMenu();
 	void saveProjectFile();
 	void newDay();

@@ -24,6 +24,11 @@ class Settings;
 class Contestant;
 class JudgingController;
 
+struct ContestRepairReport {
+	QStringList changes;
+	QStringList unresolved;
+};
+
 class Contest : public QObject {
 	Q_OBJECT
   public:
@@ -62,6 +67,7 @@ class Contest : public QObject {
 	void writeToJson(QJsonObject &);
 	void readFromStream(QDataStream &);
 	int readFromJson(const QJsonObject &);
+	ContestRepairReport repairBrokenConfiguration();
 
   private:
 	QString contestTitle;

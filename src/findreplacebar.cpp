@@ -171,6 +171,16 @@ void FindReplaceBar::find(bool forward) {
 		setStatus(tr("Not found."));
 }
 
+bool FindReplaceBar::selectionMatches(const QTextCursor &cursor, const QString &text) const {
+	QString selected = cursor.selectedText();
+	selected.replace(QChar(0x2029), QChar('\n'));
+
+	const Qt::CaseSensitivity sensitivity =
+	    caseCheck->isChecked() ? Qt::CaseSensitive : Qt::CaseInsensitive;
+
+	return selected.compare(text, sensitivity) == 0;
+}
+
 void FindReplaceBar::replaceCurrent() {
 	if (! editor)
 		return;
@@ -182,10 +192,11 @@ void FindReplaceBar::replaceCurrent() {
 
 	QTextCursor cursor = editor->textCursor();
 
-	if (cursor.hasSelection() && cursor.selectedText() == text) {
+	if (cursor.hasSelection() && selectionMatches(cursor, text)) {
 		cursor.insertText(replaceEdit->text());
 		editor->setTextCursor(cursor);
 		setStatus(tr("Replaced 1 occurrence."));
+		emit contentReplaced();
 	}
 
 	find(true);
@@ -202,25 +213,37 @@ void FindReplaceBar::replaceAll() {
 
 	const QTextDocument::FindFlags flags = findFlags();
 	const QString replacement = replaceEdit->text();
-	QTextCursor cursor(editor->document());
+	QTextCursor searchCursor(editor->document());
+	QTextCursor editCursor(editor->document());
+	QTextCursor lastMatch;
 	int count = 0;
 
-	cursor.beginEditBlock();
+	editCursor.beginEditBlock();
 
 	while (true) {
-		cursor = editor->document()->find(text, cursor, flags);
+		QTextCursor match = editor->document()->find(text, searchCursor, flags);
 
-		if (cursor.isNull())
+		if (match.isNull())
 			break;
 
-		cursor.insertText(replacement);
+		match.insertText(replacement);
+		searchCursor = match;
+		lastMatch = match;
 		count++;
 
 		if (count > 100000)
 			break;
 	}
 
-	cursor.endEditBlock();
-	editor->setTextCursor(cursor);
+	editCursor.endEditBlock();
+
+	// The search cursor of the final failed lookup is null; installing it would leave
+	// the editor without a usable cursor, so only restore the last real match.
+	if (! lastMatch.isNull())
+		editor->setTextCursor(lastMatch);
+
+	if (count > 0)
+		emit contentReplaced();
+
 	setStatus(tr("Replaced %1 occurrence(s).").arg(count));
 }

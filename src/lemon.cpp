@@ -789,68 +789,30 @@ void LemonLime::migrateLayout() {
 		LOG("Legacy data/ migrated to problem/");
 	}
 
-	if (normalizeTestCasePaths())
+	const int repairedItems = repairBrokenConfiguration();
+
+	if (repairedItems > 0) {
 		saveContest(curFile);
+		ui->statusBar->showMessage(tr("Repaired %1 broken configuration item(s)").arg(repairedItems), 5000);
+	}
 }
 
-bool LemonLime::normalizeTestCasePaths() {
+int LemonLime::repairBrokenConfiguration() {
 	if (! curContest)
-		return false;
+		return 0;
 
-	bool changed = false;
+	const ContestRepairReport report = curContest->repairBrokenConfiguration();
 
-	for (auto *task : curContest->getTaskList()) {
-		QString taskName = task->getSourceFileName();
+	for (const QString &change : report.changes)
+		LOG("Repaired configuration:", change);
 
-		if (taskName.isEmpty())
-			taskName = task->getProblemTitle();
+	for (const QString &item : report.unresolved)
+		WARN("Unresolved configuration item:", item);
 
-		if (taskName.isEmpty())
-			continue;
+	if (! report.changes.isEmpty())
+		LOG("Repaired", report.changes.size(), "broken configuration item(s)");
 
-		const QString prefix = taskName + QStringLiteral("/data/");
-
-		auto fixOne = [&](const QString &stored) -> QString {
-			if (stored.isEmpty() || stored.startsWith(prefix))
-				return stored;
-
-			const QString normalized = prefix + QFileInfo(stored).fileName();
-
-			if (QFileInfo::exists(Settings::dataPath() + normalized))
-				return normalized;
-
-			return stored;
-		};
-
-		for (auto *testCase : task->getTestCaseList()) {
-			const QStringList inputs = testCase->getInputFiles();
-
-			for (int i = 0; i < inputs.size(); i++) {
-				const QString fixed = fixOne(inputs[i]);
-
-				if (fixed != inputs[i]) {
-					testCase->setInputFiles(i, fixed);
-					changed = true;
-				}
-			}
-
-			const QStringList outputs = testCase->getOutputFiles();
-
-			for (int i = 0; i < outputs.size(); i++) {
-				const QString fixed = fixOne(outputs[i]);
-
-				if (fixed != outputs[i]) {
-					testCase->setOutputFiles(i, fixed);
-					changed = true;
-				}
-			}
-		}
-	}
-
-	if (changed)
-		LOG("Test case paths normalized to problem/<task>/data/");
-
-	return changed;
+	return report.changes.size();
 }
 
 void LemonLime::loadDay(const QString &filePath) {
@@ -1177,8 +1139,10 @@ void LemonLime::addTaskWithScoreScale(const QString &title,
 		newTestCase->setFullScore(scorePer + static_cast<int>(i < scoreLos));
 		newTestCase->setTimeLimit(timeLimit);
 		newTestCase->setMemoryLimit(memoryLimit);
-		newTestCase->addSingleCase(title + QDir::separator() + testCases[i].first,
-		                           title + QDir::separator() + testCases[i].second);
+		newTestCase->addSingleCase(title + QDir::separator() + QStringLiteral("data") + QDir::separator() +
+		                               testCases[i].first,
+		                           title + QDir::separator() + QStringLiteral("data") + QDir::separator() +
+		                               testCases[i].second);
 		newTask->addTestCase(newTestCase);
 	}
 }

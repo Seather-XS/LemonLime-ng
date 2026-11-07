@@ -3135,6 +3135,11 @@ Depends: </source>
         <translation>已儲存</translation>
     </message>
     <message>
+        <location filename="../src/lemon.cpp" line="796"/>
+        <source>Repaired %1 broken configuration item(s)</source>
+        <translation>已自動修復 %1 處錯誤的設定</translation>
+    </message>
+    <message>
         <location filename="../src/lemon.cpp" line="751"/>
         <location filename="../src/lemon.cpp" line="776"/>
         <location filename="../src/lemon.cpp" line="923"/>
@@ -4017,8 +4022,8 @@ No: remove it from the contest only.</source>
     </message>
     <message>
         <location filename="../src/statementeditwidget.cpp" line="318"/>
-        <source>No leading &quot;#&quot; needed: it is added automatically.</source>
-        <translation>標題不必寫「#」，會自動加上。</translation>
+        <source>English Name</source>
+        <translation>英文名</translation>
     </message>
     <message>
         <location filename="../src/statementeditwidget.cpp" line="341"/>

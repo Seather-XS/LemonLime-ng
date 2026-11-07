@@ -55,6 +55,60 @@ namespace {
 		return Violation::normalizeRules(rules);
 	}
 
+	QString cleanedStoredPath(const QString &path) {
+		return QDir::toNativeSeparators(QDir::cleanPath(QDir::fromNativeSeparators(path)));
+	}
+
+	QHash<QString, QString> indexTaskFiles(const QString &absoluteDir) {
+		QHash<QString, QString> index;
+		const QDir root(absoluteDir);
+
+		if (! root.exists())
+			return index;
+
+		QStringList files;
+		QStringList pending{absoluteDir};
+
+		while (! pending.isEmpty()) {
+			const QDir dir(pending.takeLast());
+
+			for (const QFileInfo &entry : dir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries,
+			                                                QDir::Name)) {
+				if (entry.isDir())
+					pending.append(entry.absoluteFilePath());
+				else if (entry.isFile())
+					files.append(QDir::toNativeSeparators(root.relativeFilePath(entry.absoluteFilePath())));
+			}
+		}
+
+		const QString dataPrefix = QStringLiteral("data") + QDir::separator();
+
+		std::sort(files.begin(), files.end(), [&dataPrefix](const QString &left, const QString &right) {
+			const bool leftInData = left.startsWith(dataPrefix);
+			const bool rightInData = right.startsWith(dataPrefix);
+
+			if (leftInData != rightInData)
+				return leftInData;
+
+			const int leftDepth = left.count(QDir::separator());
+			const int rightDepth = right.count(QDir::separator());
+
+			if (leftDepth != rightDepth)
+				return leftDepth < rightDepth;
+
+			return left < right;
+		});
+
+		for (const QString &file : files) {
+			const QString key = QFileInfo(file).fileName().toLower();
+
+			if (! index.contains(key))
+				index.insert(key, file);
+		}
+
+		return index;
+	}
+
 	QStringList sourceFilesOf(Contestant *contestant, Task *task,
 	                          QHash<QString, QFileInfoList> &directoryEntries) {
 		QStringList result;
@@ -642,4 +696,187 @@ void Contest::readFromStream(QDataStream &in) {
 		connect(this, &Contest::taskDeletedForContestant, newContestant, &Contestant::deleteTask);
 		contestantList.insert(newContestant->getContestantName(), newContestant);
 	}
+}
+
+ContestRepairReport Contest::repairBrokenConfiguration() {
+	ContestRepairReport report;
+
+	const QString dayRoot = QDir::currentPath();
+	const QString dataRoot = Settings::dataPath();
+
+	QStringList inputExtensions = settings ? settings->getInputFileExtensions() : QStringList();
+
+	if (inputExtensions.isEmpty())
+		inputExtensions << QStringLiteral("in");
+
+	QStringList outputExtensions = settings ? settings->getOutputFileExtensions() : QStringList();
+
+	if (outputExtensions.isEmpty())
+		outputExtensions << QStringLiteral("out") << QStringLiteral("ans");
+
+	for (Task *task : taskList) {
+		QString taskName = task->getSourceFileName();
+
+		if (taskName.isEmpty())
+			taskName = task->getProblemTitle();
+
+		if (taskName.isEmpty())
+			continue;
+
+		const QString taskDir = QDir(dayRoot).absoluteFilePath(dataRoot + taskName);
+		const QHash<QString, QString> fileIndex = indexTaskFiles(taskDir);
+
+		auto findFile = [&](const QString &stored, const QStringList &extensions) -> QString {
+			const QString cleaned = cleanedStoredPath(stored);
+
+			if (QFileInfo::exists(QDir(dayRoot).absoluteFilePath(dataRoot + cleaned)))
+				return cleaned;
+
+			const QString fileName = QFileInfo(cleaned).fileName();
+
+			if (fileName.isEmpty())
+				return {};
+
+			auto hit = fileIndex.constFind(fileName.toLower());
+
+			if (hit != fileIndex.constEnd())
+				return QDir::toNativeSeparators(taskName + QDir::separator() + *hit);
+
+			const QString baseName = QFileInfo(fileName).completeBaseName();
+
+			for (const QString &extension : extensions) {
+				hit = fileIndex.constFind((baseName + QLatin1Char('.') + extension).toLower());
+
+				if (hit != fileIndex.constEnd())
+					return QDir::toNativeSeparators(taskName + QDir::separator() + *hit);
+			}
+
+			return {};
+		};
+
+		auto repairOne = [&](const QString &stored, const QStringList &extensions) -> QString {
+			if (stored.isEmpty())
+				return stored;
+
+			const QString fixed = findFile(stored, extensions);
+
+			if (fixed.isEmpty()) {
+				report.unresolved << QStringLiteral("%1: %2").arg(taskName, stored);
+				return stored;
+			}
+
+			if (fixed != stored)
+				report.changes << QStringLiteral("%1: %2 -> %3").arg(taskName, stored, fixed);
+
+			return fixed;
+		};
+
+		for (TestCase *testCase : task->getTestCaseList()) {
+			const QStringList inputs = testCase->getInputFiles();
+
+			for (int i = 0; i < inputs.size(); i++)
+				testCase->setInputFiles(i, repairOne(inputs[i], inputExtensions));
+
+			const QStringList outputs = testCase->getOutputFiles();
+
+			for (int i = 0; i < outputs.size(); i++)
+				testCase->setOutputFiles(i, repairOne(outputs[i], outputExtensions));
+		}
+
+		int taskTimeLimit = task->getDefaultTimeLimit();
+		int taskMemoryLimit = task->getDefaultMemoryLimit();
+
+		if (taskTimeLimit <= 0) {
+			int fallback = 0;
+
+			for (TestCase *testCase : task->getTestCaseList())
+				if (testCase->getTimeLimit() > 0) {
+					fallback = testCase->getTimeLimit();
+					break;
+				}
+
+			if (fallback <= 0 && settings)
+				fallback = settings->getDefaultTimeLimit();
+
+			if (fallback > 0) {
+				task->setDefaultTimeLimit(fallback);
+				taskTimeLimit = fallback;
+				report.changes << QStringLiteral("%1: default time limit -> %2 ms").arg(taskName).arg(fallback);
+			}
+		}
+
+		if (taskMemoryLimit <= 0) {
+			int fallback = 0;
+
+			for (TestCase *testCase : task->getTestCaseList())
+				if (testCase->getMemoryLimit() > 0) {
+					fallback = testCase->getMemoryLimit();
+					break;
+				}
+
+			if (fallback <= 0 && settings)
+				fallback = settings->getDefaultMemoryLimit();
+
+			if (fallback > 0) {
+				task->setDefaultMemoryLimit(fallback);
+				taskMemoryLimit = fallback;
+				report.changes << QStringLiteral("%1: default memory limit -> %2 MB").arg(taskName).arg(fallback);
+			}
+		}
+
+		for (TestCase *testCase : task->getTestCaseList()) {
+			if (testCase->getTimeLimit() <= 0 && taskTimeLimit > 0) {
+				testCase->setTimeLimit(taskTimeLimit);
+				report.changes << QStringLiteral("%1: test case time limit -> %2 ms")
+				                      .arg(taskName)
+				                      .arg(taskTimeLimit);
+			}
+
+			if (testCase->getMemoryLimit() <= 0 && taskMemoryLimit > 0) {
+				testCase->setMemoryLimit(taskMemoryLimit);
+				report.changes << QStringLiteral("%1: test case memory limit -> %2 MB")
+				                      .arg(taskName)
+				                      .arg(taskMemoryLimit);
+			}
+		}
+
+		if (task->getAnswerFileExtension().isEmpty() && settings) {
+			const QString extension = settings->getDefaultOutputFileExtension();
+
+			if (! extension.isEmpty()) {
+				task->setAnswerFileExtension(extension);
+				report.changes << QStringLiteral("%1: answer file extension -> %2").arg(taskName, extension);
+			}
+		}
+
+		const QString specialJudge = task->getSpecialJudge();
+
+		if (! specialJudge.isEmpty()) {
+			const QString cleaned = cleanedStoredPath(specialJudge);
+
+			if (! QFileInfo::exists(QDir(dayRoot).absoluteFilePath(dataRoot + cleaned))) {
+				const QString graderName = QFileInfo(cleaned).fileName();
+				const QString graderPath = QDir(taskDir).absoluteFilePath(
+				    QStringLiteral("graders") + QDir::separator() + graderName);
+
+				if (QFileInfo::exists(graderPath)) {
+					const QString fixed = Settings::graderFilePath(taskName, graderName);
+					task->setSpecialJudge(fixed);
+					report.changes << QStringLiteral("%1: special judge %2 -> %3")
+					                      .arg(taskName, specialJudge, fixed);
+				} else {
+					report.unresolved << QStringLiteral("%1: special judge %2").arg(taskName, specialJudge);
+				}
+			}
+		}
+
+		if (task->getTaskType() == Task::Interaction && task->getInteractorName().isEmpty() &&
+		    ! task->getInteractor().isEmpty()) {
+			const QString name = QFileInfo(cleanedStoredPath(task->getInteractor())).fileName();
+			task->setInteractorName(name);
+			report.changes << QStringLiteral("%1: interactor name -> %2").arg(taskName, name);
+		}
+	}
+
+	return report;
 }
